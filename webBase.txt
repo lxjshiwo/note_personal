@@ -1,0 +1,152 @@
+Pull解析 
+    与Sax一样都属于事件驱动的解析方式
+    相比Sax解析过程更加灵活
+    sax一旦开始解析就是从头读到尾,不解析整个文档不会停
+    pull解析以事件为单位,手动向下继续,如果获得我们要找的内容 将会停止
+
+
+    1.创建解析器工厂
+    2.使用工厂模式获得解析器
+    3.使用解析器读取xml流
+    4.获得当前事件的状态
+        getEventType()
+        判断当前是否是文档的结束
+        parser.getName()获取当前解析的元素的名称
+        判断当前遇到元素的名称是否为相应标签
+        getAttributeValue() 获取相应得属性值返回String
+        nextText()获取相应的标签内的值返回String
+
+        XmlPullParser.START_TAG
+        XmlPullParser.END_TAG
+
+
+Web 基础
+    Client/Server
+        本地分担一部分计算
+    Browser/Server
+
+
+    静态资源
+        指web页面中提供人们浏览的数据始终不变
+            html js css jpg
+    动态资源
+        web页面中供人们浏览的数据是由程序产生，不同时间点访问web页面看到的内容
+
+
+
+Tomcat 7
+    安装版只允许有一台Tmocat
+    解压版本允许有多个
+        解压目录不应该太深，目录中不应该包含中文字符
+        配置环境变量
+        新建环境变量
+            JAVA_HOME指向jdk目录 指向地址为最后一个结尾为jdk版本信息号
+            端口占用问题
+            tomcat安装目录层次不应该包含中文名字
+        修改端口号
+            默认端口号 8080 
+
+            tomcat/conf/server.xml
+            Server.xml
+                Connector port="8080" protocal="HTTP/1.1"
+                将相应的Port改为80
+
+            让tomcat自动映射:tomcat服务器会自动管理webapps目录下的所有web应用
+            ，并把它映射车虚拟目录，
+            tomcat webapps下应用外界可以直接访问
+
+
+            静态web项目
+                文件夹中放置相应的静态资源
+                将相应的文件夹放置于webapps目录下
+
+            动态web项目
+                满足如下目录结构
+                    项目目录
+                        |-WEB—INF 文件夹  ==>项目配置文件夹,该文件夹下的内容，浏览器无法访问
+                            |-classes文件夹 ==>放置web项目的字节码文件
+                            |-lib文件夹 => 项目要使用的jar包
+                            |-web.xml文件夹 => web项目唯一配置文件
+
+                                welcome-file-list显示相应的欢迎文件
+
+            eclipse配置相应的tomcat
+                Window -> Preference -> tomcat -> 设置为enable 并配置相应的目录
+   
+
+
+
+
+            修改配置后需要重启读取配置
+
+
+            new Web Project
+                1.创建web工程名称
+                2. Source Folder设置源码所在目录名称
+                3.Web root folder web项目目录结构
+                4.Context root URL 部署到服务器时，使用什么目录
+                5.J2EE Specification Level与相应的工作环境下的j2EE本版本相同
+
+
+
+            请求头
+            请求首行
+            请求头
+            请求空行
+            请求正文
+                放置相应的发送内容
+                form表单提交的
+            
+
+            响应协议
+                1,响应首行
+                    200 OK
+                    404 请求资源未找到
+                    500 服务器内部错误
+                2.响应头
+                3.响应空行
+                4.响应正文
+Servlet
+第一个动态资源:
+功能:接收请求，完成响应
+实现一个Servlet
+    1.实现Servlet接口
+    2.继承GenericServlet 
+    3.继承HttpServlet 
+
+Servlet中的生命周期
+    1.当Servlet实例被创建后，会调用init方法
+    2.每当有请求到达时，调用Service方法处理，请求
+    3.当服务关闭时候，销毁servlet之前会调用destroy
+
+Servlet中其他
+    getServletConfig 返回Servlet配置信息
+    getServletInfo 返回Servlet相关版权作者信息
+
+ServletConfig对象:
+    getInitParameter
+    getInitParameternNames
+    getServletName
+    getServletConntext
+
+Servlet细节
+    1.线程安全问题 
+        Servlet线程不安全，使用局部变量接收线程参数
+    2.Servlet随服务器启动而加载
+        <load-on-startup>
+        配置正整数、一般般在0-5之间，数字越小优先级越高
+    3.Servlet的路径
+            *相对路径配置 => 以"/"开头
+            *后缀名匹配 => 以为"*"开头
+
+
+
+
+                
+
+        
+        
+    
+
+
+

@@ -1,0 +1,174 @@
+OSI: TCP/IP tcp/ip 分层 
+        application layer  
+        transport layer 
+        internet layer 
+        datalink layer 
+        physical layer
+
+    传输层协议：
+        tcp,udp,sctp
+
+    网络协议：
+        ip
+    ip协议
+        
+        IPvi4地址分类：
+            点分十进制：0-255 
+            0000 0000 -1111 1111
+            0.0.0.0-255.255.255.255 
+
+            A类：
+                0 000 0000 - 0 111 1111:1-127
+                网络数：126,127为本地环回
+                每个网络中的主机数：2^24-2
+                默认子网掩码：255.0.0.0
+                私网地址：10.0.0.0/8
+
+            B类:
+                10 00 0000 - 10 11 1111:128-191
+                网络数：2^14
+                每个网络中的主机数字2^16-2
+                默认子网掩码：255,255,0,0
+                私网地址：172.16.0.0/16 - 172.31.0.0/16
+
+            C类别：
+                110 0 0000 - 110 1 1111；192-223
+                网络数:2^21 
+                每个网络中的主机数为：2^8-2
+                默认子网掩码：255.255.255.0
+                私网地址：192.168.0.0/24 - 192.168. 255.0/24
+
+            D类：组播
+                1110 0000 -1110 1111；224-239   
+
+            E类：
+                240-255
+
+        子网掩码
+            172.16,100,100/16 172.17.1.1/16
+
+            跨网络通信：路由
+                主机路由
+                网路路由
+                默认路由
+
+将Linux主机介入网络中：
+    IP/mask 
+    路由：默认网关
+    DNS服务器
+        主DNS服务器
+        次DNS服务器
+        第三DNS服务器
+
+    主机名
+
+
+    配置方式：
+        静态指定：
+            ifcfg:ifconfig ,route,netstat 
+            ip:object {link,addr,route},ss ,tc,
+            配置文件
+                system-config-network-tui(setup )
+            Centos 7:
+                nmcli,nmtui
+            
+
+        动态分配：
+            DHCP:Dynamic Host Configuration Protocal 
+
+
+
+    配置网络接口：
+        借口命名方式：
+            CentOS: 
+                以太网: eth[0,1,2...]
+                ppp:ppp[0,1,2,...]
+        
+
+        ifconfig命令：
+            ifconfig [interface] 
+                ifconfig -a
+                ifconfig IFACE [up| down ]
+            ifconfig interface [aftype ] options | address ...
+                ifconfig IFACE IP/mask [up] 
+                ifconfig IFACE IP netmask MASK
+
+                注意：立即生效,但不会永久有效
+
+                启用混杂模式: [-]promisc 只要报文来了就会接收，实现网络监控
+
+        route命令：
+            路由管理命令    
+                查看：route -n
+                添加：route add 
+                    route add [-net| -host] target [netMask Nm] [gw Gw] [[dev]If]
+                    route add -net 0.0.0.0 netmask 0.0.0.0 gw 172.16.0.1 
+                    添加默认网关
+                    route add default gw 172,16.0.1
+                
+                删除:
+                route del [-net | -host ] target [gw Gw] [netmask Nm] [[dev] If]
+                route del -host 192.168.0.0 
+                route del -net 192.168.0.0 netmask 255.255.255.0
+
+            DNS服务器指定
+                /dev/resolv.conf
+                    nameserver DNS_SERVER_IP1
+                    nameserver DNS_SERVER_IP1
+                    nameserver DNS_SERVER_IP1
+                
+                正解：FQDN-->IP 
+                      dig -t A FQDN
+                      host -t A FQDN
+                反解：IP-->FQDN
+                      dig -x IP
+                      host -t PTR IP
+        
+                    FQDN:www.magedu.com 
+
+
+            netstat命令
+                print network connection ,  routing table ,interface statistic ,masqueue connections,and multicast memberships
+
+
+            显示网络连接
+                netstat [address_family_options]...[--tcp | -t] [--udp | -u] [--raw | w](裸套接字) [--listening|-l] [--all|-a] [--numeric|-n] [--numeric-hosts][--numeric-ports] [--extend |-e]  [--program |-p ] [--continuous|-c] [delay]
+                    -t: tcp协议相关
+                    -u: udp协议相关
+                    -r: raw socket相关
+                    -l: 处于监听状态
+                    -a: 所有状态
+                    -n: 不反解 以数字形式显示IP和端口
+                    -e: 扩展格式
+                    -p: 显示相关进程的pid   
+
+                    常用组合
+                        -tan, -uan. -tnl. -unl.
+            显示路由表
+                netstat {--router |-r} [address_family_options] [--extend | -e[--extend|-e]] [--verbose|-v][--numereic |-n ]
+                    -r 显示内核
+                    -n 数字形式 
+
+            显示接口统计数据：
+                netstat {--Interface |-I| -i} [iface] [--all |-a] [--extend|-e] [--program |-p ] [--numeric | -n]   
+                #netstat -i 
+                #netstat -I Iface 
+
+
+            总结：ifcfg家庭命令配置
+            ifup ifdown 
+
+
+
+
+
+                netstat 
+                
+                      
+
+
+                
+
+
+            
+

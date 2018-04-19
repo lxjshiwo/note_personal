@@ -1,0 +1,46 @@
+GoLang
+    并发支持、垃圾回收、编译型
+    类型安全
+    多核计算机提供性能提升方案
+    UTF-8支持
+
+
+
+        
+    标准包安装
+        go env 
+            GOBIN工作目录下的bin文件夹
+            GOEXE 可执行文件后缀
+            GO
+                
+            GOPATH工作目录
+                bin 编译后生成可执行文件
+                pkg 编译后生成的包文件
+                src 存放源码
+
+
+            新建系统变量GOPATH
+                针对工作目录路径，多个;分割
+    
+
+    go基本命令
+        go get 获取远程包
+        go run 直接运行程序
+        go build 测试编译
+            package名称为main 文件可以采用  go build命令
+        go fmt 格式化源码
+        go install 编译包文件并编译整个程序
+        go test 运行测试文件
+            GoConcfig_test.go
+        go doc查看文档
+
+
+
+            godoc -http=:8080在8080端口建立包说明网页
+                
+
+        
+   
+
+
+        

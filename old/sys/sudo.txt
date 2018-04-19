@@ -1,0 +1,101 @@
+sudo:
+    su:switch user
+        su -l user -c 'COMMAND'
+
+    sudo:
+        授权之后，能够让某用户以另外一个用户的身份运行命令;
+        -V  显示版本信息
+        -h  显示版本编号以及指令的使用方式说明
+        -l 显示出自己（执行sudo的使用者）权限
+        -v 因为sudo 在第一次执行时或是在n分钟内没有执行(n预为5)会询问密码，这个参数是重新做来一次确认，
+        -k将会强迫使用者在下一次执行sudo时访问密码(不论有没有超过n分钟)
+        -b 将要执行的命令放在后台执行
+        -p prompt 更改访问密码的提示语，%u会带换为使用者的帐号名称，%h会显示主机名称
+        -u username /#uid   不加此参数，代表要以root的身份执行指令，而加了此参数，可以使用username身份执行指令 
+        -s 执行环境变数中的shell所指定的shell或是/etc/passewd里指定的shell
+        -H将环境变量中的HOME指定为变更身份的使用者家目录
+        (如不加 -u 参数就是系统管理者root)
+        command 要以系统管理者的身份(或以 -u 更改为其他人)执行指令
+
+
+
+        配置文件：sudoers
+            root ALL=(ALL)  ALL
+            %wheel ALL=(ALL) ALL
+
+
+            who:运行命令者的身份,user
+            where:通过哪些主机,host
+            (whom):以哪个用户的身份,runas
+            which:运行哪些命令,command
+        使用visudo 进行对sudoers文件编辑    
+
+
+        配置项：
+            user host=(runas) COMMAND   
+
+            users:
+                    username:
+                    #uid
+                    user_alias 
+                    %group_name
+                    %#gid
+           Runas_Member:
+                    username:
+                    #uid
+                    %group_name
+                    %#gid
+                    %:nonunix_group
+                    %:#nonunix_gid
+                    +netgroup
+                    Runas_Alias
+           host:
+                    host name
+                    ip_addr
+                    network(/netmask)
+                    netaddr
+                    +netgroup
+                    Host_Alias
+           Command:
+                command name
+                directory
+                sudoedit
+
+
+
+
+                Alias_Type NAME = item1,item2,...
+                    NAME:必须使用全大写字母
+                    Alias_Type:
+                        User_Alias:
+                        Host_Alias:
+                        Runas_Alias:
+                        Cmnd_Alias:
+                        
+                NOPASSWD:表示后面的指令都不需要密码 //不支持在别名中添加 只能够使用在 Cmnd_Alias中 
+                PASSWD:表示后面的指令都需要密码
+                passwd不可以轻易授权普通用户
+                限制passwd修改管理员的命令
+                Cmnd_Alias USERADMINCMNDS = /usr/sbin/useradd, /usr/sbin/usermod, /usr/bin/passwd [a-z]*,!/usr/bin/passwd root
+                    
+
+
+
+                    User_Alias  NETADMIN = netuser1,netuser2
+                    Cmnd_Alias  NETADMINCMNDS   =  /usr/sbin/ip
+                    NETADMIN    ALL=(root) NETADMINCMNDS
+
+
+
+            
+
+
+
+
+
+        usermod -a -G wheel centos
+        id centos
+        sudo COMMAND
+
+
+

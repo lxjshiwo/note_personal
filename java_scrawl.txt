@@ -1,0 +1,106 @@
+爬虫应用分类
+    是否聚焦
+        漫爬型爬虫:百度、谷歌以链接为中心，不限制站点数据，数据存储为单个网页
+        的文本，不进行格式化方式地取，一般只做正文、摘要索引和搜索
+        垂直型爬虫:内容聚焦，淘宝爬虫电商爬虫，往往数据直接格式化为格式化数据
+
+
+爬虫的一般做法
+    1. 基于Socket通信编写 
+        最底层的实现形式，执行效率最高，开发效率较低
+        socket并不是通信协议，只是为了方便tcp/ip层的上层访问tcp/ip层做的封装
+        http访问socket,而后socket转化为tcp/ip包
+    2.基于HttpURLConnection类编写爬虫
+        Java se的net包中的核心类，主要用于http的相关操作    
+    3.基于apache的HttpClient包编写
+        核心基于java se 的net包,专为java的网络通信编程开发第三包，apache
+    4.基于phantomjs之类的无头浏览器
+        (1)是浏览器核心，非浏览器，没有界面
+        (2)提供js API 方便直接被各种语言调用
+    5.基于Selenium或WebDriver之类的有头浏览器
+        (1)操作本地浏览器，省去认为操作
+
+系统设计
+   1.模块划分
+        提交任务的UI接口
+        任务调度层
+        网络爬取层
+        数据解析层
+        数据持久化层
+   2.重难点
+   ·    乱码解决
+        多核程设计
+        爬取的各类参数灵活配置
+        反爬代理
+
+技术点
+    http协议相关+java se + httpclient+jsoup(httpparse)+database
+
+
+
+抓包分析
+    网络爬虫工具介绍选择
+        1.1面向对象
+            浏览器抓包工具和全局抓包工具
+            浏览器抓包工具:
+                浏览器自带抓包    
+                HttpWacth
+                FireFox
+            全局抓包工具:
+                Http Analyzer:针对http、https协议的本机与网络通讯时的抓包工具
+                WireShark:主要是tcp\ip层次，
+                Fiddler:可以修改网络通讯中的包，方便调试
+                Winpcap
+            1.功能稳定齐全
+            2.熟悉习惯
+                实际开发 浏览器自带+第三方抓包
+            
+    浏览器抓包工具应用
+        304跳转
+        web项目的开发测试
+        非爬虫性质的抓包测试
+        爬虫抓包分析
+
+    简单网页，内容基本在直接请求的页面中，且没有特定的权限验证，且没有特定的js
+    请求验证 
+        
+
+        http协议包括method
+            主要有get 代表查找,post代表更新 ,put代表上传，delete删除
+            归纳在get,post中
+
+            status code
+                1**
+                    服务器端已收到信息，但是还没有处理完，请继续    
+                    最原始的ajax请求中，是以判断status code来决定是否该次ajax
+                    请求完成，或状态
+                2**
+                    返回状态，成功，正常一次请求完成
+                    200 ok 
+                3**
+                    请求转移
+                    301
+                        永久转移，会在响应头中跟随location这个key,标明下次跳转
+                        的URL地址
+                    302
+                        临时转移
+                    304
+                        无更新，从缓存获取  
+                4**
+                    客户端错误
+                    400请求格式错误，401无权限，403禁止访问，404file not found
+                    文件找不到
+                5**
+                    服务器错误
+                    500请求中服务器出错
+                        
+           http header参数
+            accept:客户端接收数据类型
+                text/html
+                application/xhtml+xml,即
+            accept-encoding:
+                客户端口要求服务端返回的格式编码
+                    一般为gzip,deflate无损压缩
+            connection:代表client与server的连接性，是keep-alive,或者none
+                    
+    

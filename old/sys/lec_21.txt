@@ -1,0 +1,17 @@
+Linux 网络属性管理
+    
+    局域网:以太网，令牌环网，   
+
+        Ethernet:CSMA/CD
+            冲突域
+            广播域
+
+            MAC: Media Acess Control 
+                48bits;
+                    24bits;
+                    24bits;
+
+            IP:Internet Protocal 
+               Route Protocal
+
+

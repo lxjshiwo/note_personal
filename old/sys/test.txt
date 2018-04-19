@@ -1,0 +1,36 @@
+GENERAL.DEVICE:                         wlp12s0
+GENERAL.TYPE:                           wifi
+GENERAL.HWADDR:                         74:29:AF:40:8E:07
+GENERAL.MTU:                            0
+GENERAL.STATE:                          100 (connected)
+GENERAL.CONNECTION:                     RW2400NGHSC2-AC-2G
+GENERAL.CON-PATH:                       /org/freedesktop/NetworkManager/ActiveConnection/0
+IP4.ADDRESS[1]:                         172.17.3.153/24
+IP4.GATEWAY:                            172.17.3.254
+IP4.ROUTE[1]:                           dst = 172.18.1.1/32, nh = 172.17.3.254, mt = 600
+IP4.ROUTE[2]:                           dst = 169.254.0.0/16, nh = 0.0.0.0, mt = 1000
+IP4.DNS[1]:                             218.192.12.6
+IP4.DNS[2]:                             202.96.128.166
+IP6.ADDRESS[1]:                         fe80::1f67:feb6:d8da:8437/64
+IP6.GATEWAY:                            
+
+GENERAL.DEVICE:                         enp0s25
+GENERAL.TYPE:                           ethernet
+GENERAL.HWADDR:                         00:23:AE:35:13:EE
+GENERAL.MTU:                            1500
+GENERAL.STATE:                          20 (unavailable)
+GENERAL.CONNECTION:                     --
+GENERAL.CON-PATH:                       --
+WIRED-PROPERTIES.CARRIER:               off
+
+GENERAL.DEVICE:                         lo
+GENERAL.TYPE:                           loopback
+GENERAL.HWADDR:                         00:00:00:00:00:00
+GENERAL.MTU:                            65536
+GENERAL.STATE:                          10 (unmanaged)
+GENERAL.CONNECTION:                     --
+GENERAL.CON-PATH:                       --
+IP4.ADDRESS[1]:                         127.0.0.1/8
+IP4.GATEWAY:                            
+IP6.ADDRESS[1]:                         ::1/128
+IP6.GATEWAY:                            

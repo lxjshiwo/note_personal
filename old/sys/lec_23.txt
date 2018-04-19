@@ -1,0 +1,157 @@
+CentOS 7网络属性配置
+    
+    传统命名：以太网eth[0,1,2...],Wlan[0,1,2....]
+    
+    可预测功能
+        
+        udev支持多种命名方案：
+            Firmware,拓扑结构
+    (1)网卡的命名机制：
+        systemd对网络设备的命名方式 ：
+            (a)如果Firmware或BIOS为主板上集成的设备提供的索引信息可用，
+            并且可预测根据此索引进行命名，例如：eno1
+            (b)如果Firmware或BIOS为PCI-E扩展槽所提供的索引信息可以用，并且可以预测，则根据此索引进行命名,例如ens1
+            (c)如果硬件接口的物理信息可以用，则根据此信息进行命名，例如enp2s0
+            (d)如果用户显式启动，也可以根据mac地址进行命名，enx2387a1dc56
+            (e)上述命名均不可以用时，则使用传统命名机制
+
+            上述命名机制中，有的需要biosdevname程序参与：
+
+    (2)名称组成格式
+        en:ethernet     
+        wl:wlan
+        ww:wwan
+
+        名称类型;
+            o<index>:集成设备的设备索引
+            s<slot>：扩展槽的索引号,支持虚拟设备
+            x<MAC>:基于MAC地址的命名
+            p<bus>s<slot>:enp2s1物理位置拓扑的命名
+
+    网卡设备的命名机制：
+        第一步：
+            udev,辅助工具程序/lib/udev/rename_device,/usr/lib/udev/rules.d/60-net.rules
+        第二步：
+            biosdevname=1
+            根据/usr/lib/udev/rules.d/71-biosdevname/usr/lib/udev/rules.d/71-biosdevname.rules
+        第三步；
+            通过检测网络接口设备，根据/usr/lib/udev/rules.d/75-net-description
+                ID_NET_NAME_ONBOARD,ID_NET_NAME_SLOT,ID_NET_NAME_PATH
+
+        系统启动后一次执行三步，给网卡设备重命名.
+        修改内核程序的参数
+    回归传统方式命名
+        (1)编辑/etc/default/grub 配置文件
+            GRUB_CMDLINE_LINUX="net.ifnames=0 rhgb quiet"
+
+        (2)为grub2生成其配置文件
+            grub2-mkconfig -o /etc/grub2.cfg    
+
+        (3)重启系统
+        
+    地址配置工具：nmcli
+        nmcli [OPTIONS] OBJECT {COMMAND|help}
+
+        device - show and manage network interfaces 
+
+        conection - start, stop ,and manage network connections
+
+    如何修改IP地址等属性
+        modify connection modify IFACE [+|-] setting.property value 
+            setting.property
+                ipv4.address 
+                ipv4.gateway 
+                ipv4.dns1
+                ipv4.method 
+                    manual 
+网络接口配置tui工具：nmtui
+
+主机名配置工具：hostnamectl 
+        statusv 
+        set-hostname
+
+        hostnamectl 
+            -status
+
+        nmcli con modify eth0 ipv4.address 172.16.100.9/16
+
+        nmcli con modify eth0 +ipv4.address 172.16.100.12/16
+        接口需要启用
+        nmcli con down; nmcli con up    则增加一个地址，并且重启后仍然有效
+
+nmap.ncat.tcpdump
+
+网络客户端：
+    lftp,ftp ,lftpget,wget
+
+
+    lftp
+        [-d] [-e cmd] [-p port] [-u user[,pass]] [site]
+        mget 
+        get 
+        help
+
+    lftpget URL
+
+    ftp
+
+    wget 
+        wget [OPTIONS]...[URL]
+            -q:静默模式
+            -c:续传
+            -O:保存位置
+            --limits-rates=；指定的速率
+
+
+
+    
+        通过cd安装软件
+        mkdir /media/cdrom
+        mount -r /dev/cdrom /media/cdrom 
+        cd /etc/yum.repos.d/
+        vim local.repo
+         [CentOS7]
+        name=CentOS 7.1
+        baseurl=file://media/cdrom  
+        gpgcheck=0
+
+        mv CentOS-Base.repo CentOS-Base.repo.bak
+        yum repolist 
+        yum install lftp
+        
+
+
+
+
+
+
+
+        /etc/sysconfig/network-scripts/
+        mv 之前系统重命名的网络接口文件 ifcfg-eh0
+        vim ifcfg-eth0
+        将BOOTPROTO=dhcp 改为 BOOTPROTO=static
+        将PEERDNS=yes 改为 PEERDNS=no
+        将NAME=原来的名字 改为  NAME=现在的名字 
+        将DEVICE=原来的名字 改为  DEVICE=现在的名字 
+        添加地址 IPADDR=现在的ip地址 NETMASK=现在的netmask
+        service network restart 
+        systemctl restart network
+
+
+
+
+
+
+    localectl set-locale LANG=en_US.utf8
+
+        Red Hat下默认网卡的配制文件在/etc/sysconfig/network-scripts下，
+        而ubuntu在/etc/network下，linux mint也是在/etc/network下面
+
+
+
+
+        /etc/dafault/grub
+        grub2-mkconfig -o /etc/grub2.cfg
+            
+                
+

@@ -1,0 +1,1067 @@
+ Openssh(ssh),dropbear
+    Server:sshd,dropbear
+    Client:
+        linux:ssh,dbclient
+        Windows:xshelll,putty,seureCRT
+
+    工具程序:scp,sftp
+    
+
+    sshd:/etc/ssh/sshd_config
+        AllowUsers,AllowGroups,DenyUsers,DenyGroups,Port,Protocal   
+    ssh:/etc/ssh/ssh_config
+        获取帮助：man ssh_config 
+
+webservice socket basic 
+    
+    传输层：提供进程地址
+        Port number :
+            tcp:传输控制协议，面向连接协议：通信前需要建立虚拟链路,通信结束后需要拆除链路,流式通信协议 
+                0-65535
+            udp:User Datagram Protocol,无连接的协议,
+                0-65535
+            raw socket :裸套接字直接使用ip地址进行传输      
+
+        IANA:
+            0-1023:永久分配给固定的应用使用,特权端口（1023），22/tcp(ssh),80/tcp(http),443/tcp(https)
+            1024-41951:亦为注册端口，要求不是特别严格，分配给程序注册为某应用使用，11211 /tcp ,11211/udp(memchached),3306/tcp(mysql),   
+            41952-65535:客户端程序随机使用端口：
+            
+            
+            
+    Socket:IPC的一种实现，允许位于不同主机（甚至统一主机）上不同进程之间进行通信，数据交换:socket API  4.2 BSD
+        SOCK_STREAM:tcp套接字
+        SOCK_DGRAM:udp套接字
+        SOCK_RAW:裸套接字
+
+
+        IPv4:
+            分类:
+                A:1-127
+                B:128-191
+                C:192-223
+                D:组播，224-239
+                E:240-254   
+            私有地址;
+                A:10.0.0.0/8 
+                B:172.16.0.0/16 -172.31.0.0/16
+                C:192.168.0.0/24-192.168.255.0/24   
+
+         TCP协议的特征：
+            建立连接：三次握手
+            将数据打包成段：校验和(CRC-32)
+            确认，重传以及超时，
+            排序，逻辑序号
+            流量控制:滑动窗口算法
+            拥塞控制：慢启动和用塞避免算法
+            
+         Socket Domain:根据使用地址的不同
+            AF_INET:Address Family ipv4
+            AF_ INET6:IPV6
+            AF_UNIX:同一主机上不同进程之间通信时候使用
+
+            每类套接字都至少提供了两种socket:流，数据报
+                流：可靠的传递，面向连接，无报文边界;
+                数据报：不可靠传递，有边界，无连接
+
+
+         套接字相关的系统标准：
+            socket():创建套接字,
+            bind():绑定
+            listen():监听
+            accept():接受请求
+            connect():请求连接建立
+            write():发送
+            read()：接受
+                send(),recv(),sendto(),recvfrom()
+
+     http:  hyper text transfer protocol 
+        html:编程语言   超文本标记语言
+
+        <html>
+            <head>
+                <title>TITLE</title>
+            </haed>
+            <body>
+                <h1></h1>
+                    <p> blabla.... <a href="http://www.magedu.com/logo.jpg">blabla </a> </p>
+                <h2></h2>
+
+            </body>
+
+
+        </html>
+
+        CSS:cascading Style Sheet 
+        js:javascript,
+
+
+        MIME:Multipurpose Internet Mail Extension
+
+        工作机制：
+            http请求
+            http响应
+
+        web资源：web resource 
+            静态资源：.jpg,,gif,,html,.txt,.js,.css,.mp3,.avi
+            动态文件:.php,.jsp,
+
+            媒体：
+                媒体类型(MIME类型):major/minor
+                    text/html
+                    text/plain纯文本文档
+                    image/jpeg
+                    image/gif
+
+            URI:Uniform Resource Indentifier    
+                URN:
+                URL:Uniform Resource Locator,用于描述某服务某特定资源的位置：
+                    Scheme://Server:Port/to/resource 
+                        http://www.magedu.com/image/logp.hpg
+
+
+
+
+
+
+
+  一次完整的http请求过程:
+    (1)建立或者处理连接,接受请求或拒绝请求
+    (2)接受请求，
+        接受来自与网络的请求报文对于某类资源的一次请求过程：
+        并发访问响应模型(web I/O)
+            单线程I/O结构:启动一个进程处理用户请求，而且一次只处理一个，多个请求串行响应
+            多线程I/O结构:并行多个进程,每个进程响应一个请求
+            复用I/O结构：一个进程响应n个请求：
+                多线程模型：一个进程生成N个线程,每一个线程响应一个用户请求：
+                事件驱动：event-driven 
+            复用的多进程I/O结构：一共启动(m)多个进程，每个进程响应n个请求
+            
+    (3)处理请求:对请求的报文进行解析，并获取请求的资源以及请求方法等相关信息
+        根据请求报文首部
+	        元数据：请求报文首部    
+	           <method> <URL> <VERSION>
+	           Host:www.magedu.com 请求的主机名称
+	           Conection:
+        
+    (4)访问资源:获取请求报文中的请求资源
+        web服务器：即存放了web资源的服务器，负责向请求者提供对方请求的静态资源，或动态运行后的生成资源：这些资源放置于本地文件系统某路径下，此路径通常称呼为DotRoot 
+        /var/www/html
+            images/1.jpg
+       http://www.magedu.com/images/1.jpg
+
+       web服务器资源的路径映射方式：
+            (a)docRoot
+            (b)路径别名alias
+            (c)虚拟主机docroot  
+            (d)用户家目录docroot
+
+        
+    (5)构建访问响应报文
+        
+           资源的MIME类型:
+                (1)显式分类
+                (2)魔法分类
+                (3)协商分类
+           URL重定向:
+                web服务器构建的响应并非客户端所请求的资源，而是资源的另外一个访问路径   
+
+
+
+
+
+
+    (6)发送响应报文
+    (7)记录日志
+
+http服务器程序：
+    httpd:(apache)
+    niginx
+    lighttpd
+
+
+    应用程序服务器:
+        IIS:    
+        tmocat,jetty,jboss,resin
+        websphere,weblogic,oc4j
+
+    www.netcraft.com
+
+
+httpd的安装配置和使用：
+    httpd:apache 
+        a patchy server =apache
+        ASF: apache software foundation
+
+    httpd的特性：
+        高度模块化设计:DS0
+        DSO:dynamic shared object 
+        MPM:Multipath Processing
+            prefork:多进程模型,每个进程响应一个请求
+                一个主进程生成n个子进程，每个子进程也称为工作进程，每个子进程处理一个用户请求,也会预先产生多个空闲进程，随时等待请求到达，最大不会超过1024个;       
+            worker:多线程模型(多进程生成，一个进程生成多个线程),一个线程响应一个线程
+            event:事件驱动模型,一个进程响应多个个请求：
+
+
+        并发服务器和响应请求
+            单进程I/O模型
+            多进程I/O模型
+            复用进程I/O模型
+                多线程模型
+                事件驱动模型    
+             复用的多进程模型
+
+  httpd(2):
+    
+    CentOS 6: 2.2
+    CentOS 7: 2.4
+        rpm -q httpd查看是否安装httpd
+
+    安装方式:
+         rpm 
+         编译
+    CentOS 6:
+        rpm -ql httpd   
+
+            程序环境：
+                httpd/为网站的根目录
+                配置文件：
+                    conf.d为httpd提供额外配置的目录
+                    /etc/httpd/conf/httpd.conf
+                    /etc/httpd/conf.d/*.conf 
+                服务脚本：
+                    /etc/rc.d/init.d/httpd
+                    配置文件：/etc/sysconfig/httpd
+                主程序文件：
+                    /usr/sbin/httpd
+                    /usr/sbin/http.event
+                    /usr/sbin/http.worker 
+                日志文件目录：
+                    /var/log/httpd
+                        access_log:访问日志
+                        error_log:错误日志
+                站点文档目录：
+                    /var/www/html
+                模块文件路径：
+                    /usr/lib64/httpd/modules
+
+                配置文件的组成
+                grpe "Section" /etc/httpd/conf/httpd.conf
+				### Section 1:Global Envoriment//全局配置
+				### Section 2:'Main' server configuration//主服务器配置
+		        ### Section 3:Virtual Hosts//一个服务器提供多个站点,虚拟服务器
+                (通常2,3段落不能同时使用)
+
+                配置格式：directive value
+                    directive :不区分大小写：
+                    value:为路径时，取决于文件系统
+
+
+        常用配置：
+            1,修改监听的端口IP和Port
+                cp httpd.conf{,.bak}
+                    可以出现多条Listen 命令监听多个端口
+                   Listen [IP] PORT
+                   service httpd restart (reload)
+
+                   设略ip则是监听本机所有ip;Listen可以重复出现多次
+            2,持久连接
+                短连接每次都需要三次握手
+                Persistent Connection:
+                连接建立后，每个资源获取完成后不会断开连接，是继续等待其他的请求完成：
+                    断开：
+                        数量限制：100
+                        时间限制：可以配置
+                    副作用：对并发访问量较大的服务器，持久连接功能会使有些请求的不到响应,(建议并发访问量的)
+                    折中：使用较短的持久连接时间
+                        httpd-2.4 支持毫秒级持久时间
+
+              非持久连接：
+
+
+              KeepAlive On|Off是否启用持久连接
+              MaxKeepAliveRequest #
+              KeepAliveTimeout  #
+               
+             测试：
+                telnet HOST PORT
+                GET /URL HTTP/1.1
+                Host:HOSTNAME or IP
+                
+
+                    
+              GET /HTTP/1.1          
+              Host:172.16.100.6
+
+        3,MPM 
+            Multipath Process Module：多道处理模块
+                prefork,worker,event
+
+
+            httpd-2.2不支持同时编译多个模块，所以只能编译时选定一个:rpm安装的包提供三个二进制文件，分别用于实现对不同MPM机制的文件
+            # ps aux | grep httpd  
+            
+
+            默认为/usr/sbin/httpd,其使用prefork
+
+            查看模块列表：
+                查看静态编译的模块：
+                    httpd -l
+                查看静态编译动态装载的模块
+                    #httpd -M 
+            更换使用的httpd程序
+                /etc/sysconfig/httpd    
+                修改
+                    HTTPD=
+                重启服务生效
+
+
+           prefork的配置：
+           <IFModule prefork.c>
+           StartServers     8 
+           MinSpareServers   5  
+           MaxSpareServers  20  最大通信进程数
+           ServerLimit      256 服务器生命周期内的最大值
+           MaxClients       256 服务器最大进程数量  
+           MaxRequestPerChild   4000一个服务器最多响应多少个请求
+           </IFModule>
+
+
+           worker的配置：
+           <IFModule prefork.c>
+           StartServers     4   服务器启动时启动多少个进程
+           MaxClients       256 服务器最大线程数量  
+           MinSpareThreads   25  最少空闲线程数目
+           MaxSpareThreads  75  最大通信进程数
+           ThreadsPerChild  25  每个进程启动最多的线程数目
+           MaxRequestPerChild      0 每个进程所响应最大的数量0表示不限制
+           </IFModule>
+
+
+           PV,UV:
+                PV:Page View
+                UV:User View
+                    独立IP量;
+
+     4,DSO
+        配置指令实现模块加载：
+            LoadModule <mod_namea>  <mod_path>
+
+            模块路径可使用相对地址地址
+                相对于ServerRoot(/etc/httpd)指向的路径而言：
+                    /etc/httpd/modules
+    5,定义‘Main’ server 的文档页面路径
+        DocumentRoot
+
+        文档路径映射
+            DocumentRoot指向的路径为URL路径的起始位置：
+                DocumentRoot "/var/www/html"
+                    test/index.html --> http://HOST:PORT/test/index.html
+                    selinux,iptables关闭
+                    
+    6,站点访问控制：
+        可基于两种类型的路径指明对资源进行访问控制
+            文件系统路径
+                 <Dirextory ""> </Directory>
+                 <File "">  </File> 对单个文件做控制
+                 <FileMatch ""> </FileMatch>
+            URL路径：
+                 <Location "">  </Location>
+        访问控制机制
+            基于来源地址:  
+            基于帐号:
+    7,Directory中“基于来源地址"实现访问控制
+        (1)Options 
+            所有可用特性：Index Includes FollowsSymLinks SymLinksifOwnerMatch ExecCGI   MultiViews
+
+            Indexes:索引：路径下存在多个都可以为主页面，则将多个页面都直接罗列(如果不启用indexes则直接罗列所有的网页文件，或者/etc/httpd/conf.d/welcome.conf)
+            FollowSymLinks：允许跟踪符号连接文件
+            SymLinksifOwnerMatch
+            ExecCGI:是否允许CGI脚本
+            MultiView
+        (2)基于来源地址的访问控制机制
+            Order:检查次序 
+                Order allow,deny白名单
+                Order deny,allow黑名单
+            Allow from
+            Deny from
+
+            来源地址：
+                IP
+                NetAddr:
+                    172.16
+                    172.16.0.0
+                    172.16.0.0/16
+                    172.16.0.0/255.255.0.0
+
+
+
+   8,定义默认主页面
+        DirectoryIndex index.html index.html.var 可以有多个
+
+   9,日志设定:
+    
+
+        错误日志：ErrorLog logs/error_log
+                  LogLevel  warn
+                从低到高
+                  debug info notice warn  error crit alert emerg
+        访问日志： 
+                CustomLog logs/access_log combined(日志格式)
+                LogFormat 定义日志格式
+                LogFormat "%h %l %t \%r\" %>s %b \"%{Reference}" \"%{User-Agent}i\" "combined
+                 %h: rmote host请求者客户端ip地址
+                 %l: remote logname (from identd,if supplied) -表示为空;
+                 %u:Remote User,(from auth,maybe bogus if return status  (%s) is 401)
+                 %t:time the request was recieved (standard english format),服务器收到的请求的时间
+                 %r:First line of the request ,请求报文的道行信息(method url version)
+                 %>s:响应状态码的最后一行信息
+                 %b:size of response in bytes响应报文的大小，单位式字节，不包括响应报文首部
+                %{Referer}i/ %{Foobar}i 请求报文当中"referer"首部的值,当前资源的的访问入口，即来自与哪个页面超链接请求跳转而来;
+                %{User-agent}i:请求报文当中”User-Agent“首部的值，即发出请求用到的应用程序  
+
+                LogFormat "%h %l %t \%r\" %>s %b" common
+
+
+
+                http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats
+
+
+
+      10,路径别名
+        
+        DocumentRoot "/www/htocs"
+            http://www.magedu.com/download/bash-4.4.2-3.elx86_64.rpm
+            --> /www/htdocs/download/bash-4.4.2-3.elx86_64.rpm
+            Alias /URL/ "/PATH/TO/SOMEDIR/"
+                
+                Alias /bbs/ "/forum/htdocs"
+                    http://www.magedu.com/bbs/index.html
+                        --> /www/htdocs/bbs/(原来)
+                        --> /forum/htdocs/bbs(现在)
+       11,设定默认字符集
+            AddDefaultCharset UTF-8
+            GBK,GB2312,GB18030
+
+
+       12,基于用户做访问控制
+            
+            认证质询:
+                WWW-Authenticate:响应码为401，拒绝客户端请求，并说明要求客户端提供帐号和密码   
+            认证：
+                Authorization:客户端用户填入帐号和密码后再次发送请求报文，认证通过,则服务器端发送资源
+
+                认证方法：
+                    basic:明文认证方案
+                    diggest:消息摘要认证
+            安全域名：需要用户认证后方能访问的路径
+                应该通过名称对其进行标识，并用于告知用户认证的原因
+            用户的帐号和密码存储位置:
+                虚拟帐号：仅用于访问某服务时的认证标识：
+                存储:
+                    文本文件：
+                    SQL数据库
+                    ldap
+                    nis
+
+
+
+
+            basic认证:
+                (1)定义安全域
+                    <Directory "">
+                        Options None
+                        AllowOverride   None
+                        AuthType    Basic
+                        AuthName    "String"
+                        AuthUserFile "/PATH/TO/HTTPD_USER_PASSWD_FILE"
+                        Require user uasername1 username1 uasername3 ... 
+                      </Directory>
+                      (Require valid-user 允许所有所有合法用户)
+                       (2)提供帐号和密码存储(文本文件)
+                        使用htpasswd命令进行管理
+                            htpasswd [options] passwdfile username
+                                -c:自动创建passwdfile,因此，仅该在添加第一个用户时候使用：
+                                -m:md5加密用户密码
+                                -s:sha1加密用户密码：
+                                -D:删除用户
+                       (3)实现基于组进行认证
+	                    <Directory "">
+	                        Options None
+	                        AllowOverride   None
+	                        AuthType    Basic
+	                        AuthName    "String"
+	                        AuthUserFile "/PATH/TO/HTTPD_USER_PASSWD_FILE"
+                            AuthGroupFile "/PATH/TO/HTTPD_GROUP_FILE"
+
+	                        Require group Group1 Group2 ...
+                       </Directory>
+
+                       要提供：用户帐号文件和组文件：
+                        
+                            组文件：每一行定义一个组
+                                GRP_NAME:user1  user2 user3 ....
+
+	                    <Directory "/www/htdocs/admin">
+	                        Options None
+	                        AllowOverride   None
+	                        AuthType    Basic
+	                        AuthName    "Administrator private"
+	                        AuthUserFile "/etc/httpd/conf.d/.htpasswd"
+	                        AuthUserFile "/etc/httpd/conf.d/.htgroup"
+	                        Require group webadmin 
+                        </Directory>
+
+      13,虚拟主机：
+        
+        三种实现方案：
+            基于ip
+               为每个虚拟主机至少准备一个ip地址:很少使用
+            基于port
+                为每个虚拟主机准备至少一个专用port:实际中很少使用
+            基于hostname
+                为每个虚拟主机准备至少一个专用hostname 
+
+            可混合上述三种方法中的任意方式
+
+         注意：一般虚拟主机莫与中心主机混用，所以，使用虚拟主机先禁用中心主机：
+            禁用中心主机：注释DocumentRoot
+
+         每个虚拟主机都有专用的配置：
+            <VirtualHost "IP:PORT">
+                ServerName
+                DocumentRoot ""
+            </VirtualHost>
+
+                ServerAlias:虚拟主机的别名:
+                ErrorLog:
+                CustomLog:
+                <Directory "">
+                </Directory>
+        实例1:基于ip
+        (1)注释原DocumentRoot
+        (2)
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web1/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.7:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web2/htdocs"
+            </VirtualHost>
+        (3)httpd -t 检测语法是否有误
+        (4)mkdir -pv /vhost/{web1,web2,web3,web4}/hosdocs
+            vim /vhost/web1/htdocs/index.html
+                Page at Web1
+                以此类推
+        (5)添加ip地址 ip add 172.16.100.7/16 dev eth0
+                    ip addr list 
+        (6)service httpd reload 
+       实例2：基于port
+
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web1/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.7:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web2/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.7:8080>
+                ServerName  web3.magedu.com
+                DocumentRoot "/vhosts/web3/htdocs"
+            </VirtualHost>
+            (2)查找监听的端口 Listen 添加8080
+       实例3：基于hostname
+            NameVirtualHost 172.16.100.6:80 此处的名字需要与下方相同   
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web1/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web2/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.6:8080>
+                ServerName  web3.magedu.com
+                DocumentRoot "/vhosts/web3/htdocs"
+            </VirtualHost>
+
+            vim /etc/hosts
+                172.16.100.6 web1.magedu.com web2.magedu.com web3.magedu.com
+                curl http://web1.magedu.com
+       实例4：混合模式
+        
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web1/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.6:80>
+                ServerName  web1.magedu.com
+                DocumentRoot "/vhosts/web2/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.7:8080>
+                ServerName  web3.magedu.com
+                DocumentRoot "/vhosts/web3/htdocs"
+            </VirtualHost>
+            <VirtualHost 172.16.100.7:8080>
+                ServerName  web4.magedu.com
+                DocumentRoot "/vhosts/web4/htdocs"
+            </VirtualHost>
+
+   14,内置的status页面
+   <Location/server-status>
+        SetHandler server-status
+        Order deny,allow
+        deny from all
+        Allow from 172.16
+
+http协议基础和httpd的配置       
+
+    URL:Uniform Resource Locator    
+        URL方案：scheme
+        服务器地址：ip:port
+        资源路径：path
+
+        http://80,https://443
+
+        http://www.magedu.com:80/bbs/index.html
+        https://www.magedu.com:80/bbs/index.html
+
+
+        URL基本语法：
+           <scheme>://<user>:<password>@<host>:<port>/<path>;<params>?<query>#<frag>
+                params:参数
+                    http://www.magedu.com/bbs/hello;gender=f
+                query:
+                    http://www.magedu.com/bbs/item.php?username=tom&title=abc
+                frag:
+                    https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_linux/6/html-single/Installation_Guide/index.html#ch-Boot-x86
+
+
+
+           相对URL：相对当前资源，同站网站
+           绝对URL：跨站点
+           
+
+
+      http协议：
+        http/0.9 ,http/1.0,http/1.1 ,http/2.0
+
+        http协议：stateless
+            服务器无法追踪访问者来源
+                cookie,session
+        http事务：http请求和响应的一个
+            请求：request
+            响应：response 
+            
+            报文语法格式：
+                request报文：
+                    <method> <request-URL> <Version>
+                    <headers>
+
+
+                    <entity-body>
+
+                response报文
+                    <version><status><reason-phrase>
+                    <headers>
+
+                    <entity-body>
+
+
+
+                 method:请求方法，标明客户端希望服务器对资源执行的动作
+                    GET,HEAD,POST
+
+                version：
+                    HTTP/<major>.<minor>
+                status:
+                    三位数字:如200，301,302,404,502;响应状态码标记请求处理过程中发生的情况;
+                reason-phrase:
+                    状态码标记的状态的简要描述;
+                headers:
+                    每个请求或者响应报文可包含任意个首部:每个首部都有其首部名称，后面跟一个冒号，而后跟上一个可选空格,接着一个值
+                entity-body:实体部分，请求时附加的数据或者响应时附加的数据;
+
+
+
+            method(方法):
+                GET:从服务器获取一个资源
+                HAED:只从服务器获取文档的响应首部：
+                POST:向服务器发送服务器要处理的数据：
+                PUT:将请求的主题部分存储在服务器上：(危险方法)
+                DELETE:请求删除服务器上的指定文档
+                TRACE:追踪请求到达服务器中间经过的代理服务器
+                OPTIONS:请求服务器返回对指定资源支持使用的请求方法
+                协议查看或分析工具：
+                    tcpdump,tshark,wireshark
+
+
+            status(状态码):服务器-->客户端请求发生了什么
+                1xx:100-101,信息提示：
+                2xx:200-206,成功类的信息
+                3xx:300-305,重定向类的
+                4xx:400-415,错误类信息，客户端错误
+                5xx:500-505,错误类信息，服务端错误
+
+                常用的状态码：
+                   200:成功，请求的所有数据通过响应报文的entity-body部分发送，OK
+                   301:请求的URL指向的资源已经被删除,但在响应的报文中通过location指明了资源现在所处在的新位置：永久重定向Move Permanetly 
+                   302:与301相似，但在响应报文中通过Location指明资源现在所处临时位置，Found 临时重定向
+                   304：客户端发出了条件式请求，但是服务器上的资源未曾发生改变，通过响应此响应状态码通知客户端：Not Modified 
+                   401:需要输入帐号和密码;Unauthorized
+                   403: 请求被禁止:Forbidden
+                   404:服务器无法找到客户端请求的资源:Not Found 404
+                   500:服务器内部错误：Intrernal Server Error
+                   502:代理服务器从后端服务器收到一条为伪响应：Bad Gateway  网关配置错误
+
+            headers:头部
+                格式:
+                   Name:Value
+
+
+                   Cache-Control:public 
+
+
+                首部的分类：
+                    通用首部：
+                    请求首部:   
+                    响应首部：
+                    实体首部：
+
+
+
+                    通用首部：(既可以出现在响应报文中也可以出现在请求报文中)
+                        Date:报文的创建时间，
+                        Connection:连接状态：如keep-alive,close
+                        Via:显示经过的中间节点
+                        Cache-Control:控制缓存的生效机制
+                        Pragma:与缓存相关
+                    请求首部：
+                        Accept:通知服务器自己可以接受的媒体类型:
+                        Accept-Charset:
+                        Accept-Encoding:接受的编码格式，如gzip
+
+                        Accept-Language:接受的语言(与charset有区别)
+                        Client-IP:客户端ip
+                        Host:请求的服务器名称和端口号
+                        Referer:包含当前正在请求的资源的上级资源
+                        User-Agent:客户端代理，浏览器类型
+
+                        条件式请求首部：
+                            Expect:
+                            If-Modified-Since:自从指定时间之后，请求的资源是否发生改变
+                            If-Unmodified-Since:
+                            If-None-Match :本地缓存中存储的文档的etag标签是否与服务器文档的Etag不匹配
+                            If-Match:是否匹配
+                        安全请求首部：
+                            Authorization:向服务器发送认证信息，如帐号密码
+                            Cookie:客户端向服务器发送Cookie
+                            Cookie2
+                        代理请求首部：
+                            Proxy-Authoriztion:向代理服务器认证
+                   响应首部：
+                        信息性：
+                            Age:资源的有效期限,响应持续的时长度
+                            Server:服务器的版本
+                        协商首部：某资源有多种表示方法时使用
+                             Accept-Range:服务器可以接受的范围类型
+                             Vary:服务器查看的其他首部列表 
+                        安全响应首部：
+                            Set-Cookie:向客户端设置cookie
+                            Set-Cookie2:
+                            WWW.Authenticate:来自服务器对客户端的质询认证表单
+                  实体首部：
+                        Allow:列出对次资源可使用的请求方法
+                        Location:告知客户端真正实体位于何处
+
+                        Centent-Encoding:内容格式
+                        Centent-Language:
+                        Content-Length:主体长度
+                        Content-Location:实体真正的所处位置
+                        Content-Type:主体的对象类型
+
+                        缓存相关：
+                            ETAG:实体扩展标签
+                            Expire:实体过期时间
+                            Last-Modified:最后一次修改的时间
+
+            httpd-2.2:
+
+            15, curl命令
+                    基于URL语法命令行方式下工作的文件传输工具,支持ftp,ftps,http,https,gopher,telnet ,DICT,FILE 以及LDAP等协议:支持https认证，并且支持HTTP的post，put等方法，FTP上传,kerberos认证，http上传，代理服务器，cookies，用户名/密码认证。下载文件断点续传，上载文件断点续传，http服务器管道，  
+              curl [options] [url]
+
+              curl的常用选项：
+                
+                -A/ --user-agent <string> 设置用户代理发给服务器
+                -basic: 使用http基本认证
+                --tcp-nodelay 使用TCP_NODELAY选项
+                -e/ --referer <URL> 来源网址
+                --cacert <file> CA证书 (ssl)
+                --compressed 要求返回式压缩格式
+                -H/ --headers <line> 自定义首部信息传递给服务器
+                -I/--head只显示响应报文首部信息
+                --limits-rate <rate> 设置传输速度
+                -u/ --user <user[:password]> 设置服务器的用户和密码
+                -0/ --http1.0 使用http1.0 
+
+
+              用法：curl [options]... [URL]
+
+              elinks [options]... [url]
+                    -dump:不进入交互模式，而直接将url的内容 输出至标准输出
+            16,使用mod_deflate模块压缩页面优化传输速度
+                
+            使用场景：
+                cpu时钟较大，同时网页的带宽十分之大
+                (1)节约带宽，额外消耗CPU,同时，可能有些较老的浏览器不支持，
+                (2)压缩适用于压缩的资源，例如纯文本文件
+
+
+             SetOutputFilter DEFALTE
+             # mod_deflate configuration
+
+             # Restrict compression to  these MIME types
+             AddOutputFilterByType DEFLATE text/plain
+             AddOutputFilterByType DEFLATE text/html
+             AddOutputFilterByType DEFLATE application/xhtml+xml
+             AddOutputFilterByType DEFLATE text/xml
+             AddOutputFilterByType DEFLATE application/xml
+             AddOutputFilterByType DEFLATE application/x-javascript
+             AddOutputFilterByType DEFLATE text/javascript
+             AddOutputFilterByType DEFLATE text/css
+
+             # Level of compression (Hightest 9 - Lowest 1)
+             DeflateCompressionLevel 9
+             # Netscape 4.x has some problems
+             BrowserMatch ^Mozilla/4 gzip-only-text/html
+             # Netscape 4.06 - 4.08  has some more problems
+             BrowserMatch ^Mozilla/4\.0[678] no-gzip  
+
+             #MSIE masquerades as Netscape,but it is fine
+             BrowserMatch \bMSI[E]  !no-gzip !gzip-only-text/html
+
+
+         17,https
+
+            http over ssl = https 443/tcp
+                ssl:v3
+                tls:v1
+
+
+                https://
+
+
+                http:
+                建立:
+                    客户端tcp连接请求
+                    服务器建立连接确认
+                    客户端返回确认连接信息
+                断开：
+                    客户端发送断开信息
+                    服务器端口响应
+                    服务器端发送断开信息
+                    客户端口确认
+                https:
+                    建立到服务器端口443的tcp连接
+                    建立基于tcp连接的ssl握手
+                        在ssl上发送http请求/在tcp上发送已加密的请求
+                        在ssl上发送http响应/在tcp上发送已加密的响应
+                        ssl关闭通知
+                        tcp连接关闭
+
+               站点证书有效性：
+                  日期检测
+                  签名颁发者的可信度检测
+                  签名检测
+                  站点身份检测
+
+
+
+             SSL会话的简化过程：
+                (1)客户端发送可供选择的加密方式，并向服务器请求证书
+                (2)服务器选择使用那种加密以及选定的加密方式给客户端：
+                (3)客户端取得证书并进行对证书的验证
+                    如果信任给其发证书的cA:
+                        (a)验证证书的来源合法性：用CA的公钥解密证书上的数字签名：
+                        (b)验证证书的内容合法性:完整性验证
+                        (c)检查证书有效期限:
+                        (d)检查证书是否被吊销:
+                        (e)证书中拥有者的名字,与访问者的目标主机要一致
+                 (4)客户端生成临时密钥（对称密钥）,并使用服务器端口的公钥加密此数据发送给服务器，完成密钥交换
+                 (5)服务用此密钥加密用户请求的资源，响应给客户端
+                 注意：SSL会话是基于ip地址的，所以单个ip的主机上仅可以使用一个https虚拟主机
+
+           配置http支持https:
+                (1)为服务器申请数字证书
+                    测试：通过私发证书：
+                        (a)创建私有的CA
+                        (b)在服务器创建证书签署请求
+                        (c)CA签证
+                (2)配置httpd支持使用ssl,以及使用的证书
+                    yum -y install mod_ssl 
+
+                    配置文件：/etc/httpd/conf.d/ssl.conf
+                        DocumentRoot
+                        ServerName
+                        SSLCertificateFile
+                        SSLCertificateKeyFile
+                (3)测试基于https访问响应的主机：
+                    openssl s_client [-connect host:port ] [-cert filename ] [-CApath directory ] [-CAfile filename]
+
+        18,httpd自带的工具程序
+            
+            htpasswd:basic 认证基于文件实现时，用到的帐号密码文件生成工具
+            apachectl:httpd自带的服务控制脚本，支持start,atop参数
+            apxs:由httpd-devel 包提供的，扩展httpd使用的第三方工具
+            rotatelogs:日志滚动工具
+                access.log:-->
+                access.log,access.1.log
+                access.log,access.1.log,access.2.log 
+            suexec:
+                访问某些特殊权限配置的资源的时候，临时切换至指定用户运行：
+            ab: apache benchmark 
+
+       19,http压力测试工具
+            ab:
+            webbench:
+            http_load:
+
+            jmeter:
+            loadrunner
+
+            ab [OPTIONS] URL
+                -n: 总的请求数
+                -c: 模拟的并发数
+                -k: 以持久连接模式测试
+            ulimit -n #:调整当前用户同时打开的文件数
+
+
+
+
+
+                    openssl:
+                    cd /etc/pki/CA
+                    (umask 077; openssl -genrsa -out private/cakey.pem 2048) 创建一个
+                    touch index.txt 
+                    echo 01 > serial 
+                    openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 7300  
+                    创建完成ca证书cacert.pem 
+
+                    在/etc/httpd下创建相关的ssl 目录
+                    umask 077;openssl genrsa -out httpd.key 1024
+                    openssl req -new -key httpd.key -out httpd.csr 申请证书
+
+                    
+            
+
+
+
+
+
+                            
+        
+
+
+
+                
+        
+
+
+            
+                
+                 
+
+
+
+                
+
+
+   
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+                service httpd restart
+                ps aux | grep httpd
+                
+ssss
+            
+
+
+
+
+             
+
+
+
+    
+
+
+    CentOS 7:
+        
+        程序环境:
+            
+
+            手动载入cd源
+            mv CentOS-local.repo CentOS-local.repo.bak
+            vim CentOS-local.repo
+                [CentOS7base]
+                name=CentOS 7
+                baseurl=file:///media/cdrom
+              gpgcheck=0
+            systemctl get-default  
+            systemctl set-default muilti-user.target
+            systemctl reboot
+
+
+
+
+
+
+        
+
+
+
+
+        
+            
+            
+        
+                    
+                    
+
+
+
+
+
+
+
+                
+        
+            
+
+    mac 设备到设备
+    ip主机到主机
+    
+
+
+
+
+

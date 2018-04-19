@@ -1,0 +1,225 @@
+子命令； filesystem, device ,balance ,subvolname
+
+
+
+压缩,解压缩以及归档工具
+    
+    compress/uncompress: .z
+    gzip/gunzip: .gz
+    bzip2/bunzip2: .bz2
+    xz/unxz: .xz
+    zip/unzip:
+    tar,cpio
+    
+    1,gzip/gunzip
+
+        gzip [OPTION]...FILE...
+            -d:解压缩，相当于gunzip
+            -c:将结果输出到标准输出,重定向后可以使得源文件和压缩文件同时存在 ：
+            -r:recursive整体压缩
+
+            -#:1-9,指定压缩比
+
+        zcat:不显式展开的前提下，查看文本文件内容
+    2,bzip2/bunzip2/bzcat
+        
+        gzip2 [OPTION]...FILE...
+            -k:keep 保留原文件
+            -d:解压缩
+            -#:1-9,压缩比
+            -q:quiet 
+
+        bzcat:不显示的情况下查看文本文件
+
+    3,xz/unxz/xzcat
+        xz [OPTION]...FILE...
+            -k:keep 保留原文件
+            -d:解压缩
+            -#:1-9,压缩比
+            -q:quiet 
+
+        xzcat
+
+
+    4,tar 
+        
+        tar [OPTION]...
+
+        (1)创建归档
+            tar -c -f /PATH/TO/SOMEFILE.tar FILE ...
+            tar -cf /PATH/TO/SOMEFILE.tar FILE ...
+        (2)查看归档文件中的文件列表
+            tar -t -f /PATH/TO/SOMEFILE.tar
+
+        (3)展开归档 
+            tar -x -f /PATH/TO/SOMEFILE.tar 
+            tar -x -f /PATH/TO/SOMEFILE.tar -C /PATH/TO/DIR
+
+        通常集合压缩工具在归档的时候压缩文件
+                
+            -j:bzip2, -z:gzip ,-J:xz    
+
+bash脚本编程：
+
+    if语句，bash -n,bash -x
+
+    CONDIITON:
+        bash命令;
+            用命令的执行状态结果：
+                    成功：true 
+                    失败：false
+
+            成功或者失败的意义取决于用到的命令
+    
+    单分支：
+        if CONDITION;then 
+            if-true
+        fi
+    双分支：    
+        if CONDITION;then 
+            if-true 
+        else 
+            if-false 
+        fi
+    多分支
+        
+        if CONDTION1:then
+            if-true
+        elif CONDTION2;then  
+            if-true
+        elif CONDITON3;then 
+            if-true 
+        ...
+        else 
+            all-false 
+        fi 
+        逐条件进行判断，第一次遇到为‘真’的条件时，执行其分支，而后退出
+
+    实例：用户键入文件路径，判断文件类型    
+
+#!/bin/bash
+#
+
+
+read -p "enter a file path: " filename
+
+if [ -z $filename ]; then 
+    echo "Usage: Enter a file path"
+    exit 2
+fi 
+
+if [ ! -e $filename ]; then 
+    echo "No such file"
+    exit 3
+fi 
+
+if [ -f $filename ];then 
+    echo "A common file"
+elif [ -d $filename ];then
+    echo "A Directory"
+elif [ -L $filename ];then
+    echo "A Symbolic file"
+else 
+    echo "Other type"
+fi
+
+    注意：if语句可以嵌套： 
+
+
+循环：
+    for,while,until
+    循环体：要执行的代码，可能要执行n遍
+        进入条件:
+        退出条件:
+        
+    for循环：
+        for 变量名 in 列表; do 
+            循环体
+        done 
+        
+        执行机制：
+            依次执行列表中的元素赋值给“变量名”，每次赋值后即执行一次循环体；直到列表中元素耗尽，循环结束
+        实例：
+
+
+        #!/bin/bash 
+        if[ ! $UID -eq 0 ];then 
+            echo "Only root"
+            exit 1
+        fi
+
+        #for username in user1 user2 user3 do
+        for i in [1...10]
+            if id user$i &> /dev/null; then 
+                echo "user$i exists"
+            else 
+                useradd user$i
+                if [ $? -eq 0 ]; then 
+                     echo "user$i" | passwd --stdin user$i &>/dev/null
+                     echo "ADD user$i finished."
+                fi
+            fi 
+        done 
+
+    列表生成方式
+        (1) 直接给出列表
+        (2) 整数列表 
+            (a) {start ... end}
+            (b) $(seq [start [step]] end) 
+        (3) 返回列表的命令
+            $(COMMAND)
+
+        (4)使用glob机制
+                文件名通配机制
+
+        (5)变量引用
+            $@ $*
+练习：
+    /etc/rc.d/rc3.d/分别读取每个文件，以k开头的文件输出为一文件名加stop，以s开头的文件输出文件名加start 
+    写一个脚本使用ping,命令探测172,16,250.1-254之间主机的在线状态
+
+
+        
+		   #!/bin/bash
+		   # 
+
+		   for file in $(ls /var );do
+		   if [ -f /var/$file ];then
+		   echo "Common file"
+		   elif [ -L /var/$file ];then
+		   echo "Symbolic file"
+		   elif [ -d /var/$file ];then 
+		   echo "Directory"
+		   else 
+		   echo "Other file"
+		   fi 
+		   done    
+        (2)
+		#!/bin/bash
+		#   
+		
+		declare -i estab=0
+		declare -i listen=0
+		declare -i other=0
+		
+		
+		for state in $(netstat -tan |grep "^tcp\>" | awk '{print $NF}');do 
+		    if [ '$state' == 'ESTABLISH' ];then
+		        let estab++
+		    elif [ '$state' == 'LISTEN' ];then
+		        let listen++
+		    else 
+		        let others++
+		    fi
+		done 
+		
+		echo "ESTABLISHED: $estab    " 
+		echo "LISTEN: $estab    " 
+		echo "UNKNOWN: $estab    " 
+
+        
+
+
+
+
+

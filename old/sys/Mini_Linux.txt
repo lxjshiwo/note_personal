@@ -1,0 +1,543 @@
+Mini Linux
+    启动流程
+        CentOS  6:
+            POST --> BootSequence (BIOS) --> BootLoader (引导加载器,引导内核和ramdisk) --> kernel (ramdisk 虚根借助此实现对根的挂载) --> rootfs --> /sbin/init  
+            编写服务脚本
+            upstart配置文件
+
+            /etc/init/*.conf
+            /etc/inittab
+                默认运行级别
+                运行系统初始化脚本:/etc/rc.d/rc.sysinit
+                /etc/rc.d/rc $runlevel
+                启动终端，并运行login程序
+        CentOS 7:
+
+        POST --> BootSequence (BIOS) --> BootLoader (引导加载器,引导内核和ramdisk) --> kernel (ramdisk 虚根借助此实现对根的挂载) --> rootfs --> /sbin/systemd (systemd是强大的启动工具)
+                systemd unit文件    
+
+    bootloader  
+        lilo
+        grub legacy
+        grub2
+            stage1:mbr
+            stage1_5:filesystem driver
+            stage2:
+
+
+
+   内核编译：
+        make menuconfig --> .config 
+        make [-j #]
+        make modules_install
+        make install
+
+    步骤：
+        bootloader:grub
+        内核：kernel(非模块方式)
+        根文件系统：busybox 模拟实现用户空间中的所有程序
+
+
+
+
+    yum group install "Development Tools" "Server Platform Development" -y 
+    get linux-3.10.67.tar.xz
+    tar xf linux-3.10.67.tar.xz -C /usr/src
+    ln -sv linux-3.10.67.tar.xz linx
+    cd linux
+                make help --> allnoconfig 所有选项都不选择
+    make allnoconfig
+    ls -a 
+    less .config 
+    lscpu  查看系统信息
+    lspci 
+    make menuconfig 
+            64 bit kernel 
+            Enable loadable module support
+                Module unloading 
+                (不启用)Module signature verification
+            Processor type and features
+                Symmatric multi-processing support (支持多处理器)
+                Processor Family  (选择合适的cpu类型)
+                        generic-X86-64通用
+            Bus options (PCI etc.)
+                PCI support 
+            Device drivers         SCSI总线类型，存储协议
+                Generic Driver Options  
+                    Maitain a devtmpfs filesystem to mount at /dev 内核可以自动识别的设备装载到/dev目录下
+
+                SCSI device support 硬盘支持
+                    SCSI device support
+                    SCSI disk support 
+                
+                Fusion MPT device support  
+                    Fusion MPT ScsiHost drivers for SPI     MPT是中层驱动，需要底层scsi驱动
+                    Fusion MPT ScsiHost drivers for FC 分布式光纤接口
+                    Fusion MPT ScsiHost drivers for SAS 串行接口
+                    Fusion MPT misc device  (ioctl) driver  
+                    Fusion MPT loging facility 打开日志功能
+                USB support 
+                    Support for Host-side USB
+                    Enable USB persist by default 
+                    
+                    EHCI HCD (USB2.0) support
+                    OHCI HCD support 
+                    UHCI HCD  (most intel VIA ) support 
+                Input device support
+                    Keyboards
+                        AT keyboard
+                    Mouse interface
+                    Mice 
+                        PS/2 mouse 
+
+
+
+
+
+                File system配置支持文件系统 
+                    Second extended fs support 
+                    Ext3 journalling file system support 
+                    The Extended 4(ext4) filesystem 
+                    Ext4 POSIX Acess Control Lists
+                Executable file formats/
+                    Kernel support for ELF binaries
+                    Write ELF core dumps with partial segments
+                    Kernel support for scripts starting with #! 
+                    
+                            
+
+                Macintosh device drivers   物理层驱动
+    make -j 4 bzImage 只编译内核文件
+    cp arch/x86/boot/bzImage /mnt/boot
+    sync
+    shutdown -h now
+            添加硬盘
+    fdisk /dev/sdb
+            基本三个分区 
+                boot    
+                swap 
+                根
+    n 
+    1
+    +100M   
+    n
+    2
+    +2G
+    w
+    mke2fs -t ext4  /dev/sdb1 
+    mke2fs -t ext4  /dev/sdb2
+    mkdir /mnt/[boot,sysroot]
+    mount /dev/sdb1 /mnt/boot/
+    grub-install --root-directory=/mnt /dev/sdb
+    mount /dev/sdb2 /mnt/sysroot
+    cd /usr/src/linux
+    cp arch/x86/boot/bxImage /mnt/boot/bzImage(VMlinuz)
+    vim /mnt/boot/grub/grub.conf
+            default=0
+            timeout=3
+            title minilinux (3.10.67)
+                root (hd0,0)
+                kernel /bzImage root=/dev/sda2
+    sync(将内存数据同步到磁盘上)
+            64位的内存在256以上
+             No filesystem could mount root ,tried 内核中没有添加文件系统模块,无法识别
+             kernel panic 
+    移植bash
+    cd /mnt/sysroot  
+    mkdir -pv etc dev proc sys bin sbin usr/{bin,sbin,lib,lib64}  lib64 lib/modules home  var/{log,run,lock} tmp mnt meadia root 
+    vim bincp.sh
+    复制程序及其依赖库文件脚本实例：
+        #!/bin/bash
+        #
+        target=/mnt/sysroot
+        [ -d $target] || mkdir /mnt/sysroot
+
+        read -P "A command:" command
+
+        libcp()
+        {
+            for lib in $(ldd $1 | grep -o "[^[:space:]]*/lib[^[:space:]]*"); do 
+                libdir=$(dirname $lib)
+                [ -d $target$libdir] || mkdir -p $target$libdir
+                [ -f $target$lib ] || cp $lib $target$lib
+            done
+            
+        }
+
+        while [ "$command" != 'q' -a "$command" != 'quit']; 
+        do 
+            if !which $command > /dev/null;then
+                read -p "No such command,enter again:" command
+                continue
+            fi
+            command=$(which --skip-alias $command)
+            cmnddir=$(dirname $command)
+
+            [ -d $target$cmndir ] || mkdir -p $targetcmnddir
+            [ -f $target$command ] || cp $command $target$command
+
+            libcp $command
+            read -p "another command(quit):" command
+        done
+
+
+        bash -n bincp.sh
+        bash bincp.sh
+            bash
+            ls
+            quit
+        tree /mmnt/sysroot
+        chroot /mnt/sysroot /bin/bash
+        sync
+        vim /mnt/boot/grub/grub.conf
+                default=0 
+                timeout=3
+                title Mini Linux(3.10.6.7)
+                        root(hd0,0)
+                        kernel /bzImage ro root=/dev/sda2 init=/bin/bash
+        sync
+
+        提供init 脚本
+        cd /mnt/sysroot
+        vim /mnt/sysroot/sbin/init
+            #!/bin/bash
+            #
+
+            echo -e "\tWelcome to \033[32mMini\033[0m Linux"
+            mount -n -t proc proc /proc
+            mount -n -t sysfs sysfs /sys
+            mount -n -o remount,rw /dev/sda2 /
+            /bin/bash
+
+        chmod +x /mnt/sysroot/sbin/init 给此程序增加权限使之可以执行
+
+        bash bincp.sh
+        mount
+        blkid
+        touch 
+        ps 
+        top
+        quit
+                在mini linux中执行
+                mount -n -t proc proc /proc
+                mount -n -t ext4 -o remount .rw /dev/sda2 /
+                cat /proc/mounts 查看挂载情况
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+             硬件设备支持 --> 文件系统支持 --> init 程序
+                                                    main.c中确定的查次序
+                                                    !run_init_process("/sbin/init") || !run_init_process("/etc/init") || !run_init_process("/bin/init") || !run_init_process("/bin/sh") 
+
+
+
+        
+
+         Mini Linux :kernel + busybox
+
+            busybox:
+
+                静态方式编译:依赖与于glibc-static;
+            编译单个内核模块
+                make M=drivers/net/ethernet/intel/e1000/
+
+                make M=path/to/somedir/
+
+
+
+         busybox.tar.bz2
+         tar -xf busybox.tar.bz2
+         less INSTALL
+                    CONFIG_PREFIX=/path/from/rooot 
+         yum list all glibc*
+         yum install glib-devel
+         yum install glib-static
+            
+         开始编译busybox
+         make menuconfig 
+            Busybox Settings
+                General Configuration
+                Build Options
+                    Build BusyBox as a static binary(no shared libs)
+                Installation Options (make Install behavior )
+                    What kind of applet links to install (as soft-links)
+                    ./_install) BusyBox installation prefix (NEW) 安装至于哪个目录下    
+            Applets 将busybox模拟出那些应程序 
+            coreUTILS 核心工具
+            Console Utilities 控制台相关
+            Linux Ext2 FS Progs
+            Linux Module Utilities 
+            Shells
+         make & make install
+         cd /mnt/sysroot
+         rm -rf ./*
+         tree install 
+         cp -a _intall/* /mnt/sysroot
+         tree mnt/sysroot 
+         chroot /mnt/sysroot/ /bin/ash 由于在其下没有/bin/bash,转为使用ash
+         rm linuxrc       linuxrc 模拟成为init程序
+         ls /sbin | grep init
+
+         vim /mnt/boot/grub/grub.conf
+                 default=0 
+                 timeout=3
+                 title Mini Linux(3.10.6.7)
+                         root(hd0,0)
+                         kernel /bzImage ro root=/dev/sda2 init=/sbin/init(init 程序改为由sbin目录下的init程序执行)
+          ls 
+          当前sysroot目录下只有bin sbin usr  三个子目录
+          mkdir -pv etc lib lib64 proc sys dev root home boot mnt media tmp var 
+          sync 
+          此时的busybox将依赖于/etc/inittab 并根据文件中的指令决定如何运行，init运行程序
+          提供inittab运行文件指明需要哪些操作
+          vim etc/inittab
+            ::sysinit:/etc/rc.d/rc.sysinit                系统初始化脚本
+            ::respawn:/sbin/getty 9600 tty1 通过认证后进入控制台 #tty1::askfirst:/bin/sh            #concole::respawn:-/bin/sh                  直接打开物理控制台
+            ::respqwn:/sbin/getty 9600 tty2#tty2::askfirst:/bin/sh            
+            ::respawn:/sbin/getty 9600 tty3#tty3::askfirst:/bin/sh            启动虚拟终端
+            ::ctrlaldel:/sbin/reboot                    按下ctrl alt del 直接重新启动
+            ::shurdown:/bin/umount -a -r                执行shutdown不挂载所有的挂载项
+          
+
+          vim etc/rc.d/rc.sysinit
+            #!/bin/sh
+            #
+            echo -e "\tWelcome to \033[32mMini\033[0m Linux"
+            mount -t proc proc /proc
+            mount -t sysfs sysfs /sys
+
+
+            echo "scan /sys and to populate to /dev"
+            mdev -s
+            mount -o remount,rw /dev/sda2 /
+
+            echo "mounting all filesystems..."
+            mount -a 实现自动挂载fstab文件项目
+
+            echo "Load driver for e1000..."
+
+            insmod /lib/modules/e1000.ko
+            
+            echo"Initializing ethernet card..."
+            ifconfig eth0 172.16.100.20 up
+            ifconfig lo 127.0.0.1 up
+
+            [ -f /etc/sysconfig/network] && . /etc/sysconfig/network
+            [ -z "$HOSTNAME" -o "$HOSTNAME" == "(none)" ] && HOSTNAME='localhost'
+            hostname $HOSTNAME
+          vim etc/sysconfig/neywork
+            HOSTNAME=minilinux
+          sync
+          chroot /mnt/sysroot /bin/sh
+          touch /etc/passwd 使minilinux可以创建用户
+          touch /etc/passwd /etc/group etc/shadow
+          exit 
+          vim etc/passwd
+            root:x:0:0::/root:/bin/bash  //之前已经将bash文件移至mnt之下所以可以使用bash
+          vim etc/group
+            root:x:0:
+          head -1 /etc/shadow > etc/shadow
+          chmod 400 etc/shadow
+          vim etc/inittab
+            ::sysinit:/etc/rc.d/rc.sysinit                系统初始化脚本
+            ::respawn:/sbin/getty 9600 tty1 通过认证后进入控制台 #tty1::askfirst:/bin/sh            #concole::respawn:-/bin/sh                  直接打开物理控制台
+            ::respqwn:/sbin/getty 9600 tty2#tty2::askfirst:/bin/sh            
+            ::respawn:/sbin/getty 9600 tty3#tty3::askfirst:/bin/sh            启动虚拟终端
+            ::ctrlaldel:/sbin/reboot                    按下ctrl alt del 直接重新启动
+            ::shurdown:/bin/umount -a -r                执行shutdown不挂载所有的挂载项
+          openssl passwd -l -salt $(openssl rand -hex4)生成md5密码
+          修改shadow文件
+          vim shadow 
+          sync 
+
+          提供ssh服务
+          cd /mnt/sysroot
+          vim etc/issue
+            Welcome to magedu linux
+            Kernel \r
+          提供dropbear 
+          dropbear.tar.bz
+          tar dropbear.tar.bz2
+          ./configure --help
+          ./confiugure 
+          make 
+          make install
+          bash bincp.sh
+          dropbear 
+          dropbearkey
+          dbclient
+          quit  
+
+          cd /mnt/sysroot
+          mkdir dev/pts //远程连接默认使用虚拟终端
+          //pts需要挂载一个伪文件系统
+          vim etc/fstab
+            devpts /dev/pts devpts mode=620 0 0
+          mkdir etc/dropbear //生成密钥文件
+          cd etc/dropbear 
+          dropbearkey -t rsa -s 2048 -f dropbear_rsa_host_key
+          dropbearkey -t dss -s 2048 -f dropbear_dss_host_key
+          ls 查看是否生成相应的key文件
+          vim etc/shells //指定当前系统的安全shell 
+                /bin/sh
+                /bin/ash
+                /bin/hush
+                /bin/bash
+                /sbin/nologin
+          vim etc/nsswitch.conf  
+                passwd:files //etc/passwd指明
+                group:files
+                shadow:files
+                hosts:files dns
+          ls /usr/lib64/libnss* nsswitch使用时候依赖的库文件    
+          却当前目录下lib64.同时在/usr/lib64下也有该目录
+          mkdir /usr/lib64
+          cp -d /lib64/libnss_files* lib64/
+          cp -d /usr/lib64/libnss3.so usr/lib64/
+          cp -d /usr/lib64/libnssutil3.so usr/lib64/
+          cp -d /usr/lib64/libnss_file* usr/lib64/
+          sync
+
+          关闭主机
+          开启挂载机
+            vim .bash_profile
+                export PS1='[\u@\h\W]$PS1'
+                export PATH=$PATH:/usr/local/bin:/usr/local/sbin
+            dropbear -h 
+            mkdir   /var/run
+            netstat -tnl
+            mkdir /dev/pts
+            mount -t devpts devpts /dev/pts 
+            dropbear -F -E
+          配置远程登录的环境
+          vim /etc/profile
+          [ $UID -eq 0] && export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+          du -sh /查看根的大小
+
+
+
+
+
+
+
+
+          
+
+         
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+          vim etc/fstab 自动挂载
+            sysfs /sys sysfs defaults 0 0
+            proc  /proc proc defaults 0 0
+            devtmpfs  /dev  devtmpfs defaults 0 0
+            /dev/sda1 /boot ext4 defaults 0 0
+            /dev/sda2 /     ext4 defaults 0 0
+         chmod +x etc/rc.d/rc.sysinit
+         sync
+
+         将系统上的mount移植于minilinux中
+         mv mount mount.org
+         bash bincp.sh
+         mount 
+         bash
+         quit
+         sync
+
+
+         基于模块的方式编译网卡驱动
+         lspci  查看网卡设备
+         modinfo e1000查看网卡设备
+         重新编译内核的模块,将网卡支持编译进内核
+         cd /usr/src
+         cd linux
+         make menuconfig
+         Networking support
+            Networking Options
+                TCP/IP network
+                    IP:mutilcasting 
+                    IP:advanced router 
+                    IP:kernel level autoconfiguration 内核级别自动配置
+
+
+         Device Drivers
+            Network device support
+                Network core driver support 
+                Ethernet driver support
+                        Intel devices
+                            Intel(R) PRO/1000
+        make -j bzImage
+
+        将网卡驱动编译为模块
+        modinfo e1000查看模块是否有依赖相关的库文件需要一并提供
+        cd drivers/net/ethernet/intel/
+        make M=drivers/net/ethernet/intel/e1000/
+        cp /drivers/net/ethernet/intel/e1000.ko /mnt/sysroot/lib/modules/
+        sync
+        挂载机
+        insmod /lib/modules/e1000
+
+        
+
+
+
+        加载机
+        ifconfig -a
+        ifconfig eth0 172.16.100.20 up
+        ifconfig lo 127.0.0.1 up
+        ping 172.16.0.1
+
+
+
+            
+
+
+
+         
+         
+
+
+            
+
+
+          
+
+
+
+
+
+
+
+
+
+
+
+                        
+    
+       
+
+
+
+

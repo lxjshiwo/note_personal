@@ -1,0 +1,269 @@
+linux进程查看以及管理工具： 
+pstree ,ps ,pidof,pgrep ,   top,htop.glance ,vmstat,    
+    pstree命令
+        pstree display a tree of process
+    ps:process state 
+        ps-report a snapshot of the current processes
+
+        linux系统上各个进程的相关信息均保存在/proc/PID目录下
+
+        ps [OPTION] ...
+
+            选项：支持两种风格
+
+            常用组合：aux
+                u:以用户为中心组织进程状态信息显示
+                a:与终端相关的进程 
+                x:与终端无关的进程
+
+            USER PID %CPU %MEM  VSZ RSS TTY STAT START TIME COMMAND
+
+
+                vsz:Virtual memory size 
+                RSS:Resident Size:常驻内存集
+                STAT:进程状态
+                    R:running 
+                    S:interuptable sleeping 
+                    D:uninteruptable sleeping
+                    T：stopped
+                    Z:zombie
+
+                    +:前台进程
+                    l:多线程进程
+                    N:低优先级进程
+                    <:高优先级进程
+                    s:session leader (bash shell 程序) 
+
+                START:启动的时间
+                TIME:占用cpu的累计时长
+                COMMAND:启动进程的时间
+
+        -ef
+            -e:显示所有进程
+            -f:显示完整的信息
+        -eFH
+            -F:显示完整进程信息
+            以进程层级显示进程信息  
+        -axZ    
+        -U
+        -eo,-axo
+        -eo:pid,tid,class,rtprio,ni,pri,pcpu,stat,wchan:14,comm
+        axo:stat,euid,ruid,tty,tpgid,sess,pgrp,ppid,pid,pcpu,comm
+        ni:nice值
+        pri:priority
+        psr:processor,CPU
+        rtptrio:实时优先级
+
+    pgrep,pkill :
+        pgrep[options]...
+        pkill[options]...
+
+        -u uid: real user 
+        -U uid: effective user
+        -t terminal :与指定终端相关的进程
+        -l:显示进程名字        
+        -a:显示完整格式的进程名字
+        -P pid:显示其父进程为此处指定的进程的进程列表
+        
+    pidof
+        根据进程名获取进程的pid
+
+
+
+    top 
+        内置许多命令:
+            排序：
+                P:以占据的CPU百分比：
+                M:占据内存的百分比
+                T:累计占据的CPU时长
+
+    首部信息：
+        -l
+        uptime信息；
+    up:运行时长 load average:平均负载，cpu队列中任务的个数
+
+    Task 进程数目以及cpu信息
+        cpu分别显示：t
+        
+        wa:等待io完成的时间 hi:硬中断所消耗的时间 id:空闲
+
+    memory:m命令 
+    修改刷新间隔时间：s命令
+    终止指定进程：k
+    退出q命令
+
+    选项：
+        -d #：指定刷新时间间隔，默认为3秒：
+        -b :以批次方式显示
+        -n #:显示的屏幕数
+    htop命令：
+        s:跟踪选定进程的系统调用；
+        l:跟踪选定进程打开的文件列表
+        a:将选定的进程绑定在指定的CPU核心
+
+回顾：
+    Linux基础：
+        CPU:timeslice
+        Memory:线性地址
+        I/O:
+            分时复用
+    进程查看工具：
+linux 进程查看以及管理工具：
+    vmstat命令:
+        vmstat [options] [delay][count]
+            procs
+                r:等待运行的进程的个数
+                b:处于不可以中段睡眠态的进程个数（）
+
+            memory
+                swap:交换内存的使用总量
+                free:空闲物理内存总量
+                buffer:用于buffer的内存总量
+                cache:用于cache的内存总量
+            swap:
+                si：数据进入swap中的速率
+                so:数据离开swap中的速率
+            io:
+                bi:从块设备读入系统中的速率（kb/s）
+                bo:保存数据到块设备的速率：
+            system:
+                in:interupts中断速率：
+                cs:context switch,进程切换的速率
+            cpu:
+                us:
+                sy:
+                wa:
+                st:
+            选项：
+                -s:显示统计数据：
+        pmap命令：
+            pmap -report memory map of a process 
+                pmap [options] pid[...]
+                    -x 显示详细信息
+                另外一种实现：
+                 cat /porc/PID/map
+
+        glances命令：
+            内建命令：
+                a   Sort process autpmatically
+                c Sort process CPU
+                m  Sort process MEM
+                p Sort process name
+                i Sort process I/O rate 
+                d Sort/hide process I/O rate 
+                f Sort/hide disk IO state 
+                n
+                s
+                y 
+
+            常用选项：
+                -b:以Byte为单位显示网卡数据
+                -d:关闭磁盘I/O
+                -f:/path/to/somefile:设定输入文件的位置
+                -m:禁用mount模块
+                -n:禁用网络模块
+                -o {HTML | CSV} 输出格式：  
+                -t #:延迟时间间隔
+                -1:每个cpu相关数据单独显示
+            
+            C/S 模式下运行glances命令
+                服务模式：
+                    glances -s -B IADDR
+
+                    IPADDR:指明监听于本地的哪个地址
+
+                客户端模式：
+                    glances -c -p IADDR
+
+                    IPADDR:要连入的服务器端地址
+
+        dstat命令：
+            dstat - versatile tool for generating system resource statistics 
+            dstat -[afv] [options..] [delay [count]]
+                -c :显示cpu相关信息，
+                    -C #,#,....,total   
+                -d:显示磁盘的读写速率
+                    -D total,sda,sdb,...
+                -g：显示page想关统计信息
+                -i:显示中断的统计信息
+                -l:显示load信息
+                -m:显示memory相关统计数据
+                -n:显示network统计数据
+                -p --proc:显示process 相关 统计数据
+                -r:显示I/O相关统计信息
+                -s:显示交换内存的统计 数据
+                --ipc:显示ipc相关信息
+                --socket
+                --tcp 
+                --udp
+                --top--cpu :显示最占用cpu的进程
+                --top--io--adv 显示最占用io的进程
+                --top--mem
+                --top--latency:显示延迟最大
+
+        kill命令：
+            
+            向进程发送控制信号,以实现对进程的管理管理
+            
+            显示当前系统的可用信号：
+                kill -l 
+                man 7 signal 
+
+                常用的信号：
+                    1)SIGHUP:通知进程重读配置文件无需关闭进程
+                    2)SIGINT:终止正在运行的进程，想到相当于ctrl c信号
+                    9)SIGKILL:杀死正在运行的进程
+                    15)SIGTERM:终止正在运行的进程
+                    18)SIGCONT:
+                    19)SIGSTOP:
+
+                指定信号的方法：
+                    1)信号的数字标识:1,2,3
+                    2)信号的完整名称：SIGHUP
+                    3)信号的简写名称：HUP
+
+                向进程发信号;
+                kill [-SIGNAL] PID...
+
+                终止特定名称的所有进程
+                killall [-SIGNAL] PROGRAM
+
+        Linux的作业控制
+            前台作业：通过终端启动，而且启动后一直占据终端
+            后台作业：可以通过终端启动，但启动后即转入后台运作（释放终端）
+            如何让作业运行于后台：
+                (1)运行中的作业
+                    ctrl z转入后台， fg 返回前台
+                (2)尚未启动的作业：
+                    # COMMAND & 
+                依然与终端相关,依然与终端一起终止，如果希望送往后台后，剥离与终端的关系
+                    # nohup command &
+
+                查看所有作业
+                    jobs 命令调出
+
+                作业控制：
+                    fg [[%]JOB_NUM];把指定的后台作业调回前台 
+                    bg [[%]JOB_NUM]:让后台停止的作业继续运行
+                    kill [%JOB_NUM];终止指定的作业
+
+        进程优先级调整：
+            静态优先级：100-139     
+
+                进程默认启动时的nice 值钱为0,优先级为120    
+                nice命令：
+                    nice [options] [COMMAND[ARG]]....
+                renice 命令：
+                    renice [-n] priority pid
+
+                查看：
+                    ps axo pid,comm,ni 
+
+
+
+
+
+
+        
+
+        

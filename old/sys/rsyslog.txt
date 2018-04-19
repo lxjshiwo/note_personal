@@ -1,0 +1,212 @@
+rsyslog:
+
+    日志：历史日志
+        历史事件：
+            时间,事件
+            日志级别：事件的关键性程度,loglevel 
+
+        系统日志服务：
+        CentOS 5:
+            syslog:
+                syslogd:system 系统哦个日志
+                klogd:kernel 内核日志
+
+        CentOS 6:
+            rsyslog:
+                syslogd:
+                klogd:
+                多线程：
+                UDP,TCP,SSL,TLS,RELP
+                MYSQL,PGSQL,Oracle 实现日志存储：
+                强大的内置过滤器，可实现过滤日志信息中任何部分：
+                自定义输出格式：
+
+            elasticsearch,logstash,kibana = elk
+
+            日志收集方:
+                facility:设施，从功能或程序上对日志进行分类：
+                    auth,authpriv,cron,daemon,kern,lpr,mail,mark,news,security,user,uucp(Unix to Unix copy),loacl0-local7,syslog,ftp
+                priority:日志级别
+                    debug,info,notice,warn(warning),err(error),crit(critical),alert,emerg(panic)
+                指定级别：
+                    *:所有级别
+                    none:没有级别，禁止记录
+                    priority:此级别以及更高级别的日志信息
+                    =prioruty:此级别
+                target :
+                    文件路径:记录于指定的日志文件中，通常在/var/log下：文件路径前的"-"表示异步输入
+                    用户：将日志通知给用户
+                        *:所有用户
+                        日志服务器：@host
+                            host:必须监听在tcp或udp协议的某个端口，通常在514/tcp，udp的端口上
+                        管道： |COMMAND
+
+                facility.priority  /var/log/messages
+            程序环境：
+                主程序：rsyslogd
+                配置文件：/etc/rsyslog.conf
+                服务脚本：/etc/rc.d/init.d/rsyslog
+
+
+             rsyslog.conf 
+                RULES:
+                    facility.priority   target
+
+
+
+                文件记录日志的格式：
+                    事件产生时的日期时间   主机     进程(pid)   事件内容
+
+	                有些日志记录为二进制格式： /var/log/wtmp /var/log/btmp 
+	                    /var/log/wtmp:当前系统上成功登录的日志
+	                        last 
+	                    /var/log/btmp:当前系统上失败的登录日志
+	                        lastb
+	
+	
+	                    lastlog命令：显示当前系统每一个用户最近一次的登录时间：
+
+                 rsyslog服务器：
+                    打开配置文件中的ModLoad imudp,或者ModLoad imtcp同时在相应主机上设置将日志内容记录到相关主机上
+                    iptabels 需要向相应的主机开放
+
+                 rsyslog服务器与mysql存储
+                    (1)准备好Mysql服务器,创建用户，授权对syslog数据库的全部访问权限:
+                    (2)安装rsyslog-mysql程序包
+                    (3)创建rsyslog-mysql依赖的数据库
+                        mysql -uUSERNAME -hHOST -pPASSWORD < /usr/share/doc/rsyslog-mysql-VERSION/createDB.sql
+                    (4)配置rsyslog使用ommysql模块
+                        MOUDLES
+                        $ModLoad ommysql
+
+                        RULES
+                        facility.priority :ommysql:DBHOST,DB,DBUSER,USERPASS
+                        重启rsyslog服务
+
+                     (5)安装loganalyzer
+                        (a)配置webserver 支持php
+                            yum install httpd php php-mysql php-gd
+                            service httpd start
+                        (b)loganalyzer 
+                            cp -r loganalyzer/src /var/www/html/loganalyzer
+                            cp loganalyzer/contrib/*.sh /var/www/html/loganalyzer
+                            cd /var/www/html/loganalyzer
+                            chmod +x *.sh
+                            ./configure.sh 
+                            ./secure.sh
+                            chmod 666 config.php
+
+                    
+                 主机1
+                    安装mariadb 
+                    yum list all  rsyslog*
+                    yum install rsyslog-mysql -y 
+                    rpm -ql rsyslog-mysql
+                        执行相关展示下的create脚本
+                    mysql -uroot -pmagedu
+                        GRANT ALL ON Syslog.* TO 'syslog'@'172.16.%.%' IDENTIFIED BY 'syspass';
+                        FLUSH PRIVILIEGES
+                    vim /etc/my.cnf 
+                        skip_name_reslove = on 
+                        innodb_file_per_table = on
+                    systemctl restart mariadb.service 
+                    mysql -usyslog -psyslogpass -h 172.16.100.9
+                    iptables -L
+                    iptables -F     
+                    检查脚本是否执行成功
+                    mysql -usyslog -psyslogpass 
+                    SHOW DATABASE;
+                    use Syslog;
+                    SHOW TABLES;
+                    SELECT COUNT(*) FROM SystemEents;   
+                    SELECT COUNT(*) FROM SystemEentsProperties;   
+                    SELECT * FROM  SystemEvents;
+                    指明前端展示工具
+
+                 主机2
+                    安装mysql 提供客户端 centos 6
+                    yum install mysql 
+                    mysql -usyslog -h172.16.100.9 -psyslogpass
+                    mysql -usyslog -h172.16.100.9 -p < /usr/share/doc/rsyslog-mysql-5.8.10/createDB.sql 如何输入指定脚本 
+                    vim /etc/rsyslog.conf
+                            在MODULES目录下添加
+                            $ModLoad ommysql
+                            在RULES下修改
+                            *.info;mail.none;authpriv.none;cron.none    :ommysql:172.16.100.9,Syslog,syslog,syslogpass
+                            service rsyslog restart
+                            yum install vsftpd
+                    yum install httpd php php-mysql
+                    vim /var/www/html/index.php 
+                            <?php 
+                                    $conn = mysql_connect('172.16.100.9','syslog','syslogpass');
+                                    if($conn)
+                                        echo "ok"
+                                    else  
+                                        echo "failed"
+                            ?>
+                     service httpd restart 
+                     获取loganalyzer.tar
+                     tar -xf loganalzer.tar
+                     cp /loganalyzer/src /var/www/html/log
+                     cp /loganalyzer/contrib/* /var/www/html/log 
+                     ls 
+                     chmod +x *.sh
+                     ./configure.sh
+                     ./secure.sh 
+                     chmod 666 config.php
+                        浏览器访问相应ip下log下的install.php 
+
+                                         
+
+                   
+                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                ModLoad imuxsock
+
+                $ModLoad imudp
+                $UDPServerRun 514通过监听在udp 514
+
+                $ModLoad imtcp
+                $TCPServerRun 514通过监听在tcp 514
+
+                Global DIRECTIVES全局指定
+                RULES指明日志如何记录
+
+                kern,*          /dev/console
+                *.info;mail.none;authpriv.none;cron.none /var/log/messages
+                authopriv.*     /var/log/secure 
+                mail,*         -/var/log/maillog  //异步写入,日志系统的信息通常都是同步写入，对于mail的日志量过大则采用异步写入提升性能
+                cron.*          /var/log/cron
+                *.emerg         *   //当前主机上所有登录的用户
+                uucp,news.crit //两个facility使用统一个级别 /var/log/spool
+                local7,*        /var/log/boot.log
+                
+
+
+
+
+
+
+
+
+             
+

@@ -1,0 +1,138 @@
+grep
+    Linux上文本处理三剑客
+        grep:文本过滤（模式：pattern）工具：
+            grep,egrep,fgrep
+        sed:stream editor，文本编辑工具
+        awk:Linux上实现的gawk,文本报告生成器
+
+    grep:Global search Regular expression and Print out the line
+        作用：文本搜索工具，根据用户指定“模式”对目标文本进行匹配检查：打印匹配到的行
+        模式：由正则表达式字符以及文本字符所编写的过滤条件：
+        REGEXP：由一类特殊字符及文本字符编写的模式，其中有些字符不表示字符字面意义，而表示控制或者通配的功能；
+            两类：
+                基本正则表达式：BRE
+                扩展正则表达式：ERE
+                    grep -E,egrep 
+            正则表达式引擎：
+                grep [options]  PATTERN [FILE]
+                    
+                    选项：
+                        --color=auto 对匹配的行文本着色显示
+                        -v 反向选择
+                        -i 匹配时忽略字符大小写
+                        -o：只显示匹配到的字符串
+                        -q:静默模式，不输出任何信息
+                        -A #:显示匹配行和行后面n行
+                        -B #:显示匹配行和行前面n行
+                        -C #:context,前后各n行
+                        -E：使用ERE：扩展正则表达式
+
+            基本正则表达式元字符：
+                字符匹配：  
+                    ,:匹配任意单个字符
+                    [];匹配指定范围内的任意单个字符
+                    [^]:匹配指定范围外的任意单个字符
+                        [:digit:] [:lower:][:upper:][:alpha:][:alnum:][:punt:][:space:]
+                匹配次数;用在指定次数的字符后面，用于指定前面的字符要出现的次数；
+                *:匹配前面的字符任意次,字符可以没有
+                eg:grep "x*y"
+                    abxy 
+                    xay
+                    xxxxxxxxxy
+                .*:任意长度的任意字符   
+                \?:匹配前面的字符0次或者1次，可有可无
+                \+:匹配前面的字符至少1次
+                \{m\};匹配前面的字符m次 
+                \{m,n\}:匹配前面的字符至少m次，之多n次
+                    \{0,n}:匹配前面字符之多n次
+                    \{m,\}:匹配前面字符至少m次
+                默认情况下grep工作于贪婪模式
+                位置锚定：
+                    ^:行首锚定,用于最左侧
+                    $:行尾锚定,用于最右侧
+                    ^pattern$:用于模式匹配整行
+                        ^$:空行
+                        ^[[:space:]]*$
+                    \< 或\b:词首锚定：用于单词模式的左侧
+                    \> 或 \b:词尾锚顶：用于单词模式的右侧
+                    \<pattern\>:匹配整个单词
+                分组：
+                    \(\):将1个或多个字符捆绑在一起作为一个整体
+                    grep "\(xy\)\+"
+                    \(xy\)*ab
+
+                    Note:分组括号中的模式匹配到的内容将会被正则表达式引擎记录于内部的变量中，这些变量的命名方式为：\1.\2.\3......
+                    \1:从左侧起，第一个左括号以及与之匹配右括号之间的模式匹配到的字符；
+                    \(ab\+\(xy\)*\) 
+                        \1;ab\+\(xy\)
+                        \2;xy
+
+                    后向引用：引用前面的分组括号中的模式所匹配的字符串(而非模式本身)
+
+练习；
+显示/proc/meminfo文件中以大小写s开头的行：
+grep -i '^s' /proc/meminfo
+grep '^[Ss]' /proc/meminfo      
+
+显示/etc/passwd文件不以/bin/bash结尾的行
+grep -v '/bin/bash$' /etc/passwd
+
+显示/etc/passwd文件中id号最大的用户的用户名字
+sort -t : k3 -n /etc/passwd|tail -1 | cut -d: -f1
+
+如果root存在，显示其默认的shell程序
+grep '^root:' /etc/passwd
+id root &> /dev/null && grep '^root\>' | cut -d: -f7
+
+找出/etc/passwd中的两位或者三位数
+grep "\<[0-9]\{2,3\}\>" /etc/passwd
+
+显示/etc/rc.d/rc.sysinit文件中，至少以一个空白字符开头的而且后面存在非空白字符行
+
+grep "^[:space:]\+[^[:space:]]\+" /etc/rc.d/rc.sysinit 
+
+找出“netstat -tan”命令的结果中以“LISTEN”后跟0或1或多个空白字符的行  
+netstat -tan|grep "LITSEN[[:space:]]*"
+
+添加用户bash,testbash,basher以及nologin(其中shell为/sbin/nologin):然后找出/etc/passwd文件中用户名同shell名的行
+useradd bash 
+useradd testbash 
+useradd basher
+useradd -s /bin/nologin nologin  
+
+grep "\([[:alnum:]]\+\>\).*\1$" /etc/passwd
+
+写一个脚本，实现以下功能
+如果user1用户存在，就显示其存在，否则添加之 
+显示添加用户的id号码
+
+#!/bin/bash
+id user &> /dev/null && echo "user1 exist." || useradd user1
+id user1
+
+如果root 用户登陆了当前系统就显示root 用户在线:否则说明其为登陆
+#!/bin/bash
+who | grep "root\>" &> /dev/null && echo "the root logged" || echo "the root is out"
+总结：shell的基础特性,grep
+    shell:
+    #!/bin/bash
+        
+        
+        过程式:以指令为中心
+        对象式:以数据为中心
+    grep:文本过滤器
+        PATTERN
+
+        REGEXP:
+            BRE,ERE
+        BRE:
+        字符匹配：.,[],[^]
+        次数匹配：*,\?,\+,\{m\},\{m,n\}
+        位置锚定：^,$,\<,\b,\>,\b
+        分组：\(\)
+            后向引用：\1,\2,...1
+
+
+
+
+

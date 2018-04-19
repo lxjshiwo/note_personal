@@ -1,0 +1,27 @@
+Samba:
+    smb:Service Message Block
+    CIFS:Common Internet File System
+
+    137/udp,138/udp 139/tcp 443/tcp
+        
+        NetBIOS:Windows基于主机名互相通信的机制：
+            15个字符    
+            Wins
+
+        samba:  
+            nmbd:netbios
+            smdb:cifs
+            winbindd:
+         UNC路径:
+
+
+    win上共享文件夹
+        我的电脑 管理
+            本地用户和组
+
+                用户
+                    新增
+                        用户名test
+                            
+
+

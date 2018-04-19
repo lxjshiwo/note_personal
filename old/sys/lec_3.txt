@@ -1,0 +1,299 @@
+GPL,BSD,Apache
+www.kernel.org
+Linux,GNU:GNU/Linux,源代码
+发行版本：Fedora,Redhat(CentOS),Suse,Debian(Ubuntu,Mint),Gentoo,LFS(Linux From Scratch);
+C,Tom,AMD,Jerry,编译与硬件密切相关
+RedHat:通用格式
+奔腾：
+目录管理 ：
+ls,cd ,pwd,mkdir,rmdir,tree
+文件管理
+touch,stat,file,rm,cp,mv,nano
+日期时间
+date,clock,hwclock,cal
+
+查看文本
+cat,tac,more,less,head,tail 
+
+cat :链接并显示
+    -n 显示行号
+    -E 
+    -A
+tac 从文件的结尾往前输出
+shift+pageup,pagedown 
+
+分屏显示
+more:支持向后翻
+less:man命令使用less来打开文     
+
+head:查看前n行
+tail:查看后n行
+    -n 不加任何选项默认10行
+    -f 查看文件尾部不退出，等待后续追加到此文件的新内容
+
+文本处理
+cut,join,sed,awk
+
+
+
+database:数据库
+一个表可以没有行但不可以没有列
+表：二维表
+
+
+文本文件
+Tom:23:male:2013/5/06
+
+只影响显示
+cut:
+    -d:指定字段分割符号，默认是空格
+    -f:指定要显示的字段
+        -f 1,3
+        -f 1-3
+文本排序：
+sort
+    -n:数值排序，不使用数值排序则按照AsCII排序  
+    -r:反向排序
+    -t:字段分隔符 
+    -k:以哪个字段为关键字进行排序
+    -u:排序后相同的行只显示一次
+    -f:排序时忽略字符大小写 ,相临并且相同的行
+uniq:略过相同的行
+    -d:只显示重复的行
+    -D:
+    -c:显示文件中行重复的次数
+
+文本统计
+   wc
+    -l
+    -c
+    -w
+    -m
+    -L
+字符处理命令:tr:转换或删除字符
+tr[option]...set1[set2]
+tr 'ab'  'AB'< /etc/passwd
+tr 'a-z' 'A-Z'
+        -d:删除出现在字符集中的所有字符
+
+bash以其特性：
+shell:外壳
+GUI:Gnome,KDE,Xfce
+CLI:sh,csh,ksh,bash,tcsh,zsh
+    
+ctrl+c终止任务
+程序：进程
+进程：在每个进程看来，当前主机上只存在内核和当前进程
+进程是程序的副本，进程程序的实例
+用户的工作环境：
+bash:
+    #
+    $
+    tom,jerry
+shell 子shell
+
+bash:
+1,命令历史，命令补全
+2,管道重定向，
+3,命令别名
+4,命令行编辑
+5,命令行展开
+6,文件通配符 
+7,变量
+8,编程 
+
+
+
+命令行编辑: 
+光标跳转：
+ctrl+a:跳到命令行首
+ctrl+e:跳到命令行尾
+ctrl+u:删除光标至命令行首的内容
+ctrl+k:删除光标至命令行尾的内容
+ctrl+l:清屏
+对Linux系统，结束符号为$,而windows中为$/m
+命令历史：
+history 
+    -c:清空命令历史
+    -d OFFSET [n]:删除指定位置 的命令
+    -w：保存命令历史至历史文件中
+环境变量：
+PATH:命令搜索路径
+HISTSIZE:命令历史缓冲区大小
+命令历史的技巧：
+!n 执行命令历史中的第n条命令
+! -n 执行倒数第n条命令
+!! 执行上一条命令
+!string:执行命令历史中以string字符串开头的命令
+!$:引用前一个命令的最后一个参数
+ESC,.
+ALT+.
+命令补全：
+搜索PATH环境变量所指定的每个路径下以我们给出的字符串开头的可执行文件，如果多余一个，两次tab可以列出列表 ；否则将直接补全
+路径补全：搜索文们给出的起始路径下的每一个文件名，并试图补全
+命令别名：
+alias CMDALIAS=command [option] [arguments] 最好加上单引号
+只在当前shell的生命周期中有效:  别名的有效范围仅为当前shell进程
+alias 显示当前所有命令别名
+
+unalias CMDALIAS  
+
+\CMD
+
+
+命令替换
+把命令中某个子命令替换为执行结果 $(Command),`Command`
+touch ./file-$(date +%F-%H-%M-%S).txt   
+
+bash支持的引号：
+``:命令替换
+"":弱引用，可以实现 变量替换
+'':强引用，不完成变量替换 
+
+文件名通配,globbing 
+*:任意长度的任意字符
+?:任意单个字符
+[]:匹配指定范围内的任意单个字符
+    [abc],[a-m],[a-z],[A-Z],[a-zA-Z]
+    [:space:]:空白字符
+    [:punct:]:标点符号
+    [:upper:]:大写字母
+    [:lower:]:小写字母
+    [:digit:]:数字
+    [:alnum:]:数字和大小写字母
+[^]:匹配指定范围以外任意单个字符
+
+显示以字母开头，中间一个空格，字母结尾的文件
+[[:alpha:]]*[[:space:]]*[[:alpha:]]
+ls [am]*
+ls  *[0-9]*
+ls [[:digit:]]
+ls *[^[:alnum:]]*
+
+
+安全上下文(secure context)：
+
+权限：
+r,w,x
+文件：
+r：可读，可以使用类似cat的命令来查看文件内容
+w:可写，可以编辑或删除此文件
+x:可执行，eXacutable,可以命令提示符下当作命令交给内核
+目录
+r:可以在此目录执行ls以列出内部文件的所有文件
+w:可以在此目录创建文件
+x:可以使用cd切换此目录，也可以使用ls-l查看内部文件信息
+
+rwx:    
+    r--:只读
+    R-x:读和执行权限
+    ---:无权限
+000 --- 
+001 --x
+010 -w-
+011 -wx
+100 r--
+110 rw-
+111 rewx
+755: rwx -xr -xr
+640:rw-r-----
+660:rw-rw----
+775:rwxrwxr-x
+
+
+用户：UID,/etc/passwd
+组：GID,/etc/group
+影子口令：
+用户：/etc/shadow
+组：/etc/gshadow 
+用户类别：
+管理员：
+普通用户：1-65535
+    系统用户：1-499
+    一般用户:500-60000
+
+用户组：
+管理员组:
+普通组：
+    系统组：
+    一般组:
+
+用户组类别：
+    私有组：创建用户时，如果没有为其指定所属的组，系统会自动为其创建一个与用户同名的组
+    基本组：用户的默认组
+    附加组,额外组：默认组以外的组
+计算资源
+权限
+用户
+逻辑容器，关联权限：用户组,方便的指派权限 
+
+
+
+/etc/passwd 
+account:登陆名
+password :密码
+UID;
+GID:基本组
+comment:注释信息
+HOME DIR:家目录
+SHELL：用户的默认shell
+GECOS:
+
+
+/etc/shadow 
+!表示锁定
+account:登陆名
+encrypted password：加密密码
+
+/etc/passwd 
+用户名：密码：UID：GID：注释：家目录:默认shell:w
+
+/etc/shadow:
+用户名：密码;最近一次修改密码的时间：最短使用期限：最长使用时间：警告时间   ：非活动时间：过期时间:
+/etc/group
+组名字：密码：GID：以此为其附加组的用户列表
+
+
+
+加密方法：
+    对称加密：加密和解密都使用同一个密码
+    公钥加密：每个密码成对出现；一个为密钥(secret key) ，一个为公钥(public key )
+    单向加密，散列加密：提取数据特征码,常用于数据完整性检验
+        1,雪崩效应 
+        2,定长输出
+            MD5:Message Digest ,128位定长输出
+            SHA1: Secure Hash ALgorithm ,160位定长输出
+                
+
+useradd USERNAME
+groupadd GROUPNAME
+
+
+用户管理：
+    useradd,userdel,usermod,passwd,chsh,chfn,finger,id,chage
+组管理：
+    groupadd,groupdel,groupmod,gpasswd
+权限管理：
+    chown,chgrp,chmod.umask
+
+
+用户:标识符
+用户组：标识符
+文件：
+    kernal内核  
+    硬件
+IO重定向：
+    标准输出重定向：1>,>>
+    标准错误重定向：2>，>>
+    标准输出
+    &>,&>>
+    COMMAND>/path/to/somfile.out    2>&1
+    输入重定向：<
+        显式使用：tr
+        隐式使用：...
+    管道：COMMAND |COMMAND2|...
+    文本处理命令：wc,cut,sort,uniq
+
+
+
+

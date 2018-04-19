@@ -1,0 +1,199 @@
+
+Linux service and security
+	
+	Openssl
+	Openssh
+	dns: bind
+	web:http,httpd(apache),php,mariadb(mysql)
+		lamp
+		nginx(tengine),lnmp
+	file server: ftp, nfs, samba
+	dhcp,pxe
+	iptables
+Openssl 
+	NIST:
+		保密性
+			数据保密性
+			隐私性
+		完整性
+			数据完整性
+			系统完整性
+		可用性
+
+	安全攻击：
+		被动攻击：窃听
+		主动攻击：伪装,重放,消息重放，拒绝服务
+	
+	安全机制：
+		加密,数字签名,访问控制,数据完整性，认证交换，流量控制，路由控制，公正
+	
+	安全服务：
+		认证	
+		访问控制
+		数据的保密性
+			链接保密性
+			无连接保密性
+			选择域保密性
+			流量保密
+		数据完整性
+		不可否认性
+	
+	密码算法和协议
+		对称加密
+		公钥加密
+		单向加密
+		认证协议
+	Linux系统：Openssl,gpg(pgp）
+
+	加密算法和协议：
+		对称加密：加密和解密使用同一个密钥
+		DES：Data Encryption Stabdard 
+		3DES
+		AES:Advanced Encryption Standard (128bits,192bits,258,384,512bits)
+		blowdish:
+		twofish:
+		IDEA:
+		
+		特性:
+			1,加密
+			2，将原始数据分割成特定大小的块，逐个进行加密的,
+		缺陷：
+			1,密钥过多	
+			2,密钥破解
+	公钥加密：密钥成对出现
+		公钥：公开给所有人,pubkey
+		私钥：自己留着，必须保证其私密性,secretkey
+		特点：用公钥加密的数据，必须与与之配对的私钥解密
+
+		身份认证(数字签名):主要用于接收方确认发送方的身份
+		密钥交换:发送方用对方的公钥加密对称密钥，并发送给对方
+		数据加密:
+
+		算法：RSA,DSA,ELGamal
+	
+	单向加密：只能解密，不能加密，提取数据特征码
+		特征：定长输出，雪崩效应
+		算法：
+			md5，128bits
+			sha1，
+			sha256
+			sha384
+			sha512
+		功能：
+			完整性：
+	密钥交换：IKE
+		公钥加密
+		DH:(Deffie Hellman)
+		A:P,G
+		B:p,G
+
+		A:x
+			--> p^x%G
+			p^y%G^x=p^xy%G
+		B:y
+			--> p^y%G
+			p^x%G^y=p^xy%G
+PKI:Public Key Infrastructure 
+		签证机构：CA
+		注册机构：RA
+		证书吊销列表：CRL
+	x.509:定义了证书的结构以及认证协议的标准
+		版本号
+		签名算法id
+		发行者名称
+		主体名称
+		主体公钥
+		发行者的唯一标示
+		主题的唯一标示
+		扩展
+		发行者签名
+
+	ssl:Secure Socket Layer (基于ip地址)
+	TLS:Transport layer security
+		1995,SSL,2.0,Netscape 
+		1996,SSL,3.0
+		1999,TLS (Transport Layer Security),ISOC
+		2006,TLS 1.1, RFC 4346
+		2008,TLS,1.2
+		2015,TLS 1.3,
+
+		分层设计：
+			1,基础算法原语的实现：aes,res,md5
+			2,向上一层：各种算法的实现
+			3,再向上一层：组合算法实现的半成品
+			4，用各种组件拼装而成的种种成品密码学协议/软件：
+				tls,ssh,
+	Openssl：开源项目
+		三个组件
+			openssl：多用途的命令行工具：
+			libcrypto:公共加密库：
+			libssl:库，实现ssl
+
+		openssl:	
+			openssl verssion 程序版本号码
+			标准命令，消息摘要,加密命令
+				enc,ca,req,...
+
+			对称加密：
+				工具：openssl,enc,gpg
+				算法：3des,
+				whatis enc man enc,
+					enc命令：
+						openssl enc -e -des3 -a -salt -in fstab  -out fstab.ciphertext
+						openssl enc -d -des3 -a -salt -in fstab.ciphertext -out fstab  
+						-des3
+						openssl ?
+			单向加密：
+				工具: md5sum,sha1sum,sha224sum,sha256sum, openssl dgst
+				dgst命令：
+					openssl dgst -md5 /path/to/somefile 
+
+				MAC:Message Authentication Code
+				单向加密的延伸应用，用于实现在网络通信中保证所传输的数据的完整性
+					机制：
+						CBC-MAC:
+						HMAC:使用md5或sha1算法
+
+				生成用户密码：
+					passwd命令：
+					openssl passwd -1 -salt 12345678
+
+				生成随机数：
+					rand命令:
+						openssl rand -base64 | hex num
+						num:表示字节数， -hex时;每个字符4位。出现字符数为num*2
+					公钥加密：
+						加密：
+							算法：RSA
+							工具：gpg,openssl rsault,
+						数字签名：
+							算法：RSA,DSA;ELGmal
+							工具：openssl rsa,dsa 
+						密钥交换：
+							算法：dh,
+
+							DSA:Digital Signature Algorithm
+							DSS:Digital Signature Standard
+							RSA:
+
+							生成密钥对：
+								genrsa命令:
+								openssl genrsa -out /PATH/TO/PRIVATEKEY.file NUM_BITS
+								(umask 077, openssl genrsa -out key.pri 2048)
+								取出公钥
+								openssl rsa
+								-in
+								/PATH/TO/PRIVATEKEY.file -pubout
+
+
+
+							随机数生成器：
+								熵池：
+								/dev/random:仅从熵池中返回随机数，随机数用尽则阻塞
+								/dev/urandom:仅从熵池中返回随机数，随机数用尽,利用软件生成随机数，不阻塞
+
+							
+
+
+
+

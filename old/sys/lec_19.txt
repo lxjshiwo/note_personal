@@ -1,0 +1,111 @@
+回顾：btrfs,compress/uncompress,archive,bash
+    btrfs:
+        子命令：filesystem ,device, 
+
+
+Linux 程序包管理
+    API:Application Programming Interface 
+        POSIX:Portable OS
+
+    程序源代码--> 预处理 --> 编译 --> 汇编 --> 链接
+        静态编译：
+        共享编译: /lib/lib64 .so
+    ABI:Application Binary Interface 
+        Windows 与Linux 不兼容
+        库级别的虚拟化
+            Linux:WINE
+            Windows :Cywin  
+    
+    系统级别开发:
+        c
+        c++
+    应用级别开发:
+        java
+        python
+        php
+    
+    二进制应用程序的组成部分
+        二进制文件，库文件，配置文件，帮助文件
+
+        程序包管理器:
+            debian:deb,dpt  
+            redhat:rpm,rpm
+                rpm:Redhat Package Manager 
+                    RPM is Package Manager 
+
+            Gentoo:
+            Archlinux:
+        
+        源代码：name-VERSION.tar.gz
+            VERSION: major.minor.release
+        rpm包命名方式
+            name-VERSION-realse.arch(指定平台).rpm
+                 VERSION:major.minor.release
+                 ARCH:release(rpm包版本).os.arch 
+
+                 常见的arch 
+                    x86: i386 ,i486,i586,i686
+                    x86_64:x64,x86_64,amd64
+                    powerpc:ppc
+                    跟平台无关：noarch 
+
+            testapp:拆包
+                testapp-VERSION-ARCH.rpm:主包
+                testapp-devel-VERSION-ARCH.rpm:支包
+                testapp-testing-VERSION-ARCH.rpm:子包
+            包之间：存在依赖关系
+                X,Y,Z
+
+
+                yum: rpm包管理器的前端工具
+                apt-get: deb包管理器的前端工具
+                zypper ;suse上的管理器的前端工具
+                dnf:fedora 22+ rpm包管理器的前端工具
+
+            查看二进制程序所依赖的库文件
+                ldd /PATH/TO/BINARY_FILE
+                
+            管理及查看本机已经装载的库文件
+                ldconfig 
+                    /sbin/ldconfig -p:显示本机已经缓存的所有可用的库文件路径以及映射关系
+                    配置文件：/etc/ld.so.conf /etc/ld.so.conf.d/*.conf
+                    缓存文件：/etc/ld.so.cache  
+
+            程序包管理器 
+                功能：将编译好的应用程序的各个组成文件打包成一个或几个程序包，从而 方便快捷地实现程序包的安装，卸载，查询，升级和检验管理操作
+                1,程序包的组成清单(每个包的独有)
+                    文件清单
+                    安装或卸载时运行的脚本
+                2,数据库(公共)
+                    程序包的名称和版本
+                    以来关系
+                    功能关系
+                    安装生成的各文件路径以及校验码 
+
+            管理程序包的方式:
+                使用包管理器:rpm
+                使用前端工具;yum.dnf 
+
+            获取程序的途径:
+                (1)系统发行版官方服务器：    
+                 Centos镜像
+                    http://mirrors.aliyun.com
+                    http://mirrors.sohu.com
+                    http://mirrors.163.com
+                    
+                (2)项目官方站点
+                (3)第三方组织
+                    fedora-EPEL
+                    http://pkgs.org
+                    http://rpmfind.net 
+                    http://rpm.phone.net
+                (4)自己制作 
+
+            建议：检查合法性
+                来源合法性：
+                程序包合法性:
+
+
+
+    
+

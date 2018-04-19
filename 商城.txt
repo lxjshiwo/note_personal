@@ -1,0 +1,10 @@
+tomcat 
+    webApp
+        ROOT
+        目录下
+
+
+软件框架
+    软件分包
+    一个页面的内容放在一个package中
+    

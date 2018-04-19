@@ -1,0 +1,1536 @@
+2017.12.26
+    1.sql语句
+        DML
+            SELECT
+                获取数据
+                SELECT　列名称　FROM 表名称
+                SELECT　* FROM 表名称
+                    * 选取所有列的快捷方式
+                SELECT　DISTINCT 
+                    SELECT　DISTINCT 列名称 FROM 表名称
+                    在表中，可能会包含重复值，列出不同(distinct)的值
+                WHERE 子句
+                    SELECT　列名称　FROM 表名称 WHERE 列 运算符 值
+                        = 
+                        <>
+                        >
+                        >=
+                        <=
+                        BETWEEN
+                            在某个范围内
+                        LIKE
+                            搜索某种模式
+
+
+                        引号注意
+                            SQL使用单引号来环绕文本值(大部分数据库系统接受双引
+                            号)
+
+
+                        AND 和 OR运算符
+                            AND 和 OR 可在WHERE子句中把两个或多个条件结合起来
+                            ，
+                            ()使用圆括号来组成复杂的表达式
+            
+
+
+
+
+                        ORDER BY 
+                            用于根据指定的列队结果集进行排序
+                            默认按照升序对记录进行排序
+                            DESC关键字降序
+                        LIKE
+                            操作符用于在WHERE子句中搜索列中的指定模式
+                            SELECT　column_name LIKE pattern
+                        NOT　LIKE
+                            不包含模式
+
+           SQL通配符
+                    %   
+                        替代一个或多个字符
+                    _
+                        仅替代一个字符
+                    [charlist]
+                        字符列中的任何一个字符
+                    [^charlist]
+                    或者
+                    [!charlist]
+                        不在字符列中的任何的单一字符
+              IN操作符
+                IN操作符允许我们在WHERE子句中规定多个值
+                    SELECT column_name(s)
+                    FROM table_name
+                    WHERE column_name IN (value1,value2,...)
+              BETWEEN操作符
+                BETWEEN操作符在WHERE子句中使用，作用是选取介于两个之间的数据
+                范围
+
+
+                SELECT　column_name(s)
+                FROM table_name 
+                WHERE column_name
+                BETWEEN value1 AND value2
+
+                NOT BETWEEN
+              Alias
+                可以为列名称和表名指定别名(Alias)
+
+                表
+                SELECT column_name(s)
+                FROM table_name AS alias_name
+                列
+                SELECT column_name AS alias_name
+                FROM table_name
+              JOIN
+                用于根据两个或多个表中的列之间的关系，冲这些表中查询数据
+                join和key
+                数据库中的表可以通过键将彼此联系起来
+                    Primary Key是一个列，在这个列中的每一行的值都是唯一的
+                    每个主键的值都是唯一的，这样做的目的是在不重复每个表中的所
+                    有数据的情况下，把表间数据交叉捆绑在一起
+                引用两个表
+                    FROM table_name_1 INNER JOIN table_name_2
+                    ON table_name_1.col_name_1 = table_name_2.col_name_2
+                    ORDER BY 
+                不同的SQL JOIN
+                    JOIN :如果表中至少有一个匹配，则返回行
+                    LEFT JOIN:即使右表中没有匹配，也从左表返回所有的行
+                        关键字会从左表(table_name1)那里返回所有的行，即使在
+                        右表(table_name2) 中没有匹配的行
+
+                        SELECT column_name(s)
+                        FROM table_name1
+                        LEFT JOIN table_name2
+                        ON table_name1.column_name = table_name2.column_name
+                        *某些数据库中，LEFT JOIN称为LEFT OUTER JOIN
+
+
+
+                    RIGHT JOIN:即使左表中没有匹配，也从右表中返回所有的行
+                        会从右表(table_name2)那里返回所有的行,即使在左表
+                        (table_name1)中没有匹配行
+                        SELECT column_name(s)
+                        FROM table_name1
+                        RIGHT JOIN table_name2
+                        ON table_name1.column = table_name2.column_name
+                        *某些数据库中，RIGHT JOIN 称为 RIGHT OUTER JOIN
+
+                        
+                    FULL JOIN:只要其中一个表存在匹配，就返回
+                        SELECT　column_name(s)
+                        FROM table_name1
+                        FULL JOIN table_name2
+                        ON table_name1.column_name = table_name2.column_name
+                        *某些数据库中，FULL JOIN 称为 FULL OUTER JOIN
+
+                UNION 和 UNION ALL
+                    UNION 操作符用于合并两个或多个SELECT语句的结果集
+                    UNION 内部的SELECT语句必须拥有相同数量的列，列也必须拥有相
+                    似的数据类型，同时，每条SELECT语句中的列的顺序必须相同
+
+                    SELECT column_name(s) FROM table_name1
+                    UNOIN
+                    SELECT column_name(s) FROM table_name2
+                    *默认地，UNION操作符选取不同的值，如果允许重复的值，使用
+                    UNION ALL
+
+
+                UNION ALL
+                    SELECT column_name(s) FROM table_name1
+                    UNION ALL
+                    SELECT coulumn_name(s) FROM table_name2
+                    另外,UNION结果集中的列名总是等于UNION中第一个SELECT语句中
+                    的列名
+
+
+
+
+                        
+               INNER　JOIN 关键字
+                    SELECT column_name(s)
+                    FROM table_name1
+                    INNNER JOIN table_name2
+                    ON table_name1.column_name = table_name2.column_name
+                    *INNER　JOIN 与 JOIN是相同的
+                        INNER JOIN关键字在表中存在至少一个匹配时返回行，
+
+
+               SELECT INTO
+                    用于创建表的备份复件
+
+                    SELECT INTO 语句从一个表中选取数据，然后把数据插入另一个表中
+                    SELECT INTO 语句常用于创建表的备份复件或者用于对记录进行存
+                    档
+                    SELECT *
+                    INTO new_table_name [IN externaldatabase(其他的数据库)]
+                    FROM old_tablename
+
+                    或者只把希望的列插入新表
+                    
+                    SELECT column_name(s)
+                    INTO new_table_name [IN externaldatabase(其他的数据库)]
+                    FROM old_tablename
+
+
+
+
+                    
+
+                    
+
+
+                    
+
+
+                            
+
+		    TOP子句
+		                    用于规定要返回的记录的数目
+		                        *并非所有的数据库系统都支持TOP
+		                    SELECT　TOP number | percent column_name(s)
+		                    FROM table_name
+		
+		                    Mysql
+                        SELECT column_name() FROM table_name LIMIT number;
+
+
+            UPDATE
+                更新数据库表中的数据
+                UPDATE 表名称 SET 列名称 = 新值 WHERE 列名称 = 某值
+
+
+            DELETE
+                从数据库表中删除数据
+                DELETE　FROM 表名称 WHERE 列名称 = 值
+                
+
+            INSERT INTO
+                向数据库表中插入数据
+                INSERT INTO 表名称 VALUES(值1,值2...)
+                INSERT INTO table_name(列1，列2，...) VALUES(值1,值2...)
+
+                
+
+        DDL
+            CREATE DATABASE
+                创建爱数据库
+                CREATE DATABASE database_name
+            AlTER DATABASE
+            CREATE TABLE
+                创建数据库中的表
+                CREATE TABLE
+                {
+                    列名称1 数据类型，
+                    列名称2 数据类型，
+                    列名称3 数据类型，
+                    ...
+                    
+                }
+
+                data_type
+                    integer(size)
+                    int(size)
+                    smallint(size)
+                    tinyint(size)
+                    demical(size,d)
+                    numeric(size,d)
+                    char(size)
+                    varchar(size)
+                    date
+            ALTER TABLE
+                变更表
+            DROP TABLE
+            CREATE INDEX
+                创建索引(搜索键)
+            DROP INDEX
+
+
+       SQL约束(Constraints)
+            约束用于限制加入表的数据类型
+            创建表时规定约束(通过CREATE TABLE 语句)，或者在表创建之后也可以(通
+            过ALTER TABLE语句)
+
+            主要约束
+                NOT NULL
+                    约束强制列不接受NULL值，始终包含值，意味如果不向字段添加值
+                    ，就无法插入新的记录或者更新纪录
+
+                UNIQUE
+                    约束唯一标示数据库表中的每条记录
+                    UNIQUE和PRIMARY KEY约束均为列集合提供了唯一性的保证
+                    PRIMARY KEY 拥有自动定义的UNIQUE约束
+                    多列定义UNIQUE
+                    CONSTRAINT col_name1 UNIQUE (col_name2,col_name3)
+
+                    ALTER结合
+                    单个
+                    ALTER TABLE table_name
+                    ADD UNIQUE (col_name)
+                    多个
+                    ALTER TABLE table_name
+                    ADD CONSTRAINT col_name1 UNIQUE (Id_P,LastName)
+
+
+                    撤销UNIQUE约束
+                    Mysql
+                        ALTER TABLE table_name
+                        DROP INDEX col_name
+                    sql SERVER
+                        ALTER TABLE table_name
+                        DROP CONSTRAINT col_name
+
+
+
+
+
+                PRIMARY KEY
+                    约束唯一标识数据库表总的每条记录
+                    主键必须包含唯一的值
+                    主键列不能包含NULL值
+                    每个表都应该有一个主键，并且每个表都只能有一个主键
+
+
+                    Mysql
+                        PRIMARY KEY (col_name)
+                        多列定义
+                        CONSTRAINT col_name1 PRIMARY KEY (col_name2,col_name3...)
+                    SQL server
+                        col_name PRIMARY KEY 
+
+                    ALTER TABLE
+                    单个
+                    ALTER TABLE table_name
+                    ADD PRIMARY KEY(col_name)
+                    多行
+                    ALTER TABLE table_name
+                    ADD CONSTRAINT col_name1 PRIMARY KEY (col_name1,col_name2,...)
+                    *使用ALTER TABLE语句添加主键，必须把主键列声明不含NULL值
+                    (在表首次创建时)
+                    撤销
+                        Mysql
+                            ALTER TABLE table_name
+                            DROP PRIMARY KEY
+                        SQLserver
+                            ALTER TABLE table_name
+                            DROP CONSTRAINT col_name
+
+                FOREIGN KEY
+                    一个表中的FOREIGN KEY约束
+                    用于预防破坏表之间的连接动作
+                    能防止非法数据插入外键列，其必须是指向那个表中的值之一
+                    Mysql
+                        FOREIGN KEY (col_name) REFERENCES table_name(col_name)
+                    SQLserver
+                        col_name id FOREIGN KEY REFERENCES table_name(col_name)
+                    多列约束
+                    CONSTRAINT col_name1 FOREIGN KEY (col_name2)
+                    REFERENCES table_name(col_name)
+
+
+                    ALTER TABLE
+                    Mysql
+                    ALTER TABLE table_name
+                    ADD FOREIGN KEY (col_name)
+                    REFERENCES table_name(col_name)
+
+                    多个行
+                    ALTER TABLE table_name
+                    ADD CONSTRAINT col_name
+                    FOREIGN KEY (col_name)
+                    REFERENCES table_name(col_name)
+
+                    撤销
+                        Mysql
+                        ALTER TABLE table_name
+                        DROP FOREIGN KEY col_name
+                        SQL
+                        ALTER TBALE table_name
+                        DROP CONSTRAINT col_name
+                    
+                CHECK
+                    约束用于限制列中的值的范围
+                    单个列定义CHECK约束，该列值允许特定的值
+                    一个表定义CHECK约束，此约束会在特定的列中对值进行限制
+
+                    MySQL
+                    CHECK (col_name 的比较式)
+                    SQL server
+                    col_name int NOT NULL CHECK(col_name 比较式)
+
+                    多行定义CHECK约束
+                    CONSTRAINT col_name CHECK(col_name1的比较式 AND col_name2的比较式)
+
+
+                    ALTER TABLE
+                    Mysql
+                        ALTER TABLE table_name
+                        ADD CHECK(col_name比较式)
+                    多列
+                        ALTER TABLE table_name
+                        ADD CONSTRAINT 约束名 CHECK (col_name1的比较式 AND col_name2的比较式   )
+                    撤销
+                        ALTER TABLE table_name
+                        DROP CHECK 约束名
+                DEFAULT
+                    用于向列中插入默认值
+                    如果没有规定其他值，那么默认值添加到所有新记录
+                    col_name 其他约束 DEFAULT '值'
+                    col_name 其他约束 DEFAULT function() [GETDATE()]
+
+
+                    ALTER
+                    ALTER TABLE table_name
+                    ALTER COLUMN col_name SET DEFAULT '值'
+                    撤销
+                        MySQL
+                            ALTER TABLE table_name
+                            ALTER col_name DROP DEFAULT
+                        SQL
+                            ALTER TABLE table_name
+                            ALTER COLUMN col_name DROP DEFAULT
+                 CREATE INDEX
+                    快速加快查询
+                    *更新一个包含索引的表需要比更新一个没有索引的表要更多时间
+                    ，由于索引本身也需要更新，因此，理想的做法是仅仅在常常被搜
+                    索的列(以及表)上面创建索引
+                    
+
+
+
+                    CREATE INDEX index_name
+                    ON table_name (column_name)
+
+                    创建一个唯一的索引
+                        两行不能拥有相同的索引值
+                        CREATE UNIQUE INDEX index_name
+                        ON table_name (column_name)
+
+
+                    SQL撤销索引，表以及数据库
+                        通过DROP语句，可以轻松删除索引，表数据库
+                        AlTER TABLE table_name DROP INDEX index_name
+
+
+                        DROP TABLE 表名称
+                        DROP DATABASE 数据库名称
+
+                        TRUNCATE TABLE 表名称
+                            仅仅删除表格中的数据
+
+                    ALTER
+
+                Auto-increment
+                    会在新记录中插入表中是生成一个唯一的数字
+                    MYsql
+                    AUTO INCREMENT字段
+                    col_name data_type constraint AUTO_INCREMENT
+                    默认AUTO_INCREMENT的开始值是1，每条记录递增1
+                        ALTER TABLE table_name AUTO_INCREMENT=100
+                    sqlSERver
+                        col_name datatype constrain PRIMARY KEY IDENTITY,
+                        IDENTITY(start,step)
+                        设置AUTO_INCREMENT的起始数字和增加步进
+
+                SQL VIEW
+                    基于sql语句的结果集的可视化表
+                    视图包含行和列，就像是一个真实的表，视图中的字段就是来自一
+                    个或者多个数据库中真实的表中的字段
+                    可以向视图添加SQl函数、WHERE以及JOIN语句，也可提交数据
+                    *数据库的设计和结构不会受到视图中的函数、where或join语句影
+                    响
+
+                    创建
+                    CREATE VIEW view_name AS
+                    SELECT column_name(s)
+                    FROM table_name
+                    WHERE condition
+                    
+                    *视图总是显示最近的数据.每当用户查询视图时，数据库引擎通过
+                    使用SQL语句来重建数据
+
+                    更新
+                        CREATE/RELPACE VIEW view_name AS
+                        SELECT column_name(s)
+                        FROM table_name
+                        WHERE condition
+                    撤销
+                        DROP VIEW view_name
+
+
+
+
+                    Mysql Date函数
+                        
+
+                        NOW()
+                            返回当前的日期和时间
+                        CURDATE()
+                            返回当前的日期
+                        CURTIME()
+                            返回当前时间
+                        DATE()
+                            提取日期或日期/时间表达式的日期部分
+                        EXTRACT()
+                            返回日期/时间按的单独部分
+                        DATE_ADD()
+                            给日期添加指定的时间间隔
+                        DATE_SUB()
+                            从日期减去指定的时间间隔
+                        DATEDIFF()
+                            返回两个日期之间的天数
+                        DATE_FORMAT()
+                            用不同的格式显示日期/时间
+
+
+                        DATE  YYYY-MM-DD
+                        DATETIME    YYYY-MM-DD HH:MM:SS
+                        TIMESTAMP   YYYY-MM-DD HH:MM:SS
+                        YEAR    YYYY或YY
+
+                    SQL Server Date函数
+                        GETDATE()   返回当前日期和时间
+                        DATEPART()  返回日期/时间的单独部分
+                        DATEADD()   在日期中添加或减去指定的时间间隔
+                        DATEDIFF()  返回两个日期之间的时间
+                        CONVERT()   用不同的格式显示日期/时间
+
+
+
+                    NULL值
+                        NULL值是遗漏的未知数据
+                        默认的，表的列可以存放NULL值
+                        IS NULL
+                            某个列可选，不向该列添加值的情况下插入新纪录或更新
+                            已经有的记录，意味着该字段将以NULL值保存
+                            NULL值处理方式与其他值不同
+                            NULL用作未知的或不使用的值的占位符
+                            *无法比较NULL和0;不等价
+                            始终用IS NULL来查找NULL值
+                        IS NOT NULL
+                   
+                   NULL函数
+                        ISNULL()
+                        NVL()
+                        IFNULL()
+                        COALESCE()
+
+                        function(col_name,value)
+                            当col_name列中的值为NULL时候，将使用value来替其值
+                        
+                        
+
+
+
+
+                    
+
+
+
+
+                    
+                    
+
+            
+        
+
+数据库
+    按照数据结构来组织，存储和管理数据的仓库
+    数据库是存储在一起的，相关数据的集合,这些数据是结构化的,无有害或不要冗余，
+    并为多种应用服务,数据的存储独立于使用它的程序，对数据库插入新数据，修改和
+    检索原有数据均能按一种公用和可控的方式进行
+
+
+    (1)物理数据层
+    (2)概念数据层
+    (3)逻辑数据层
+
+    (1)实现数据共享
+    (2)减少数据的冗余
+    (3)数据实现集中控制
+    (4)数据一致性和可维护性，以确保数据的安全性和可靠性
+    (5)故障恢复
+
+
+    小型数据库
+        access
+    中型数据库
+    大型数据库
+        oracle
+        sql server
+        sysbase
+        informix
+        mysql
+    海量数据库
+        db2
+
+    数据库选择
+        1.成本
+        2.实现功能
+        3.并发性要求(最终用户)
+        4.安全要求性
+
+       1.卸载 
+            控制面板
+            添加或删除程序
+            
+        
+已经有一个实例被挂起
+    
+
+
+SQl server表管理
+    1.表名和列的命名规范
+        a.必须字母或者"_"开头,不能使用数字开头
+        b.长度不能超过128字符
+        c.不能使用sql server保留字
+        d.只能使用如下字符 A-Z ,a-z 0-9,$ ,#,_等
+    2.支持的数据类型
+        char 定长 8000字符(非unicode编码)
+        char(10)
+            不用完的空位空格补全
+        varchar 
+            变长 最大8000字符
+        varchar(10)
+            自动回收空余字符
+
+        确定字段为定长则直接使用char定义，从而使得查询速度较快
+            1.学号
+            2.身份证
+
+        ntext 可变长度Unicode数据，最大长度2^30 -1个字符
+        text 可变长度非Unicode数据，最大长度2^30 -1个字符
+
+        区别:
+            text
+                是字节格式的存储英文，也可以存中文但是有时候会显示乱码
+            ntext
+                是多字节格式存储unicode的，也就是存储各种文字使用
+            
+        nchar 
+            定长 最大4000字符(àunicode编码)
+        nchar(10)
+            定长空格补齐
+        nvarchar
+            变长 最大4000字符(unicode编码)
+        nvarchar(10)
+        *
+            一般带有汉字的段用nvarchar,全英文或符号用varchar,因为narchar为
+            unicode字符集，该类型的字段无论是单个字母还是单个汉字，都占用两个
+            字节，nvarchar 处理汉字或其他的unicode字符集的速度比varchar快
+            
+            如果有一些特殊字符在nvarchar中没有，只能选用适合的代码页用varchar
+           
+           
+           数字型 
+            1)bit
+                只有0,1
+            2)int 
+                -2^31 到 +2^31 -1
+            3)bigint 
+                -2^63 到 +2^63 -1 
+            4)float
+                float(n)
+                    科学计数法后尾存放小数的位数
+                存放小数，不推荐使用
+            5)numeric
+                numeric(num1,num2)
+                总的位数num1,保留num2个小数点后位
+                numeric(10,3)
+                numeric(10)
+
+           日期类型
+            datetime(表示日期)
+                专门时间函数getdate()
+            timestamp(时间戳)
+           图片
+            image
+            一般数据库保存图片路径，使用图片服务器技术图床
+            在图片有安全要求时,将图片放置于数据库中
+           视频
+            binary字段可以存放
+
+
+           sql 建议表设计者，给表一个主键(primary key)，用来唯一表示一条记录
+           不能重复出现,不能为空
+
+
+           插入部分字段
+            INSERT INTO　table_name (col_name1,col_name2,...)
+            VALUES(value_1,value_2,...)
+            
+            指明插入字段与值的对应关系,主键必须给值
+
+           修改行数据
+
+           UPDATE table_name SET　col_name_1 = val_1 WHERE 
+
+           修改含有NULL值的数据
+           UPDATE table_name SET　col_name_1 = val_1 WHERE col_name is null
+           null值判断需要使用is、not is
+
+           删除数据
+            全部数据
+            delete from 表名;
+            删除指定数据
+            delete from 表名 where 字段名='值' and 字段名='值'
+
+           主键和外键
+            针对外键
+            1.外键只能指向主键
+            2.外键和主键的数据类型要一致
+
+            SQL server不区分大小写
+           查询所有列
+            select * from emp(表名) where 条件
+           查询取消重复行(重复行为得到结果完全一样的行)
+            select distinct字段1，字段2 from 表名 where
+           查询内允许使用算数表达式
+            select ename,sal*13+isnull(comm,0)*13 '年工资' from emp;
+            select col_name1,col_name2计算式 [别名] from table_name;
+
+           查找1982.1.1之后入职的员工
+           select * from emp where hiredate>'1982-1-1';
+           select * from emp where sal between 2000 and 2500;
+           like 模糊查询
+           % 0到多个字符
+           _单个字符
+           select ename,sal from emp where ename like 's%'
+           (sal>=2000 sal <2500)
+
+
+           --显示第三个字度为大写O的所有员工姓名和工资
+           select ename,sal from emp where ename like '__O%'
+
+           --批量查询 in 
+           select * from emp where empno in (123,456,789);
+
+
+           --显示没有上级的员工
+           select * from emp where MGR is null;
+           --查询工资高于500或岗位为MANAGER 的雇员，同时满足他们的姓名首字幕
+           为j
+
+           select * from emp where (sal>500 or job='manager') and ename like
+           'j%'
+           order by语句 默认升序
+           可以根据不同字段排序，首先考虑第一个字段
+           select * from emp order by sal asc
+
+           select * from emp order by sal desc
+           按照入职的先后顺序排
+           select * from emp order by hiredate asc
+
+           按照部门升序而雇员的工资降序排序
+           select * from emp order by deptno,sal desc
+
+           统计每个人的年薪，并按照从低到高的顺序排序
+           select ename,(sal+isnull(comm,0))*13 nianxin from emp orderby
+           nianxin 
+
+            
+           表的复杂查询
+            数据分组 max min avg sum count
+
+            显示所有员工中最高工资和最低工资
+            select min(sal) from emp;
+            显示最低工资和该雇员名字
+            select ename,sal from emp where sal=(select min(sal) from emp)
+            sql语句从右向左执行
+            显示所有员工的平均工资和工资总和
+            select avg(sal) '平均工资',sum(sal) '总工资' from emp;
+            把高于平均工资的员工名字和他的工资显示,并显示平均工资
+            select * from emp where sal>(select avg(sal) from emp)
+
+            计算共有多少员工
+            select COUNT(*) from emp
+
+            group by子句
+                对查询结果分组统计
+            having 子句
+                限制分组显示结果,与group by结合使用,可以对分组查询到的结果
+                进行筛选
+
+            显示每个部门的平均工资和最高工资
+            select avg(sal) as 'average',max(sal) as 'max',deptno from emp group by deptno;
+            显示每个部门的每种岗位的工资和最低工资
+            select avg(sal),min(sal),deptno,job from emp group by deptno,job
+            order by deptno
+            显示平均工资低于2000的部门号和它的平均工资
+
+            select avg(sal),deptno from emp group by deptno having
+            avg(sal)<2000
+
+
+            数据分组总结
+                1.分组函数只能出现在选择列表、having、order by子句中
+                2.如果在select 语句中同时包含group by,having ,order by那么他
+                们的顺序是group by ,having,order by
+                3.在选择列如果有列、表达式、和分组函数，那么这些列和表达式必
+                须有一个出现在group by子句中，否则会出错
+
+
+            自连接
+                自连接是指在同一张表的连接查询
+
+
+             显示某个员工的上级领导的姓名 例如"FORD"的上级
+             --1.查找ford上级 select mgr from emp where ename = 'ford'
+
+                
+             select ename ,(select mgr from emp where ename='ford')from emp where where empno = (select mgr from emp
+             where ename = 'ford')
+
+
+             显示公司每个员工和他的上级的名字   
+             分析 将emp表看作是两张表 worker boss
+             外连接(左外连接，右外连接)
+             select worker.ename '雇员' ,boss.ename '老板' from emp worker,emp boss where
+             worker.mgr = boss.empno;
+
+
+             子查询 
+                嵌入在其他sql语句中的select语句，嵌套查询
+             单行子查询
+                子查询结果只返回一行,单行单列的数据返回
+                    
+                    显示与SMITH同一部门的所有员工
+                    select * from emp where deptno = (select deptno from emp where ename = 'smith')
+                    select * from emp where deptno in (select deptno from emp where ename = 'smith')
+             多行子查询
+                返回多行数据的子查询
+
+                查询和部门10的工作相同的雇员的名字、岗位、工资、部门号
+                select * from emp where job  in 
+                (select distinct job from emp where deptno=10)
+
+             作为临时表使用子查询结果时，将子查询语句放置于from语句中
+             当在from语句中使用子查询，必须给子查询结果起别名
+             --显示高于部门平均工资的员工的信息
+             1.首先知道各个部门的平均工资
+             select avg(sal) ,dept from emp group by deptno
+             2.将上面的查询结果，当作一个临时表对待,
+             select emp.ename,emp.sal,temp.myqavg,deptno from  emp,( select avg(sal) 'myavg',dept from emp group by
+             deptno) as temp where emp.deptno = temp.deptno and emp.sal > temp.myavg
+
+
+
+             分页查询
+                top + num 表示取出num数目的实例后
+
+
+             显示第5个到第10个入职的雇员(按照时间的先后顺序)
+             select top 6 * from emp not in 
+             (select top 4 * from emp order by hiredate)
+             order by hiredate;
+
+
+             --显示第11到13入职的人的信息
+             select top 3 * from emp not in 
+             (select top 10 * from emp order by hiredate)
+             order by hiredate;
+
+
+             如何删除一张表中的重复记录
+             select distinct * into #temp_table from table_name;
+             delete table table_name;
+             insert into table_name select * from #temp_table;
+             drop table #temp_table;
+
+
+             左外连接和右外连接
+                左外连接
+                    指左边的表的记录全部显示，如果，没有匹配的记录就用null填入
+                右外连接
+                    指右边的表的记录全部显示，如果，没有匹配的记录就用null填入
+             显示公司每个员工和他上级的名称,同时显示没有上级的员工
+             左外连接
+                
+             select w.ename,b.ename from emp.w left join emp.b where w.mgr = b.empno
+
+             约束
+                确保数据库数据满足特定的商业规则
+                not null
+                    当插入数据时，必须为列提供数据
+                unique
+                    该列值不能重复，但是可以为空，但是最多只能有一个空值，主键不能为空值
+                primary key(主键)
+                    用于唯一标示行的数据当定义主键约束后，该列不但不能重复而
+                    且不能为null
+                    一张表最多只能有一个主键，但是可以有多个unique约束
+                    表可以有付哈主键
+
+                    --复合主键
+                        primary key (col_name1,col_name2)
+
+             行级定义和表级定义
+                
+             foreign key(外键)
+                定义主表和从表，外键约束定义在从表上，主表必须具有主键约束或
+                是unique约束，当定义外键约束后，要求外键列数据必须在主表的主
+                键列存在或者是null
+            check
+                强制行数据必须满足的条件
+                sal int check(sal>=300 and sal<=1000)
+            default
+                指定默认值
+                mesDate datetime default getdate()
+
+
+            表的修改
+                ALTER TABLE distributors ADD COLUMN address varchar(30)
+            修改字段的类型/或是名字(不能有数据)
+            ALTER TABLE distributors
+                ALTER COLUMN address TYPE varchar(80)
+                ALTER COLUMN name TYPE varchar(100)
+            ALTER TABLE distributors RENAME COLUMN address TO city;
+            删除一个字段
+            ALTER TABLE distributors DROP address RESTRICT;
+            修改表的名字
+            ALTER TABLE distributors RENAME TO suppliers;
+            删除表
+            drop table 表名;
+                        
+                    
+             
+
+
+
+
+
+
+
+             
+                
+                
+
+                
+
+
+               
+
+
+                
+
+
+
+
+
+            多表查询
+                基于两个和两个以上的表或是视图的查询
+
+                1.通过什么字段、条件将两张表关联
+
+                    不带任何条件将出现笛卡尔集
+
+
+
+                显示雇员名，雇员工资所在部门的名字
+                
+                select ename,sal,loc from emp,deptno where
+                emp.deptno=dept.deptno
+
+                如果两张表都有相同名字的字段，则需要带表名
+                    
+                    
+
+
+
+
+
+
+
+
+           
+
+
+
+
+
+
+            
+                
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+                
+
+       
+
+       
+            
+                    
+
+
+
+        
+
+
+
+
+
+
+
+        unicode编码
+            2字节表示一个字符(英文字母,也可以是汉字)->对汉字支持良好
+        非unicode编码:
+            一个字节表示一个字母，两个字节一个汉字
+        big5
+            支持繁体中文
+        iso-8859-1编码
+            支持欧文
+        gb2312国标码
+        gbk支持更多汉字
+
+
+
+
+
+
+    创建/维护
+    查询技巧 
+
+
+
+基本查询
+复杂查询
+维护数据的完整性
+修改表
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+博客园
+    数据库设计 
+        泛化(Generalization)
+            超类与子类型
+            抽取多个实体的共同属性作为超类实体
+            表达 重叠性约束 
+                完备性约束
+                    
+                
+                排他字母"d",否"o"
+
+
+
+    1.理解用户的需求
+    2.提取业务规则
+
+
+    列出问题清单
+        功能:
+
+		    系统应该做些什么？
+		    为什么你想建这个系统？
+		    系统看上去应该是怎样的？
+		    需要些什么报表？
+		    用户需要自己定义新报表吗？
+		    系统的操作者会是谁？
+            
+        数据需求:
+
+		    系统界面上需要展现哪些数据？
+		    这些数据应该由谁来提供？
+		    这些数据是如何关联的？
+		    这些工作现在是如何处理的？数据来自哪里？
+
+        数据完整性:
+		
+		    系统界面上需要展现哪些数据？
+		    这些数据应该由谁来提供？
+		    这些数据是如何关联的？
+		    这些工作现在是如何处理的？数据来自哪里？
+
+        安全性:
+
+		    是否每个用户都需要一个不同的密码？
+		    是否需要控制不同的用户所能访问的数据？(eg: 销售代表有权限看到客户的信用卡账号，但订单录入专员却不能)
+		    存储在数据库中的数据是否需要加密？
+		    谁做了什么操作是否需要记录以便于审计？(eg: 记录销售代表提高客户级别的操作，在需要时可以追溯操作的原因)
+		    系统中的客户分成几个级别？每个级别的客户有多少？
+		    是否已有文档记录了用户的工作与权责？
+            
+        环境:
+
+        当前项目是要代替或升级现有的某系统吗？
+
+•是否有描述现有系统的文档？
+
+•现有系统的哪些功能是需要的？哪些是不需要的？
+
+•现有系统处理些什么数据？这些数据是如何存储的？数据之间是如何关联的？
+
+•是否有关于现有系统数据的文档？
+
+        当前项目必须与其他哪些系统交互？
+
+•项目与其他系统之间如何交互？
+
+•新项目是否需要向现有系统提供数据？如何提供？
+
+•新项目是否需要接收现有系统的数据？如何接收？
+
+•是否有关于其他系统的文档？
+
+    客户的整个业务流程是怎样的？(了解在整个业务流程中当前项目的作用)
+        
+            
+
+
+1.为什么业务规则非常重要
+    
+2.怎样识别业务规则
+    记录所有的业务规则并对这些规则进行分类能帮助我们更好的在系统中实现业务逻辑。    
+    1.修改规则会有多困难,越是复杂的规则，修改起来越困难且容易出错
+    2.规则变化的可能性有多大,变化频繁的规则需要额外设计更好的应对将来的变化
+    需要特别注意的规则（关键业务规则）：
+
+		    枚举值。
+		    计算参数。
+		    有效参数。
+		    交叉记录和交叉表检查。
+		    可概括性约束。如果可预见到将来需应用一些类似的约束，我们可以考虑把这些约束抽象出来进行管理。
+		    非常复杂的检查。有些检查规则非常复杂，把这些规则放到程序代码中实现更为容易和清晰。
+        
+    直接可以在数据库中实现的业务规则：
+
+		    固定枚举值
+		    数据类型要求。每个字段具有确定的数据类型是关系型数据库的重要特性之一。
+		    必填值。
+		    合理性检查。合理性检查设定的范围基本不会变化。
+        
+3.如何修改关系模型并隔离出业务规则
+    1. 若规则为检验一组有效值时，把该规则转化为外键约束。
+    2. 若规则为参数可能变化的计算式时，把这些参数提取到一张表中。
+    3. 若逻辑或计算规则很复杂时，则提取到代码中进行实现。这里说的代码可以是应用程序端代码，还可以是数据库端存储过程。
+
+
+概念数据建立模型步骤
+    1.辨识实体与属性
+
+	    a)实体应包含描述性信息
+	    b)多值属性应作为实体来处理
+            一个实例的某个描述符包含多个对应值，则即使该描述符没有自己的描述信息也应作为实体进行建模。
+	    c)属性应附着在其直接描述的实体上
+        
+        
+    2.识别泛化层次结构
+        如果实体之间有泛化层次关系，则把标识符和公共的描述符（属性）放在超类实体中，把相同的标识符和特有的描述符放在子类实体中。
+    3.定义关系
+        在识别实体和属性之后我们可以处理代表实体之间联系的数据元素即关系。
+		对于任何关系，需要明确以下几个方面。
+		
+		    1.关系的度（二元、三元等）；
+		    2.关系的连通数（一对一、一对多等）；
+		    3.关系是强制的还是可选的；
+		    4.关系本身有些什么属性。
+        冗余关系
+            描述同一概念的两个或多个关系被认为是冗余的。
+              
+视图集成   
+    1.产生不一致的局部ER图
+        不同的泛化程度；不同的关系连通数（一对多、多对多等）；不同用户视角定义的实体、属性或关系（相同的概念，不同的人使用了不同的名称与建模形式）。
+    
+
+    首先，在两张局部ER图中寻找是否存在“同物异名”与“异物同名”现象
+    其次，再来看两张ER图之间的结构性冲突,解决该冲突的方法是保留强类型
+    比较变化后的各局部ER图，寻找之间的“共同之处”进行合并
+
+
+
+
+
+
+
+    2.视图集成的步骤
+
+		    1.集成策略选择
+                a)每次集成2个局部ER图。
+                b)每次集成n个局部ER图（n大于2且小于等于总ER图数）。
+                相对来说第一种集成策略每次所涉及的实体、关系数量较少，也更容易掌控。
+		    2.比较实体关系图
+                仔细观察不同ER图中的对应实体，发现其中因视角不同而存在的冲突。命名上的冲突包括“同物异名”和“异物同名”。
+                结构性冲突的表现形式更多。类型冲突包括使用不同的构造方式建模同一概念
+                依赖冲突是指类似或相同的关系在不同的局部ER图中被建模成不同的连通数。
+                键冲突是指在不同的局部ER图中，同一概念的实体被分配了不同的键。
+		    3.统一实体关系元素
+                基本目标是解决各局部ER图中的冲突，使这些元素一致化，为最终的ER图集成做准备。
+                对某些ER图中的实体及键属性进行改名
+		    4.合并、重构实体关系图
+                合成和重构局部ER图，最终得到完整、最简约和可理解的全局ER图。
+                    完整
+                        全局ER图中所有组件的语义完整
+                    最简约
+                        去除全局ER图中的冗余
+                            重叠的实体
+                            多余的语义关系
+
+
+    ER模型到SQl表
+        1.转化得到的SQL表与原始实体包含相同的信息内容
+		    二元“多对多”关系中，任何一端的实体
+		    二元“一对多”关系中，“一”一端的实体
+		    二元“一对一”关系中，某一端的实体
+		    二元“多对多”回归关系中，任何一端的实体（注：关系两端都指向同一个实体）
+		    三元或n元关系中，任何一端的实体
+		    层次泛化关系中，超类实体
+        2.转化的到的SQL表除了包含原始实体的信息内容之外，还包含原始实体父实体
+        的外键
+
+		
+		    二元“一对多”关系中，“多”一端的实体
+		    二元“一对一”关系中，某一端的实体
+		    二元“一对一”或“一对多”回归关系中，任何一端的实体
+        3.由"关系"转化得到的SQL表，该表包含"关系"所涉及的所有实体外键，以及该
+        "关系"自身的属性信息
+
+
+		    二元“多对多”关系
+		    二元“多对多”回归关系
+		    三元或n元关系
+                
+        转化过程中对于NULL值的处理规则
+
+		1. 当实体之间的关系是可选的，SQL表中的外键列允许为NULL。
+		2. 当实体之间的关系是强制的，SQL表中的外键列不允许为NULL。
+		3. 由“多对多”关系转化得到的SQL表，其中的任意外键列都不允许为NULL。
+
+
+
+        一般二元关系的转化
+            1. “一对一”，两实体都为强制存在
+            2. “一对一”，一实体可选存在，另一实体强制存在,另一种转化方式是把“可选的”实体作为主表，让“强制存在的”实体作为从表，包含外键指向“可选的”实体，这种方式外键列允许为NULL。
+            3."一对一"，两实体都为可选存在
+                当两个实体都是可选的,可选任意一个实体包含外键指向另一实体，外键列允许为NULL值。
+            4. “一对多”，两实体都为强制存在
+            在“一对多”关系中，无论“多”端是强制存在的还是可选存在的都不会影响其转化形式，外键必须出现在“多”端，即“多”端转化为从表。当“一”端实体是可选存在时，“多”端实体表中的外键列允许为NULL。
+            5. “一对多”，一实体可选存在，另一实体强制存在
+            6. “多对多”，两实体都为可选存在
+            在“多对多”关系中，需要一张新关系表包含两个实体的主键。无论两边实体是否为可选存在的，其转化形式一致，关系表中的外键列不能为NULL。实体可选存在，在关系表中表现为是否存在对应记录，而与外键是否允许NULL值无关。
+                
+                一名工程师可能是专业协会的会员且可参加多个专业协会。每一个专业协会可能有多位工程师参加
+                create table engineer
+				(
+				    emp_id char(10),
+				    primary key(emp_id)
+				);
+				create table prof_assoc
+				(
+				    assoc_name varchar(256),
+				    primary key(assoc_name)
+				);
+				create table belongs_to
+				(
+				    emp_id char(10),
+				    assoc_name varchar(256),
+				    primary key(emp_id, assoc_name),
+				    foreign key(emp_id) references engineer
+				        on delete cascade on update cascade,
+				    foreign key(assoc_name) references prof_assoc
+				        on delete cascade on update cascade
+				);
+
+
+          二元回归关系的转化
+                对于“一对一”或“一对多”回归关系的转化都是在SQL表中增加一列与主键列类型、长度相同的外键列指向实体本身。外键列的命名需与主键列不同，表明其用意。外键列的约束根据语义进行确定。
+                7. “一对一”，两实体都为可选存在
+                公司员工之间可能存在夫妻关系。转化得到的SQL表定义如下
+                create table employee
+				(
+				    emp_id char(10),
+				    emp_name char(20),
+				    spouse_id char(10),
+				    primary key(emp_id),
+				    foreign key(spouse_id) references employee
+				);
+                8. “一对多”，“一”端为强制存在，“多”端为可选存在
+                工程师被分为多个组，每个组有一名组长。
+                create table engineer
+				(
+				    emp_id char(10),
+				    leader_id char(10) not null,
+				    primary key(emp_id),
+				    foreign key(leader_id) references engineer
+				);
+
+
+                “多对多”回归关系无论是可选存在的还是强制存在的都需新增一张关系表，表中的外键列须为NOT NULL。
+                9. “多对多”，两端都为可选存在
+                社交网站中人之间的朋友关系，每个人都可能有很多朋o友
+                create table person
+				(
+				    person_id char(10),
+				    person_name char(20),
+				    primary key(person_id)
+				);
+				create table friend
+				(
+				    person_id char(10),
+				    friend_id char(10),
+				    primary key(person_id, friend_id),
+				    foreign key(person_id) references person,
+				    foreign key(friend_id) references person,
+				    check(person_id < friend_id)
+				);
+                 
+
+				三元和n元关系的转化
+				无论哪种形式的三元关系在转化时都会创建一张关系表包含所有实体的主键。
+
+                “一对一对一”三元关系
+                1名技术员在1个项目中使用特定的1本记事簿
+
+				1本记事簿在1个项目中只属于1名技术员
+				1名技术员的1本记事簿只用于记录1个项目
+				注：1名技术员仍可以做多个项目，对于不同的项目维护不同的记事簿
+create table technician
+(
+    emp_id char(10),
+    primary key(emp_id)
+);
+create table project
+(
+    project_name char(20),
+    primary key(project_name)
+);
+create table notebook
+(
+    notebook_no integer,
+    primary key(notebook_no)
+);
+create table uses_notebook
+(
+    emp_id char(10),
+    project_name char(20),
+    notebook_no integer not null,
+    primary key(emp_id, project_name),
+    foreign key(emp_id) references technician
+        on delete cascade on update cascade,
+    foreign key(project_name) references project
+        on delete cascade on update cascade,
+    foreign key(notebook_no) references notebook
+        on delete cascade on update cascade,
+    unique(emp_id, notebook_no),
+    unique(project_name, notebook_no)
+);
+            
+
+
+            “一对一对多”三元关系
+
+
+			    参与1个项目的1名员工只会在1个地点做该项目
+			    1名员工在1个地点只能做1个项目
+			    1个地点的1个项目可能有多名员工参与
+			    注：1名员工可以在不同的地点做不同的项目
+                create table employee
+				(
+				    emp_id char(10),
+				    emp_name char(20),
+				    primary key(emp_id)
+				);
+				create table project
+				(
+				    project_name char(20),
+				    primary key(project_name)
+				);
+				create table location
+				(
+				    loc_name char(15),
+				    primary key(loc_name)
+				);
+				create table assigned_to
+				(
+				    emp_id char(10),
+				    project_name char(20),
+				    loc_name char(15) not null,
+				    primary key(emp_id, project_name),
+				    foreign key(emp_id) references employee
+				        on delete cascade on update cascade,
+				    foreign key(project_name) references project
+				        on delete cascade on update cascade,
+				    foreign key(loc_name) references location
+				        on delete cascade on update cascade,
+				    unique(emp_id, loc_name)
+				);
+
+
+            12. “一对多对多”三元关系 
+
+
+				    1个项目中的1名工程师只会有1名经理
+				    1个项目中的1名经理会带领多名工程师做该项目
+				    1名经理和他手下的1名工程师可能参与多个项目
+                    create table project
+					(
+					    project_name char(20),
+					    primary key(project_name)
+					);
+					create table manager
+					(
+					    mgr_id char(10),
+					    primary key(mgr_id)
+					);
+					create table engineer
+					(
+					    emp_id char(10),
+					    primary key(emp_id)
+					);
+					create table manages
+					(
+					    project_name char(20),
+					    mgr_id char(10) not null,
+					    emp_id char(10),
+					    primary key(project_name, emp_id),
+					    foreign key(project_name) references project
+					        on delete cascade on update cascade,
+					    foreign key(mgr_id) references manager
+					        on delete cascade on update cascade,
+					    foreign key(emp_id) references engineer
+					        on delete cascade on update cascade
+					);
+                    project_name, emp_id -> mgr_id
+
+                     
+
+                    13. “多对多对多”三元关系
+
+
+					    1名员工在1个项目中可以运用多种技能
+					    1名员工的1项技能可以在多个项目中运用
+					    1个项目中的1项技能可以被参与该项目的多名员工运用
+                        create table employee
+(
+    emp_id char(10),
+    emp_name char(20),
+    primary key(emp_id)
+);
+create table skill
+(
+    skill_type char(15),
+    primary key(skill_type)
+);
+create table project
+(
+    project_name char(20),
+    primary key(project_name)
+);
+create table sill_used
+(
+    emp_id char(10),
+    skill_type char(15),
+    project_name char(20),
+    primary key(emp_id, skill_type, project_name),
+    foreign key(emp_id) references employee
+        on delete cascade on update cascade,
+    foreign key(skill_type) references skill
+        on delete cascade on update cascade,
+    foreign key(project_name) references project
+        on delete cascade on update cascade
+);
+                    
+				            
+                
+
+            
+                
+
+
+
+
+
+
+ 转化步骤
+    1.把每一个实体转化为一张表，其中包含键和非键
+    2.把每一个"多对多"二元或二元回归关系转化为一张表，其中包含实体的键和关系的
+    属性
+    3.把三元及更高(n元)关系转化为一张表
+
+
+
+
+   实体转化
+        若两个实体之间是“一对多”关系，把“一”端实体的主键加入到“多”端实体表中作为外键。若两实体间是“一对一”关系，把某个“一”端实体的主键放入另一实体表中作为外键，加入外键的实体理论上可以任选，但一般会遵循如下原则：按照实体间最为自然的父子关系，把父实体的键放入子实体中；另一种策略是基于效率，把外键加入到具有较少行的表中。
+        把泛化层次中的每一个实体转化为一张表。每张表都会包含超类实体的键。事实上子类实体的主键同时也是外键。超类表中还包含所有相关实体的公共非键属性，其他表包含每一子类实体特有的非键属性。
+        转化得到的SQL表可能会包含not null, unique, foreign key等约束。每一张表必须有一个主键（primary key），主键隐含着not null和unique约束。
+
+   “多对多”二元关系转化
+
+        每一个“多对多”二元关系能转化为一张表，包含两个实体的键和关系的属性。这一转化得到的SQL表可能包含not null约束。在这里没有使用unique约束的原因是关系表的主键是由各实体的外键复合组成的，unique约束已隐含。
+
+ 
+    三元关系转化
+        每一个三元（或n元）关系转化为一张表，包含相关实体的n个主键以及该关系的属性。这一转化得到的表必须包含not null约束。关系表的主键由各实体的外键复合组成。n元关系表具有n个外键。除主键约束外，其他候选键(candidate key)也应加上unique约束。
+                
+第一范式 
+    定义：当且仅当一张表的所有列只包含原子值时，即表中每行中的每一个列只有一个值，则该表符合第一范式。
+    域是某属性所有可能值的集合，但同一个域可能被用于多个属性上。
+    
+超键是一个或多个属性的集合，其能帮助我们唯一确定一条记录。若组成超键属性列的子集仍为一个超键，但该子集少了任何一个属性都将使其不再是一个超键，则该属性列子集称为候选键。主键是从一张表的候选键集合中任意挑选出的，作为该表的一个索引。
+
+
+第二范式（2NF）
+
+    定义：一张表满足第二范式（2NF）的条件是当且仅当该表满足第一范式且每个非键属性完全依赖于主键。当一个属性出现在函数依赖式的右端，且函数依赖式的左端为表的主键或可由主键传递派生出的属性组，则该属性完全依赖于主键。
+
+一个或多个属性值能唯一确定一个或多个其他属性值称为函数依赖。给定某表（R），一组属性（B）函数依赖于另一组属性（A），即在任意时刻每个A值只与唯一的B值相关联。这一函数依赖用A –> B表示。
+            
+            
+            
+            
+ 
+            
+            
+            
+          
+            
+            
+    

@@ -1,0 +1,314 @@
+sql server数据库 备份和恢复
+    2种方式
+        1.分离/附加
+        分离完后去sql server目录下查找数据库名.mdf 和数据库名.ldf分离后的文件
+        ，分离后该数据库就不能再使用了
+        附加 
+            重新使用某个分离的数据库的操作时进行的操作，重新关联数据库
+        2.备份/恢复
+            生成.bak文件
+        
+
+     查询分析器备份恢复
+     备份
+     backup database database_name to disk='path_name/file.bak'
+     恢复
+     restore database database_name from disk='path_name/file_name'
+     表的备份
+
+
+
+
+java对表的crud操作
+
+
+
+
+    JDBC
+    import java.sql.*;
+        多种数据库提供统一访问
+        (1)jdbc-odbc 桥连接
+        (2)本地协议纯java驱动
+        (3)网络协议纯java驱动
+        (4)本地api
+
+     Hibernate
+        对JDBC再次封装，实现对数据库操作更加宽泛的统一和更好的可移植性
+
+
+
+    开放数据库连接
+        sql server
+            配置工具
+                外围应用配置器
+                    服务器连接的外围应用配置
+                        database Engine
+                        远程连接
+                            本地连接和远程连接
+                        SQL Server Browser
+                            服务
+                                启动类型
+                                    自动
+                                启动
+
+     控制面板 -> 管理工具 -> ODBC 数据源管理器 
+        用户DSN 添加 sql server 
+        取名
+        服务器 local/. 均为本机
+        设置登录方式
+        设置连接的数据库
+
+        Connection ct = null;
+		Statement sm = null;
+		try
+		{
+			//1.加载驱动(把需要的驱动程序加入内存)
+			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+			//2.得到连接[指定连接到哪个数据源，用户名和密码]
+			//如果配置数据源为win nt 则不需要 “sa” 与 “密码”
+			//Connection ct = DriverManager.getConnection("jdbc:odbc:myTest");
+			ct = DriverManager.getConnection("jdbc:odbc:myTest", "sa", "lxjshiwo");
+			//3.创建Statement或者PreparedStatement[区别]
+			//Statement用处是：用于发送sql语句。到数据库
+			sm = ct.createStatement();
+			//4.执行(crud,创建数据库，备份数据库)
+			//添加一条数据到dept表
+			//executeUpdate()执行cud操作
+			int i = sm.executeUpdate("insert into dept valuew('50','security','xiyong')");
+			if(i==1)
+			{
+				System.out.println("ok");
+				
+			}
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			
+		}
+		finally
+		{
+			//关闭资源，不关闭连接则会报错连数目过多
+			//打开与打开顺序向反，后创建先关闭
+			try {
+				//为了程序健壮
+				if(sm!=null)
+				{
+					sm.close();
+				}
+				
+				if(ct!=null)
+				{
+					ct.close();	
+				}
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+
+
+    Connection
+        createStatement
+        prepareStatement 
+            通过?来后期设置传入sql语句的参数
+            ps = ct.preparedStatement("select * from users where username=?");
+            ps.setString(1,"ShunPing")
+
+
+
+    ResultSet 结果集
+       ResultSet 返回一个表行的结果集 
+       指向整个返回查询结果集的第一行的上方,实际结果值为空
+        getInt(col_pos)
+        getString(col_pos)
+            取出表的内容
+            
+
+
+Statement和PreparedStatement
+
+    excuteQuery()
+        执行查询、
+    executeUpdate()
+        执行添加、删除、修改
+
+
+
+    Statement和PrepareStatement的区别
+        1.直接使用Statement,驱动程序一般不会对sql语句作处理而直接交给数据库:使
+        用PreparedStatement,形成预编译，对语句作字符集转换
+        对于多次重复执行的语句，使用PreparedStatement效率更高，并且更适合batch
+        操作，另外较好解决系统编译问题
+        2.PreparedStatement还能有效的防止危险字符注入，并通过?替代值
+            setString(col_num,value)
+            setInt(col_num,value)
+
+            getxxx可以通过col_num 和 col_name 来取得相应类型的值
+
+
+        使用jdbc连接需要引入3个jar包，有
+        msbase.jar 
+        mssqlserver.jar
+        msutil.jar
+        sqljdbc4.jar 
+
+
+        project -> properties -> java build path -> add
+        3.PrepareStatement不仅包含了SQL语句，而且大多数情况下语句已经被预编译
+        过，当执行时只需要DBMS运行SQL语句
+        选择是否使用PrepareStatement在于相同句法的SQL语句是否执行了多次，以及
+        两次之间的差别仅是变量的不同
+        
+
+[Microsoft][SQLServer 2000 Driver for JDBC]Error establishing socket
+    报错 
+    未有连接上sql
+    解决方法
+        1.在SQL SERVER Configuration Manager
+            SQL SERVER 2005网络配置
+                MSSQLSERVER的协议 TCP/IP ip地址 在127.0.0.1 信息下查看监听端口
+                已启用选择是
+            SQL SERVER 2005 服务 将SQL SERVER与SQL SERVER Browser都重新启用后
+            开启1433端口监听
+
+java 使用 DDL语句 CREATE DROP BACKUP
+    通过函数 
+     prepareStatement("语句")
+
+    通过ps.execute();
+    进行相应的修改
+
+
+
+
+        execute()
+        executeQuery()
+        executeUpdate()
+
+
+
+     
+
+
+
+
+
+
+
+ 开发小型、中型项目的开发技巧
+    jude开发工具
+        建模 设计软件
+    项目开发流程
+        1.需求分析
+            理解客户对项目的需求是什么
+        2.设计阶段
+            1.用什么技术，什么框架
+            2.操作系统
+            3.数据库
+            4.设计文档
+            5.开发小队
+        3.编码阶段(实现阶段)
+        4.测试阶段
+        5.实施
+            实施工程师
+    对系统分析和设计初步理解模式的概念(mv)    
+
+学生需求文档
+    1.功能说明(使用 use case图说明 uml(统一建模语言))
+        uml 
+            1.rational rose
+            2.jude
+            包含图
+                1.use case 用例图(清晰描述该系统有设么角色和功能)
+                2.时序图
+                3.类图
+    2.设计数据库
+        学生表(stus)
+        字段名          类型            备注
+        stuId           varchar(30)         学生id
+        stuName         nvarchar(50)        学生名 not null
+        stuSex          nvarchar(1)      性别   '男'或'女 ' default '男'
+        stuAge          int              年龄 >0
+        stuJg           nvarchar(20)     籍贯
+        stuDept         nvarchar(20)    所在系
+        3.设计界面(原型开发)
+        先完成界面再写 
+        1.将对表的操作进行封装为一个类
+            TabelModel
+        2.创建点击弹出框
+            新建一个类继承java.swing.JDialog
+            实现接口ActionListener
+
+
+            JDialog类的三个参数 
+                Frame owner
+                String title
+                boolean modal
+            模式窗口，非模式窗口
+
+
+
+
+        继承javax.swing.table.*;
+        下的AbstractTabelModel
+            含有需要实现的函数
+                int getColumnCount()
+                int getRowCount()
+                Object getValueAt(int row,int column)
+                    return (String)((Vector)this.rowData.get(row)).get(column)
+
+           
+           作为参数传入给JTable时候，将调用需要实现的三个函数，将此返回值作为
+           参数创建表格
+           同时需要重写函数
+            getColumnName()
+
+
+        
+
+
+
+    JTable
+        JTabel()构造一个默认的JTabel,使用默认的数据模型， 
+        JTabel(Object[][] rowData,Object[] columnNames)
+            构造一个JTable来显示二维数组rowData中的值，列名为columnNames
+        JTabel(Vector rowData,Vector columnNames)
+        JTable(TableModel dm)
+        .setModel(TabelModel dataModel)
+            void 
+            将此表的数据模型设置为newModel,并向其注册以获取来自数据模型的侦听
+            器通知
+                使得原来的表内容清空，不使用情况下，表内容会堆积
+
+
+
+            
+            
+
+
+配置相应jre 
+    project -> properties -> java build path -> libraries ->alternate jre
+
+    
+    implements ActionListener
+
+    实现接口
+        actionPerformed(ActionEvent arg0)
+        addActionListener(this)
+            arg0.getSource() 
+            当加载信息的对象与事件监听者的响应函数在同一个类中，可以使用getSource来获取
+            相应对象
+
+
+
+
+
+
+
+
+
+       

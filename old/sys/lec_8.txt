@@ -1,0 +1,146 @@
+bash的配置文件
+    两类：
+        全局配置:
+            /etc/profile
+                /etc/profile.d/*.sh
+            /etc/bashrc
+
+        个人配置
+            ~/.bash_profile
+            ~/,bashrc
+
+
+        按功能划分,两类
+            profile类:为交互式登陆的shell提供配置
+                全局：/etc/profile,/etc/profile.d/*.sh  
+                个人：~/.bash_profile
+                功用：
+                    (1) 用于定义环境变量
+                    (2)与行名利概念或脚本
+            bashrc类：为非交互式登陆shell提供配置
+                全局：/etc/bashrc
+                个人：~/.bashrc
+                功能：
+                    (1)定义命令别名
+                    (2)定义本地变量
+
+
+            
+
+
+
+        shell登陆：
+
+            交互式的登陆：
+                直接通过终端登陆
+                通过“su-Username“或”su -l Username“切换用户
+
+
+                /etc/profile--> /etc/profile.d/*.sh-->~/bash_profile-->/.bashrc-->/etc/bashrc
+
+            非交互式登陆：
+                su Username 
+                图形界面下打开的终端
+                执行的脚本  
+
+                ~/.bashrc-->    
+        编辑配置文件定义的新配置的生效方式
+        (1)重新登陆
+        (2)source或.命令进程
+        问题：
+        让用户的PATH环境变量的值多出一个路径，例如
+        管理员
+        ~/.bash_profile
+        PATH="$PATH:/usr/local/appache2/bin"
+        所有人
+        /etc/profile.d/apache.sh    
+        PATH=$PATH:/uer/local/mysql/bin
+    
+
+    bash中算数运算
+        +,-,*./,%,**
+        实现算数运算
+        (1)let var=算术表达式
+        (2)var=$[算术表达式]
+        (3)var= $((算术表达式))
+        (4)var=$(expr arg1 arg2 arg3 ...)
+        $(expr $num1 \* $num2)
+        乘法在某些情况下要转义
+
+        bash有内建的随机任意数字 $RANDOM 
+    增强型数值符号
+        += -=, *=,/=.%=
+        let varOPERvalue
+            let count+=1
+    自增，自减
+        let var+=1
+        let var++
+        let var-=1
+        let var--
+        help let 
+        
+    练习，
+    写一个脚本
+    计算/etc/passwd文件中第10个用户和第20个用户的ID之和
+    #!/bin/bash
+    userid1=$(head -n 10 /etc/passwd | tail -n 1 | cut -d: -f3)
+    userid2=$(head -n 20 /etc/passwd | tail -n 1 | cut -d: -f3)
+    echo "$userid1"
+    echo "$userid2"
+
+    sum=$[$userid1+$userid2]
+    echo "$sum"
+    传递两个文件路径作为参数给脚本，计算这两个文件中所有空白行的和
+    统计/etc,/var,/usr 目录共有多少个一级子目录和文件
+
+
+    条件测试
+        判断某需求是否满足，需要由条件测试机制来实现 
+
+        note:专用的测试表达式需要由测试命令辅助完成测试过程
+
+        测试命令：
+            test EXPRESSION
+            [ EXPRESSION ]
+            [[ EXPRESSIONi ]]
+            note:在表达式前后一定要有空括号否则语法错误
+        bash的测试类型
+            数值测试;
+                -gt:是否大于
+                -ge:是否大于等于
+                -eq:是否大于等于   
+                -lt:是否小于    
+                -le:是否小于等于
+            字符串测试：
+                ==:是否等于
+                >:是否大于
+                <:是否小于
+                !=:是否不等于
+                =~:左侧字符串是否能够被右侧的PATTERN所匹配
+                    note：此表达式子一般用于[[]]中
+                -z "STRING":测试字符串是否为空，空则为真，不空为假
+                -g "STRING":测试字符串是否为不空， 不空则为真，空为假
+                note：用于字符串测试的字符串都应该加上“”
+            文件测试：
+
+    bash自定义退出
+        exit [n]:自定义退出状态码；
+            注意：脚本一旦遇到exit命令，脚本会立即终止，终止推出状态取决于exit命令后面的数字
+
+
+        注意：如果未给出脚本退出状态码，整个脚本的退出码取决于最后一条命令的状态码
+
+
+
+        脚本，接受一个文件路径作为参数：
+            如果参数少于1,则提示用户“至少应该给一个参数”，并退出
+            如果参数个数不小雨1,则显示第一个参数所指向的文件中空白行的个数
+
+
+
+
+
+
+
+
+

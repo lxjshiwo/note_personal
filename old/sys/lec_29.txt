@@ -1,0 +1,185 @@
+Linx Kernel :
+    单内核体系设计，但充分借鉴了微内核设计体系的优点，为内核引入 模块化设计
+    内核组成部分:
+        kernel :内核核心，一般为bzImage ,通常在/boot目录下，名称为vmlinuz-VERSION-RELEASE   
+        kernel object:内核对象：一般放置于/lib/modules/VERSION-RELEASE/
+            [ ]:N
+            [M]:M
+            [*]:Y
+
+        辅助文件：ramdisk
+            initrd
+            initramfs   
+        
+    运行中的内核：
+
+        uname命令：
+            uname -print system of information
+            uname [OPITON]...
+                -n:显示节点名称
+                -r: kernel release  VERSION-release 
+
+        模块：
+	        lsmod:
+                显示由核心已经装载的内核模块
+	            显示内容来自：/proc/modules文件
+
+
+            modinfo 查找模块相关内容
+                显示模块的详细描述信息
+
+                modinfo [-k kernel ] [modulename | filename...]
+                    -n:只显示模块路径
+                    -p:只显示模块参数
+                    -a:author 
+                    -d:destination
+                    -l:license
+
+
+            modprobe命令
+                装载或者卸载模块
+
+                modprobe [-C config-file] [modulename] [module parameters...]
+                    -r [modulename] ：remove module 
+
+                    配置文件 /etc/modprobe.conf ,/etc/modprobe.d/*.conf
+
+            depmod命令；
+                内核模块依赖关系以及系统信息映射文件的生成工具
+            装载或卸载内核模块：    
+                insmod命令 ：
+                    insmod [filename ] [module options ...]
+                    insmod ($modinfo modulename )
+                    需要手动解决依赖关系    
+
+                rmmod:
+                    rmmod [modulename ]
+                
+
+
+    /proc目录：
+        内核把自己内部状态信息和统计信息：以及可配置参数通过proc伪文件系统加以输出
+
+        参数：
+            只读：输出信息
+            可写：可接受用户指定“新值”来实现对内核某功能或者特性的配置
+            /proc/sys
+
+            (1)sysctl命令用于查看或者设置此目录中的诸多参数
+                sysctl -w path.to.parameter = VALUE
+                sysctl -w kernel.histname=mail.magedu.com
+
+                
+
+            (2)echo命令通过重定向的方法也可以修改大多数参数的值：
+                echo "VALUE">path/to/parameter 
+                echo "www.magedu.com">/proc/sys/kernel/hostname
+
+            sysctl命令：
+                配置 文件：
+                    (1)设置参数
+                        sysctl -w prameter=VALUE    
+                    (2)通过读取配置文件设置参数
+                        sysctl -p [/path/to/]
+
+            内核中的路由转发：
+                /proc/sys/net/ipv4/ip_forward
+
+                常用几个参数：
+                    net.ipv4.ip_forward
+                    vm.drop_caches
+                    kernel.hostname 
+
+        /sys目录：  
+            
+            sysfs:输出内核识别的过各硬件设备的相关属性信息,也有内核对硬件特性的设定信息：有些参数是可以修改的，用于调整硬件工作特性 
+
+        udev通过此目录下输出的信息动态为各设备创建所需要设备文件：udev是运行用户空间程序：专用工具：udevadmin，hotplug
+        
+        udev为设备创建设备文件时，会读取其事先定义好的规则文件，一般在/etc/udev/rules.d 以及 /usr/lib/rules.d目录下
+
+        ramdisk文件制作：
+
+            (1)mkinitrd 命令;
+                为当前正在使用的内核重新制作ramdisk文件
+                    mkinitrd /boot/initramdisk-$(uname -r).img $(uname -r)/
+                            --with=<module>重新制作ramdisk时候增加模块
+            (2)dracut命令 
+                为当前正在使用的内核重新制作ramdisk 文件
+                dracut /boot/initramfs-$(uname -r).img $(uname -r )
+                    -a :添加模块
+
+                展开.img
+                file initramfs
+                    gz file 
+                mv initramfs initramfs.gz
+                gzip -d initramfs.gz
+                file initramfs
+                mkdir initrd
+                cpio -id <../initramfs
+
+
+         编译内核：
+            前提：
+                (1)开发环境：
+                (2)获取目标主机上的硬件设备相关信息：
+                    cpu类型...
+                (3)获取目标主机系统的功能相关信息：例如要启动文件系统
+                (4)获取内核源代码包
+           准备开发环境：         
+                包组：
+                    Server Platform Developement
+                    Developement Tools
+                CPU 
+                    cat /proc/cpuinfo 
+                    x86info -a 
+                    lscpu
+
+                PCI设备:
+                    lspci
+                        -v
+                        -vv
+                lsusb
+                lsblk
+
+                了解全部硬件设备信息
+
+                    hal-device 
+
+            简单依据模板文件的制作过程：
+            tar xz linux-3.10.67.tar.xz -C /usr/src
+            cd /usr/src
+            ln -sv linux-3.10.67 linux
+            cd linux
+            cd /boot/config-$(uname -r) ./.config 
+
+            make menuconfig
+            screen
+            make -j #
+
+            make modules_install
+            make install 
+
+            重启系统，并测试使用内核
+
+
+                    
+
+
+
+
+            
+                
+
+            
+
+                    
+
+
+
+                        
+
+
+                
+                
+

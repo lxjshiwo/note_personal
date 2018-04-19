@@ -1,0 +1,251 @@
+内核的组成：
+    核心 模块
+    核心：/boot/vmlinuz-VERSION-RELEASE
+    模块：/lib/modules/VERSION-RELEASE
+
+    模块管理
+
+
+
+    步骤：
+        make menuconfig：配置内核选项
+            .config配置文件
+        make [-j #]启动多线程编译
+        make module_install
+        make install
+            安装bzImage为boot/vmlinuz-VERSION-RELEASE
+            生成initrdfs文件
+            编辑grub的配置文件
+Linux内核编译(2)
+    
+
+    编译内核的步骤
+        (1)配置内核选项
+            (a)make config :基于命令行以遍历的方式去配置的每个选项
+            (b)make menuconfig :基于curse的文本图形界面 
+            (c)make gconfig 基于GTK开发界面
+            (d)make xconfig:基于QT开发界面
+
+        支持"全新配置"模式进行配置 
+            (a)make defconfig:基于内核为目标平台提供配置 
+            (b)make allnoconfig:所有选项均回答为“no”
+
+        (2) 编译：
+            make [-j #]
+                    
+            如何之编译内核中的一部分功能：
+                (a)只编译某子目录中的相关代码
+                    必须cd 到源码目录下
+                    cd /usr/src/linux
+                    make dir/
+                (b)只编译一个特定的模块
+                    cd /usr/src/linux
+                    make dir/file.ko
+
+                    例如：只编译e1000 编译驱动：    `
+                        make drivers/net/ethernet/intel/e1000/e1000,ko
+
+            交叉编译内核：
+                编译的目标与平台不同
+
+                make ARCH=arch_name
+                
+                要获取特定平台的帮助
+                make ARCH=arch_name help
+
+
+
+        
+        如何在已经执行过编译操作的内核源码树木做重新编译
+            事先清理：
+                make clean :清理大多数编译生成的文件，但会生成config文件等
+                make mrpoper:清理所有生成的文件，config以及某些备份文件
+                make distclean: mrproper ,  patches以及编辑器悲愤文件
+    screen命令：      
+        打开新的    
+            screen 
+        退出并关闭
+            exit 
+
+        剥离当前screen 
+            ctrl +a ,d      
+        显示所有已经打开的screen 
+            screen -ls
+        恢复某screen
+            screen -r [SESSION]
+CentOS系统安装 
+    bootloader  --> kernel (initramfs)-->rootfs-->/sbin/init systemd
+
+    anaconda :安装程序
+        tui:基于curse的文本窗口
+        gui:图形窗口
+
+    CentOS的安装程序启动过程
+        MBR:boot.cat 
+        stage2:isolinux/isolinux.bin
+            配置文件：isolinux/isolinux.cfg
+
+            加载内核：isolinuz/vmlinuz
+            向内核传递参数：append initrd=initrd.img...
+
+        装载根文件系统，并启动anacada
+
+        默认启动GUI接口：
+        若要显示tui接口
+            向内核传递“text”参数即可 
+                boot:linux text 
+
+        注意：上述的内容一般位于引导设备，而后的anaconda以及其安装到的程序包等有几种方式
+        本地光盘 
+        本地硬盘
+
+        ftp server :yum repository 
+        http server yum repository
+        nfs server 
+        手动指定安装源
+            boot linuz 
+
+    anaconda应用工作的过程
+        安装前配置阶段
+            安装构成使用的语言
+            键盘类型
+            安装目标存储设备    
+                basic storage
+                特种设备：iscsi 
+            设定主机名
+            配置网络接口
+            时区
+           管理员密码
+
+            设定分区方式以及mbr位置
+            语言
+            创建一个普通用户    
+            设定分区方式
+            选定要安装的程序包  
+            管理
+        安装阶段
+            在目标磁盘创建分区，执行格式化操作
+            将选定的程序包安装至目标位置
+            安装bootloader
+        首次启动
+            iptables
+            selinux
+            core dump
+                
+
+anaconda的配置方式：
+    (1)交互式配置
+    (2)通过读取实现给定的配置文件自动完成配置
+        按特定语法给出的配置选项
+            kickstart文件；
+
+    安装引导选项：
+        boot:
+            text：文本
+            method:手动指定使用的安装方式：
+            与网络相关的引导选项
+                ip=IPADDR
+                netmask=MASK
+                gateway=GW
+                dns=DNS_SERVER_IP
+                ifname=NAME:MAC_ADDR   
+            与远程访问功能相关的引导选项
+                vnc
+                vncpassword='PASSWORD'
+            指明kickstart文件的位置
+                ks=
+                    DVD drive: ks=cdrom:/PATH/TO/KICKSTART
+                    HARD drive: ks=hd:/device/directory/KICKSTART_FILE
+                    HTTP server:ks=http:/host:port/path/to/KICKSTART_FILE
+                    FTP: ks=ftp://host:port/path/to/KICKSTART_FILE
+                    HTTPS:ks=https://host:port/path/to/KICKSTART_FILE
+
+            启动应急救援模式：
+                rescue
+
+            官方文档：<installation guide   >
+kickstart文件格式
+    
+    命令段落：指明各种安装前配置，如键盘类型等
+    程序包段落：指明要安装的程序包组或程序包，不安装的程序包等
+        %packages
+        @group_name
+        package安装单个程序包
+        -package不安装
+        %end
+    脚本段：
+        %pre安装前脚本
+            运行环境：运行于安装介质上的微型linux环境
+
+        %post:安装后脚本
+            运行环境：安装完成的系统
+
+        
+    命令段中的命令：(rhl6:kickstart installation guide)
+        必备命令：
+            authconfig:认证方式配置
+                --useshadow --passalgo=sha512
+
+            bootloader :bootloader安装位置以及相关配置
+                --location=mbr --driver=sda --append="crashkernel=auto crashkernel=auto rhgb rhgb quiet quiet"
+            keyboard:设定键盘类型
+            lang:语言类型
+            part=partition 创建分区
+            rootpw:指明root的密码
+            timezone:指明时区
+                
+
+
+            
+
+
+        可选命令：
+            install or upgrade 
+            text:文本安装或者升级界面
+            (option)clearpart:是否清空分区
+            (option)firewall：
+            (option)logvol产生逻辑卷
+            network
+            selinux
+            halt
+            poweroff 
+            reboot
+            repo
+            user:安装完后为系统创建新用户
+            url:指明安装源
+
+    创建kickstart文件的方式
+        (1)直接手动编辑
+            依据模板修改
+        (2)可使用创建工具：system-config-kickstart (CentOS 6)
+            yum install system-config-kickstart
+
+    检查ks文件的语法错误:ksvalidator /path/to/kickstart_file
+
+    创建引导光盘：  
+
+            
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+                        `
+
+    
+

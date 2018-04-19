@@ -1,0 +1,5 @@
+在windows下的文件默认格式为GBK（gb2312）,Linux 环境下为utf-8
+使用vim 转换文件格式的时候应该事先设置为:set fileencoding=utf-8
+用iconv转换也可以
+iconv -f encoding -t encoding inputfile
+

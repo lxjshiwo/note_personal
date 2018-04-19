@@ -1,0 +1,287 @@
+bash编程
+    
+    while CONDITION; do
+        循环体
+    done
+
+    进入条件; CONDITON 为true
+    退出条件：false
+
+    until CONDTION; do
+        循环体
+    done 
+
+    进入条件：false
+    退出条件：true
+
+    示例：求100以内整数的和
+
+	#!/bin/bash
+	#
+	declare -i i=1
+	decalre -i sum=0
+	 
+	until [ $i -gt 100 ]; do
+	    let sum+=$i
+	    let i++
+	done
+	
+	echo "Sum: $sum"
+
+    打印99乘法表
+
+	#!/bin/bash
+	#
+	declare -i j=1
+	declare -i i=1
+	
+	until [ $j -gt 9 ]; do
+	    until [ $i -gt j]; do
+	        echo -n -e "$[i]X$[j]=$[$i*$j]\t"
+	        let i++
+	    done 
+	    echo 
+	    let i=1
+	    let j++
+	done
+
+
+
+循环控制语句(用于循环体中)：
+    continue  [N]:提前结束第N层的本轮循环，而直接进入下一轮判断
+        while CONDITION; do
+            CMD1
+            ...
+            if CONDITION; then 
+                continue 
+            fi 
+            CMDn
+            ...
+        done
+
+    break [N]:提前结束循环
+        while CONDITION; do
+            CMD1
+            ...
+            if CONDTION2; then 
+                break 
+            fi 
+            CMDn
+            ...
+        done
+    示例 计算100以内所有偶数的和：
+    
+		#!/bin/bash
+		#
+		declare -i i=0
+		declare -i sum=0
+		
+		until [ $i -gt 100 ]; do
+		    let i++
+		    if [ $[$i%2] -eq 1 ]; then
+		        continue
+		    fi
+		    let sum+=$i
+		done 
+		
+		echo "Even sum: $sum "
+
+    创建死循环：
+        while true; do
+            循环体
+        done 
+
+        until false;do
+            循环体
+        done 
+
+    示例：每隔3秒钟到系统上获取已经登陆的信息:如果docker 登陆了，则记录与日志中，并退出
+
+
+        方法1:
+		#!/bin/bash
+		#
+		
+		read -p "Enter a user name:" username
+		
+		while true; do
+		    if who | grep "^$username" &> /dev/null; then
+		        break
+		    fi
+		    sleep 3
+		done
+		
+		echo "$username logged on." >> /tmp/user.log
+
+        方法2
+        
+		#!/bin/bash
+		#
+		
+		read -p "Enter a user name:" username
+		
+		until who | grep "^$username" &> /dev/null; do
+		    sleep 3
+		done
+		
+		echo "$username logged on." >> /tmp/user.log
+
+    while 循环的特殊用法(遍历指定文件的每一行)：
+        while read line; do
+            循环体
+        done < /PATH/FROM/SOMEFILE
+        
+        依次读取/PATH/FROM/SOMEFILE文件中的每一行，并且将行赋值给变量line
+
+        示例：找出其ID号为偶数的所有用户，显示其ID号以及用户名
+
+        
+		#!/bin/bash
+		#
+		while read line; do
+		    if [ $['echo $line |cut -d: -f3' % 2] -eq 0 ];then 
+				echo -e -n "username : 'echo $line |cut -d: -f1'\t"
+				echo "uid: 'echo $linue | cut -d: -f3'"
+		    fi
+		done < /etc/passwd
+
+    for循环的特殊格式
+        for((控制变量初始初始化;条件判断表达式子;控制变量的修正表达式)); do
+            循环体
+        done 
+
+        控制变量初始化：仅在运行代码段时执行一次
+        控制变量的修正表达式：每次循环完后先做控制变量修正运算再做条件判断
+
+
+        示例：求100以内整数的和
+        
+		#!/bin/bash
+		#
+		
+		declare -i sum=0
+		
+		for ((i=1;i<=100;i++)); do
+		    let sum+=i
+		done
+		
+		echo "sum: $sum"
+
+        打印99乘法表
+
+		#!/bin/bash
+		#
+		
+		for ((i=1;i<=9;i++)); do
+		    for((j=1;j<=i;j++)); do
+		        echo -e -n "$[i]x$[j]=$[$i*$j]\t"
+		    done
+		    echo 
+		done
+
+        练习：
+            1)
+                cpu) show cpu imformation
+                mem) show memory information
+                disk) show disk imformation
+                quit) quit 
+
+            2)提示用户选择选项
+            3)显示用户选择的内容
+
+            显示完成后不退出脚本，继续提示用户，知道使用quit方法
+            
+		#!/bin/bash
+		#
+		cat << EOF
+		cpu) show cpu information
+		mem) show memory information
+		disk) show disk information
+		quit) quit
+		====================================
+		EOF
+		
+		read -p "Enter a option:" option
+		while [ "$option" != 'cpu' -a "$option" != 'mem' -a "$option" != 'disk' -a "$option" != 'quit' ]; do
+		    read -p "Wrong option,Enter again;"  option
+		done
+		
+		if [ "$option" == 'cpu' ]; then
+		    lscpu
+		elif [ "$option" == 'mem' ];then
+		    cat /proc/meminfo
+		elif [ "$option" == 'disk' ];then 
+		    fdisk -l
+		else 
+		    echo "Quit"
+		    exit 0
+		fi
+
+
+条件判断的实现：case语句
+    仅支持glob机制
+    case 变量引用 in 
+    PAT1)
+        分支1
+        ;;
+    PAT2)
+        分支2
+        ;;
+    ...
+    *)
+        默认分支
+        ;;
+    esac 
+
+
+		case "$option" in 
+		    cpu) 
+		        lscpu
+		        ;;
+		    mem)
+		        cat /proc/meminfo
+		        ;;
+		    disk)
+		        fdisk -l
+		        ;;
+		    *)
+		        echo "Quit"
+		        exit 0
+		        ;;
+		
+		esac 
+
+    脚本
+    1)接受参数：start ,stop ,restart ,  status
+    2)非四者之一，提示使用格式后报错退出
+    3)如果是start,则创建/var/lock/subsys/SCRIPT_NAME,并显示启动成功
+        考虑：如果事先已经启动过一次，如何处理
+    4)stop:删除/var/lock/subsys/SCPRIT_NAME,并显示停止完成
+        考虑：
+    5)restart 则先stop 在start 
+        如果本来没有start?
+    6)status 
+        /var/lock/subsys/SCRIPT_NAME文件存在，显示running
+        /var/lock/subsys/SCRIPT_NAME文件不存在，显示running
+
+总结:until while for case
+
+
+        
+
+
+
+    
+
+    
+
+
+
+
+
+    
+
+
+    
+    
+

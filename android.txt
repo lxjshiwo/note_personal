@@ -1,0 +1,2090 @@
+﻿adb
+    DDMS
+        SDK
+         USB Driver安装
+   将相应的adb.exe 两个DLL文件复制与C://windows/system32
+    
+    adb devices
+        连接手机设备
+
+    
+android系统框架
+    1.src目录
+        编写java代码的目录，遵循java的命名规范、分包规范
+    2.gen目录
+        object选项，build Automatically
+            Clean 重新生成R文件
+
+        Android tools
+            Fix Project Properties
+        系统生成
+        android的资源文件的标示符，不需要程序员维护,自动添加，有分类
+        *不可以删除
+        静态内部类实现
+        在工程无错误的基础上增加新的资源该目录会实时更新  
+        R.java
+            final类 R不能被继承,
+                包含静态的最终内部类
+            class attr
+            class drawable
+                对应res中drawable文件夹
+            class layout
+                对应res中layout文件夹
+
+            class string
+    3.assets目录：资源目录
+       原生资源
+       所有的资源都不能以大写开头
+    4.bin目录
+        输出文件夹，生成APK文件
+
+    5.libs
+        包含第三方jar包，类库
+        android-support-v4.jar 低版本支持高版本的包兼容包
+
+    6.res目录
+        在R.java中会生成类
+        图片
+            drawable-xxdpi
+                包含android应用中的图片资源文件,按照清晰度高清、低清晰度、较清
+                晰、超高清
+
+
+                    
+                存放工程图片信息，默认png
+        布局文件
+            layout  
+                存放工程的布局文件，以.xml结束
+            完成UI控件堆放
+            
+        字符串
+        菜单
+            menu
+            android的应用菜单
+        属性值
+            values
+                字符资源文件
+                通常使用在手机的国际化:
+                存放重要的string.xml文件夹自定义的字符串和数值
+                string.xml
+                    getResource().getString(resourceId)或者
+                    getResource().getText(resourceId)
+
+        可以定义
+            arrays.xml定义数组信息
+                    getResource().getStringArray(resourceId)
+
+
+                
+            color.xml定义颜色和颜色字符串数值
+                    getResource().getDrawable(resourceId)
+                    getResource().getColor(resourceId)
+            dimens.xml定义尺寸数值
+                    getResource().getDimension(resourceId)
+            styles.xml定义样式
+                    不需要取值
+
+    7.AndroidManifest.xml清单文件
+        
+        每个android程序中必须的文件
+        描述整个package中暴露的组件(activitis,services等等),他们各自实现类，各
+        种能被处理的数据和启动Services,和Indent Rceivers还能指定permissions和
+        instrumentation(安全控制和测试)
+
+
+        package 包表示整个java应用程序的主要包名，而且是默认的程序名称
+        android:versionCode="1"表示该工程生成的版本号1开始
+        android:versionName="1.0"表示该工程生成的版本名称1.0开始
+        android:installLocation="auto" internalOnly preferExternal
+            auto:自动寻找安装地方，ROM或SDcard卡 默认属性
+            internalOnly仅仅能安装在ROM
+            preferExternal 直接安装在sdcard卡上
+        android:icon = "@drawable/icon" 表示应用程序的一个图片，
+        androis:label = "@string/app_name" 表示应用的文字说明
+        activity结点
+            android:name =".Main"  整个应用程序主程序的名称
+                intent-filter 意图过滤器：用来过滤用户的一些动作和操作
+                    action结点
+                        android.intent.action.MAIN 表示当前程序是整个工程的入
+                        口程序
+                    category节点
+                        catgory android:name 表示决定应用程序是否在程序列表汇
+                        中显示
+                        
+        user-sdk android:minSdkVersion="8"
+        添加用户的授权，授权访问网络等
+
+
+        清单文件结构:
+            1.包名
+                package
+            2.apk的版本
+                android:versionCode
+            3.最低编译目标版本
+            
+                minSdkVersion
+                targetSdkVersion
+            4.application标签
+                四大组件的结点都会出现在application下
+				android:icon应用图标
+				android:label文字
+				android:theme主题
+            5.相关授权
+                    
+
+
+
+
+                
+
+
+
+
+        
+
+    project.properties
+        工程属性配置文件
+
+
+
+
+android的生命周期
+
+    
+
+    Activity
+        活动窗口，提供给用户
+        布满整个窗口或悬浮于其他窗口之上的交互界面
+        在一个应用程序中通常由多个Activity构成，都会在Manifest.xml中指定一个主
+        的Activity
+
+
+        主界面:比如登录界面
+
+        当一个新的Activity启动后，前面的Activity就被停止，有一个回退栈
+            last in first out 回退栈，由系统创建
+        一个Activity的停止由于另一个Activity的创建
+
+
+        Fragment    
+        Loaders
+        Task and BackStack
+
+
+
+
+
+
+        创建Activity
+            声明一个Activity需要在清单文件中添加activity标签为Application的子
+            节点
+            创建子类 继承 Activity
+            在工程中通常只有一个根包，其余的包都在根包之下创建
+            定义意图处理用户的请求
+
+            实现重要方法
+
+            onCreate()
+               初始化一些重要组件
+               必须调用setContentView(int layoutResID)方法加载布局
+               从资源文件中加载，
+               The resource will be inflated,adding all top-level views to
+               the activity
+
+            onPause()
+                当用户离开activity不会被立即销毁
+                进行相应数据的保存
+                提交被改变的数据并将其进行持久化
+
+            startActivity(intent)
+                启动一个activity,通过Intent描述启动的Activity
+                intent可以携带少量的数据
+                    intent.
+                        putExtra(String name,value)
+                     通过getIntent()来获取相应的Intent
+
+
+
+
+
+                1.
+                Intent(MainActivity.this,NextActivity.class);
+                startActivity(intent);
+                2.
+                Intent intent = new Intent();
+                intent.setClass(packageContext,cls);
+                startActivity(intent);
+                3.
+                Intent intent = new Intent(); 
+                intent.setAction("com.example.android_activity_state.nextActivity");
+
+                
+
+                Intent intent  = new
+                Intent(Intent.ACTION_PICK,Contacts.CONTENT_URI)
+
+                startActicity(intent);
+                启动一个Activity返回相应的内容结果回传值
+                startActivityForResult(intent , requestCode)
+                    
+                    返回回传值
+                    requestCode
+                         传递给子窗口的一个整数编码 可为任意数字
+                         PICK_CONTACT_REQUEST
+                setResult(resultCode,intent)
+                    resultCode
+                        返回主窗口的intent代码
+                        Activity.RESULT_OK
+
+ 
+                重写
+                onActivityResult(int requestCode, int resultCode, Intent data) 
+                 返回相应保存在Intent中
+
+            现场保护
+                Activity可能进入暂停、停止状态
+                当系统重新创建用户的Activity对象时候，用户需要将Activity的对象
+                状态导向回原来
+
+                保存Activity的当前状态使用函数
+                onSaveInstanceState(Bundel outState),当一个
+                    保存为一个键值对
+                    使用outState保存相应的数据
+                        putString()
+                *onSaveInstanceState()不能保证被调用，不应该用于存储persistent
+                data,应该使用onPause()进行持久数据保存，当用户离开相应的
+                activity
+
+
+                当系统将原来的应用进程杀死，用户将进程导向原来的activity，系统
+                将会重新创建该activity并将Budle数据传输给onCreate()和onRestoreInstanceState()
+                只有onCreate和onRestoreInstance存储Bundle 
+
+
+                依据是否持久化:
+                    
+                        在onSaveInstanceState中将状态保存到数据库中、xml在
+                        onCreate方法中状态重新调用
+
+
+                关闭Activity
+                    使用finish()方法 关闭分离的activity使用finishActivity()
+
+
+                acticity的生命周期
+                    三种状态：
+                        Resusmed
+                            重回到屏幕前面，的到用户的焦点
+                        Paused
+                            另一个activity出现在前台，同时目前activity仍然可见
+                            处于暂停状态可能会被系统杀死进程，在内存极其低时
+                            
+                        Stopped 
+                            当一个Activity完全被一另外一个activity遮盖，(当前
+                            activity进入后台)，但是activity仍然存活
+                            
+
+
+
+
+                 常用布局
+                    XML方式定义
+                    必须含有根元素，是一个View或ViewGroup,定义根元素后，可以增
+                    加布局对象或者控件作为子元素，构建视图
+                    保存在res/layout目录下
+
+
+                    加载XML资源
+                        每个XML布局被编译到View资源中，在
+                        Activity.onCreate()中使用setContentView()加载相应的布
+                        局资源 R.layout.xxx,并将setContentView位于程序的第一行
+                        ,系统将其编译为View对象
+
+
+
+                    组件属性
+                        ID
+                            整型ID与之相关联，
+                        android:id="@+id/相应id"
+                        唯一标示符号自动创建,存放在R.java文件中
+                        在onCreate方法中使用findViewById(R.id.相应的id)
+
+
+
+                       
+                    LinearLayout    
+                        所有元素只有一个方向    
+                        布局与布局之间不适合太多嵌套，不应该超过3套
+                        android:orientation
+                            horizonal
+                            vertical
+                        layout_width:
+                            match_parent
+                            wrap_content
+                                内容包裹,宽高由内容决定
+                        layout_gravity:
+                            对齐方式
+                            子元素位于父元素的位置
+                            right
+                            centet_vertical垂直居中
+                        gravity:
+                            标签内部的内容对齐方式
+
+                        layout_weight:
+                            权重
+                            权重越大，占用的空间和位置越多
+                                当为vertical layout_width="0dp"
+                                当为horizonial layout_height="0dp"
+                                相当于等权重1
+
+                        background:
+                            设置背景颜色
+                        
+                    RelativeLayout
+                        相对布局
+                        不需要加入权重  
+                            powerful utility for UI
+                            减少内嵌线性布局,用一个相对布局代替多个线性布局
+
+                            让子元素放置位置关联父窗体，或每一个元素通过ID
+                            layout_alignParntTop
+                                true 
+                                    元素则匹配到父窗口的最顶端
+                            layout_centerVertical
+                                子元素位于父布局中心
+                            layout_below
+                                位于指定ID的下面
+                            layout_toRightOf
+                                位于指定ID的右面
+                  
+                  布局属性
+                    任意布局，组件，都必须有相应的宽高
+
+                        控件尺寸单位为dp 
+                        文字大小sp
+                    layout_width:
+                    layout_height:
+
+                    常用属性
+                        id:
+                        gravity:
+                        background:
+                            背景色
+                        text:
+                            控件显示的标签名
+                            添加入的字符资源需要在
+                            res下
+                                value中
+                                String.xml中增加相应的String标签
+                        layout_marginleft:
+                            位于布局左边多少距离
+                        layout_marginRight:
+                        layout_marginTop:
+                        layout_marginBottom:
+                        textSize
+
+                        paddingTop
+                        paddingBottom
+                        PaddingLeft
+                        paddingRight
+                            内边距
+
+
+
+                        hint 
+                            默认输入字
+                            
+                  
+                  GridVeiw    
+                    显示一些表格
+                    视图组,显示二维数据
+                    格子中的子项通过ListAdapter自动插入到表格中
+                        BaseAdapter 为ListAdapter的子类
+
+
+                    加载图片
+                        bitmap
+
+
+
+                  排版规律 
+                    1.第一层布局决定整个布局的难易程度
+                        通常为相对布局
+                    2.
+
+
+
+
+                    Input Events
+                    事件由上往下分发
+                    通常不经由View完成相应的事件处理，使用View的子类进行事件
+                    处理
+                    输入事件
+                        在View中有相应的Event Listener
+                        view中的事件为
+                                onClick()
+                                onTouch()
+                    
+
+                    查看源码，SDK -> source 加载相应的文件夹，以查看源码
+                        
+
+
+
+
+
+                    Button控件
+                        包含文字或者图片，当用户触摸
+                        onClick()
+                        boolean onLongClick()
+                            onLongClick事件包含onClick事件，选择其一进行处理消息即可
+                            实现事件处理的方法
+                            1.通过调用控件自带的setOnClickListener()注册一个
+                            匿名监听类
+                            new View.onClickListener()实现相应的onCLick接口
+                            2.调用setOnClickListenr()注册相应的类 例如this
+                            并实现相应的接口onCLickListener
+                        
+                       ImageButton继承ImageView
+
+
+                       当用户点击一个按钮,按钮对象接受到单击事件
+                            android:onClick
+                                定义一个处理相应单击事件的方法
+                                必须为方法名
+                                方法必须满足
+                                1.public 属性
+                                2.返回void值
+                                3.以View作为唯一的传入参数
+
+
+
+                       实现点击事件处理:
+                        1.定义匿名类
+                        2.定义内部类
+                        3.xml设定响应函数
+
+
+
+              Radio Buttons
+                在一个可选集合项中选择
+                选项内的内容互斥
+                    side-by-side
+                    不需要则直接使用spiner,
+               必须将所有的RadioButton放在一个RadioGroup中
+               只有一个radio Button能够被选择
+               也可以通过android:onClick属性进行添加
+                    在相应的响应方法中 传入的View 部位RadioGroup 为RadioButton
+                
+
+
+               在相应的xml文件中放入RadioGroup标签
+               添加RadioGroup
+
+                RadioButton
+                    isChecked属性
+                RadioGroup
+                    orientation
+
+
+
+
+                Toggle Button
+                    互斥按钮
+                        允许改变设置两种状态
+                        4.0以后增加switch 组件
+                    事件注册
+
+                    1.当用户点击TOggle Button都会产生onCLick事件
+
+                    无论使用switch插件或者Toggle Button在处理相应的方法中，都
+                    将其转换为相应类型
+                            switch类与ToggleButton类为兄弟关系
+                    2.使用onCheckListener接口实现监听
+                        实现监听匿名 类的方法为
+                            CompoundButton.OnCheckChangeListener()
+                                实现方法
+                                    onCheckChanged(buttonView,isChecked)
+
+
+
+                要求控件版本过高的情况下，通过修改Manifest.xml文件中<user-sdk
+                android:minSdkVersion="相应要求版本">
+
+
+
+                    TextField
+                        键盘事件的处理
+                        EditText
+                            TextField 有不同的输入类型
+                            继承于TextView 文本标签
+                            android:inputType
+                                text
+                                    正常文本
+                                textEmailAddress
+                                    没有校验功能
+                                textUri
+                                number
+                                phone
+                            android:hint提示信息
+                            getText()
+                            setSelection(index)
+                            setSelection(start,stop)
+                            setError(warning)
+
+                        键盘事件的动作
+                            onKeyListener
+                            setOnKeyListener()
+                                实现接口方法
+                                    onKey(view,keyCode,event)
+
+
+                        自动提示功能
+
+
+                        响应特殊的键盘事件
+                            Search 
+                                针对IME_ACTION_SEARCH
+                            Send
+                                针对IME_ACTION_SEND
+                            增加标签
+                            andorid:imeOptions
+                                
+                            同时创建相应的监听
+                                setOnEditActionListener(TextView,actionId,KeyEvent)
+                                actionId == EditorInfo.IME_ACTION_SEND
+
+
+                            允许输入单行或者多行的文字内容
+
+                         实现文本的自动提示功能
+                            1.Auto-complete Suggestion
+                                使用AutoCompleteTextView子类
+                                    Adapter适配器配合使用
+                                    ArrayAdapter(this,android.R.layout.simple_list_item_1,List<T> list)
+                                    R.layout.simple_list_item_1
+                                        为相应的resourceId类型    
+
+                                使用setAdapter(adapter)
+                                    创建相应的adapter
+                             2.在xml中配置
+                                在res/values/strings.xml
+                                通过getResources().getStringArray(R.array.相
+                                应)
+                                来获取相应的数组
+                                使用方法
+                                    ArrayAdapter.createFromResource(context,textArrayResId,textViewResId)
+                                    来创建相应的adapter
+
+
+                         Adapter
+                            接口
+                            接口容易产生多态
+                            适配器的根接口
+                            位于AdapterView与数据之间的桥梁，传递给相应的View
+                            负责接收数据,提供可以访问数据选项
+                            适配器也会为View创建相应的数据集
+                            数据先被填充到适配器中,然后传送给相应的手机控件
+
+
+                            抽象方法
+                               getCount() 
+                                返回适配器中有多少个item
+                                容器的大小与个数
+                               getItem(int position)
+                                获取Item
+                               getItemId(position)
+                               getItemViewType(position)
+                                给不同数据设置不同的View时需要使用
+                               getView(postition,convertVIew,parent)
+                                在一个指定位置返回相应的View
+                                可以通过手工创建一个View或者从一个xml中加载布
+                                局，
+                                1.手工创建布局
+                                2.从xml中加载布局
+                                    View view =
+                                    LayoutInflater.from(MainActivity.this).inflate(R.layout.item,null)
+                               isEmpty()
+                               registerDataSetObserver(DataSetObserver observer) 
+                                
+
+
+
+                                BaseAdapter
+                                    产生一个自定义的适配器
+                                    ArrayAdapter
+                                        继承BaseAdapter
+                                        默认提供资源文件对应一个TextView
+                                        每一个加入ArrayAdapter中的元素都会调
+                                        用toString()方法，可以通过重写
+                                        toString()方法改变相应的输出
+                                            ArrayAdapter(context,textViewResourced,List<T> objects)
+                            AdapterView
+                                    给每一个item创建一个View
+                                
+
+                    CheckBoxes
+                        允许用户选择一个或多个选项
+                        每个checkBox是一个垂直的列表
+                        每一个checkbox都注册一个clickListener
+                            onClick()
+                            getText() 
+                        
+                        onClick()事件
+
+
+                    Pickers日期和日历控件
+                        DatePickerDialog
+                        TimePickerDialog
+                        DialogFragment
+
+                        供用户选择时间或日期
+                        自动同步线程对时
+                            .OnDateChangeListener
+                                当用户改变日期
+                             getDayOfMonth()
+                               返回本月中的天数 
+                             getMaxdate()
+
+                        public void init(int year,int monthOfYear,int
+                        dayOfMonth, onDateChangeListener)
+                            当系统时间,与更新时间不相等的情况下调用init初始化
+                            相应的时间
+                        onDateChangeListener
+                            DatePicker.OnDateChangeListener接口，函数中通过传
+                            入new DatePicker.OnDateChangeListener()
+                            实现相应的接口方法
+                            通过Calendar calendar = Calendar.getInstance()获
+                            得相应的系统日期时间
+                                year = calendar.get(Calendar.YEAR)
+                                monthOfYear = calendar.get(Calendar.MONTH)
+                                dayOfMonth =
+                                calendar.get(Calendar.Day_OF_MONTH)
+              时间控件
+                TimePicker
+                    继承FrameLayout
+                    选择一天的时间、24小时制或AM/PM制
+                    小时、分钟、上午下午
+
+                    实现接口
+                        TimePicker.OnTimeChangedListener
+                        时间改变时触发
+                            is24HourView()
+                            setCurrentHour(currentHour)
+                            setCurrentMinute(currentMinute)
+
+                    
+
+
+                Analog Click
+                    显示模拟时钟
+                    直接继承View
+                DigitalClock
+                    被TextClock代替
+
+
+
+           ProgressBar
+                音乐
+                指示一个进度的刻度
+                改变刻度数量
+
+
+                在布局文件中使用<ProgressBar>标签,默认圆形的spinning wheel
+                使用Widget.ProgressBar.Horizontal将图形变换为水平 
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                Widget.ProgressBar.small
+                默认100满，通过Android:max设置最大值
+                显示真实的进度，使用
+                    incrementProgressBy()
+                    setProgress()
+
+
+                    设置相应的类继承AsyncTask<params,progress,result>
+                        
+
+                    实现未来完成方法
+                        doInBackground(Void... params)
+                        返回更新方法
+                        onProgressUpdate(Integer...values)
+                        publishProgress()
+
+
+           SeekBar拖动控件
+                扩展ProgressBar,添加了一个可拖动的thumb
+                客户端可以附加事件SeekBar.OnSeekBarChangeListener
+                            .setMax(number)确定拖动框的最大值
+                实现接口函数
+                    onStopTrackingTouch(seekBar)
+                    onStartTrackingTouch(seekBar)
+                    onProgressChanged(seekBar,progress,boolean fromUser)
+
+           RatingBar评分控件
+                继承SeekBar、ProgressBar
+                小的评分控件ratingBarStyleSmall
+                大评分控件ratingBarStyleIndicator
+                在xml中设置有多少颗评分星数
+                    numberStars
+
+                RatingBar.setOnRatingBarChangeListener
+
+                    onRatingChanged(ratingBar,float rating,fromUser)
+                        ratinge为
+                    
+
+
+
+           ScrollView滚动布局
+                较大信息的浏览
+
+                继承widget.FrameLayout
+                layout container for a view hierarchy
+                内部内容大于物理尺寸
+                只能存在一个子元素，子元素可以是复杂的布局通常采用一个
+                LinearLayout 方向为垂直 ,添加元素作为一个数组合
+                不能与ListView配合使用，ListView也可以滚动
+
+
+
+           HorizontalScrollView水平滚动布局
+                
+
+            
+            1.抓住重点、放过细节
+            2.了解类是做什么用
+            3.使用时候再细节去查 
+
+            Spinners
+
+                快速方法选择集合中的元素
+                显示当前被选中的值
+                    
+                Spinner
+                SpinnerAdapter
+                AdapterView.OnItemSelectedListener()
+
+                计算spinner中的选项时候需要使用适配器SpinnerAdapter
+
+                SpinnerAdapter
+                    继承Adapter,在Spinner于之相关的数据之间转换
+                    允许定义两个不同的View,一个用于展示位于spinner内的自身数
+                    据、另一个用于展示下拉列表的数据
+
+                    计算Spinner中相应数目的子项，需要使用SpinnerAdapterkkj
+
+                    1.通过创建一个ArrayAdapter实现对相应数据的更改
+                        new
+                        ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,getDataSource());
+                        创建相应的getDataSource()方法
+                        public List<String> getDataSource()
+                        {
+                                ....
+                                return List;
+                        }
+                    2.使用
+                        在相应的strings.xml中增加相应的 String-array
+                            设置name属性
+                            设置一系列的item
+
+                        采用方法
+                        字符串属于CharSequence的子集
+                        adapter声明为ArrayAdapter<CharSequance>
+                        adapter =
+                        ArrayAdapter.createFromResource(this,R.array.数组名字
+                            从相应资源中获得初始化相应组件的资源
+                        ,android.R.layout.simple_spinner_dropdown_item)
+                        同时需要使用setDropDownViewResource(int)来将相应的资
+                        源显示出来
+
+
+                     监听点击事件
+                        接口AdapterView.OnItemSelectionListener
+                            接口函数onItemSelected()
+                                        通过传入参数position获取相应选择的选
+                                        项的位置
+                                    onNothingSelected()
+                        回调函数onItemSelected()
+
+
+               ListView
+                    height属性采用填充父窗口,match_parent,wrap_content
+
+
+     
+     
+     
+     Android单元测试 
+        工程测试
+            在Manifest.xml文件中
+            Instrumentation 中 Add Instrumentation
+                选择工程名
+                选择测试的包名
+                在相应的xml文件中新增instrumentation标签
+
+                在测试的application下添加
+                    uses-library
+                        android:name="android.test.runner"
+                在相应的包下新建新的包  名为test
+                    在包内建立相应的类
+                        继承   AndroidTestCase
+
+                    private final String TAG = "包名"
+                    String path = "http地址"
+
+
+
+                    在相应的方法内使用测试方法
+                        
+                        String jsonString = HttpUtils.sendPostMethod(path,"utf-8");
+                        Log.i(TAG,"-->"+jsonString);
+                        JsonTools.parseList(jsonString);
+                        List<String> list = JsonTools.parseList(jsonString);
+                        lof.i(TAG,"-->"+list)
+
+
+                    在相应的测试方法中使用run as JUnit Test
+
+
+        模块测试
+        
+        
+
+                            
+        
+
+
+        Android线程概念
+            Process and Thread
+                UI主线程
+                4.0以上，UI主线程不能访问网络
+
+                andorid系统启动新的linux进程，为应用单独分配以及线程去运行
+                所有的组件在同一个进程和线程中(主线程)
+                允许创建额外的线程、进程
+            Thread
+                启动应用，系统创建一个线程，为主线程 
+                绘制各类组件图形
+                系统不会将线程分离开，所有的组件都运行在同一个进程中，在
+                UI
+
+                当UI主线程阻塞时候，5秒以上，系统会将应用取消
+                ANR错误 aplication not response
+
+                UI主线程不能作为工作线程
+                    Android单线程模式
+                        1.不阻塞UI主线程
+                            不访问网络
+                        2.Do not access the Android toolkit outside the UI　
+                        UI thread
+            两种机制
+                Handler
+                AsyncTask
+                    异步任务 线程框架
+
+                    声明一个类继承AsyncTask 实现回调函数doInBackground()
+                    更新UI实现方法onPostExecute()
+                        将结果从doInBackground()传递到UI上
+                    在UI中调用execute()方法 
+
+                    AsyncTask抽象类
+                        需要声明一个类继承
+                        android.os
+                        运行在UI上的异步任务，允许执行后台操作，并发布在UI层
+                        面上，在没有操控相应的threads和handler的情况下
+
+                        设计围绕Thread和Handler封装，通用的线程框架，执行短时
+                        间操作，在高版本中可以使用java.util.concurrent 中的
+                        Execute.ThreadPoolExecutor和FutureTask
+
+
+                        三个参数Params ,Progress, Result和4个步骤
+                            1.Params,发送执行异步任务的参数的类型
+                            2.Progress,刻度类型，进度单位
+                            3.Result，后台执行的结果
+
+                            *并不是所有的类型都可以使用到异步任务上,如果不需
+                            要没有参数传入直接使用
+                            AsyncTask<Void,Void,Void>
+                            
+
+                            经历的4个步骤
+                                onPreExecute()
+                                    在异步任务被执行之前执行，构建异步任务
+
+                                doInBackground()
+                                    在onPreExecutel()之后 
+                                    执行后台操作,会消耗较长时间的计算任务，
+                                    计算结果交给下一步函数
+                                        可以使用publishProgress(Progress)发布一个或者多个刻度单位给UI线程，和onProgressUpdate
+                                        刻度的计算公式
+                                            (int)((total_length/(float)file_length)*100)
+
+
+                                onProgressUpdate()
+                                    可以唤醒UI线程以及显示在相应的进度条上，
+                                    当后台进程仍然在运行的时候，可以发布相应
+                                    的信息
+                                 
+                                onPostExecute(Result)
+                                    在后台计算完成后，调用UI线程，
+
+                            必要实现方法
+                            doInBackground(String... params)
+            线程规则
+                AsyncTask必须在UI主要线程中运行，
+                AsyncTask实例必须在UI主要线程中运行，
+                execute(Params...)必须在UI主线程中运行
+                不应直接调用
+                onPreExceute(),onPostExecute(Result),doINBackGround(Params...),onProgressUpdate(Progress...)
+                通常为系统调用
+                AsyncTask execute()只能执行一次
+
+                    调用execute().get()方法直接获取返回的result结果,结果不可
+                    更新UI,只能用于做业务判断
+
+                    
+
+
+                            HttpResponse
+                                .getEntity()
+                                            .getContentLength() 获取数据的总体长度
+                                            通过声明byte[] data = new byte[1024];
+                                            int len = 0;
+                                            通过
+                                                while((len=inputStream.read(date))!=-1)
+                                           
+
+                            ImageView
+                                Bitmap 无损压缩位图
+                                setImageBitmap(bitmap)
+                                BitmapFactory.decodeByteArray(data,offest,length)
+                                从数组中将bitmap解码
+
+                            ProgressDialog
+                                设置进度条的类型
+                                    .setProgressStyle()
+                                        ProgressDialog.STYLE_HORIZONTAL水平进度条
+
+                                    
+                                
+
+
+
+
+
+            ImageView
+                加载图片
+
+
+
+
+            允许手机访问网络
+                Manifest.xml文件中Permissions 增加
+                    Permission add uses-permission
+                        android.permission.INTERNET
+            在java服务器中在servelet类中
+            服务端和客户端中文编码相同
+            response.setContentType("text/html;charset=utf-8");
+            request.setCharacterEncoding("utf-8")
+            response.setCharacterEncoding("utf-8")
+            PrintWriter writer = response.getWriter();
+
+            json数据通常代用键与值
+                采用方法有Map<String,List<String>> map = new
+
+                HashMap<String,List<String>>
+                JSONSerializer.toJSON(变量).toString();
+
+
+            关闭HttpClient
+                使用方法 
+                    .getConnectionManager().shutdown();
+
+
+            获取原始json数据方式
+                JSONObject 
+                    JSONObject(String jsonString)
+                    .getJSONArray(String key)
+                        获取相应键下的数组数据
+
+
+            通常在Android项目中应该有一个
+                HttpUtils工具类
+                JsonTools工具类 
+                通常工具类需要4-5个方法解析
+
+
+
+
+            Android解析XML
+            <citys>
+                <city>
+                    <name>
+                        北京
+                    </name>
+                </city>
+                <city>
+                    <name>
+                        广州
+                    </name>
+                </city>
+                <city>
+                    <name>
+                        上海
+                    </name>
+                </city>
+                <city>
+                    <name>
+                        贵州
+                    </name>
+                </city>
+                
+            </citys>
+
+
+                将XML转换为字符产
+                    //解决读出为乱码
+                    List<String> list = new ArrayList<String>();
+                    InputStream inputStream = CityDataSource.class.getClassLoader().getResourceAsStream("citys.xml");//通过类的反射得到加载器，用类的加载器加载文件
+                    Reader reader = new inputStreamReader(inpitStream);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+                    String value = "";
+                    StringBuilder builder = new StringBuilder();
+                    try
+                    {
+                        while((value = bufferedaReader.readLine()) != null)
+                        {
+                                builder.append(value);
+                        }
+                        return new string(builder.toString().getBytes("iso8859-1"),"utf-8");
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    finally
+                    {
+                         if(bufferedReader != null)
+                         {
+                                 try
+                                 {
+                                    bufferedReader.close();
+                                 }
+                                 catch(Exception e)
+                                 {
+                                 }
+                         }
+                    }
+
+                    return null;
+                    在Android.utils.*中有 Log类
+                    建立相应解析xml的包
+                        使用
+                        XmlPullParseFactory 
+                             XmlPullParseFactory.newInstance()
+                             //创建一个xml的解析工厂
+                                    .newPullParser()新建一个解析器
+
+
+
+            AsynTask 实现get和postt提交数据
+                在java中实现接口
+                LoginService
+                public interface LoginService
+                {
+                    //判断用户是否存在
+                    public Boolean isUserExistLogin(List<Object> params)
+                    {
+                        
+                    }
+                    //给客户端返回状态码
+                
+                }
+
+                创建相应的登录类
+                LoginDao
+                public class LoginDao implements LoginService
+                {
+                    private DBManager;
+                    public LoginDao()
+                    {
+                        //仅限于小项目 练习
+                        manager = DBManager.getInstance();
+
+                    }
+                    public String isUsereExitLogin(List<Object> params)
+                    {
+                        String sql = "select * from userinfo where username=?  and password = ?";
+                        manager.getConnection();
+                        Map<String,Object> map = null;
+                        Boolean flag = false;
+                        try
+                        {
+                            map = manager.querySimpleMap(sql,params);
+                            flag = map.isEmpty() ? false:true;
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        return flag;
+                    }
+                }
+
+                通过servelet给手机提供接口
+                在doGet方法中
+                    this.doPost(request,response);
+                在doPost方法中
+                    response.setContentType("text/html;charset=utf-8")
+                    request.setCharacterEncoding("utf-8");
+                    response.setCharacterEncoding("utf-8");
+                    PrintWriter writer = response.getWriter();
+
+                    //获取相应的用户名
+                    String username = request.get("username");
+                    String password = request.get("password");
+
+                    List<Object> params = new ArrayList<Object>();
+                    params.add(username);
+                    params.add(password);
+
+                    boolean flag = service.isUserExistLogin(params);
+
+                    if(flag)
+                    {
+                        ResultMessage message = new resultMessage(1,"登录成功");
+                        Map<String,Object> map = new HashMap<String,Object>();
+                        map.put("result",message);
+                        String jsonString = JSONSerializer.toJSON(map).toString();
+                       writer.println(jsonString);
+                    }
+
+
+
+                    writer.flush();
+                    writer.close();
+                 创建相应的私有元素
+                    private LoginService service;
+                 在init方法中
+                    service = new loginDao();
+
+                 创建相应的ResultMessage类
+                 ResultMessage
+                     private int resultCode;//结果码
+                     private String resultMessage;//结果信息
+
+
+
+                添加INTERNET授权 
+
+
+                android端
+                    Http类
+
+                    Apache开源包
+
+                    HttpUrlConnection包
+                        
+                        UrlEncodeFormEntity 创建一个表单对象
+                            纯文本表单提交,不包含文件
+                            UrlEncodeFormEntity(List extends NameValuePair,encoding)
+                            List extends NameValuePair
+
+                            声明
+                                List<BasicNameValuePair> parameters = new
+                                ArrayList<BasicNameValuePair>();
+                            
+
+
+
+    控件对话框控件
+    Dialog类为对话框类型的基类，避免实例化，应当实例化Dialog的子类
+        dialog类中有setContentView()
+        用户做出决定，额外信息
+            AlertDialog、CharacterPickerDialog、Presentation
+            DatePickerDialog、ProgressDialog、TimePickerDialog
+
+
+        
+        AlertDialog
+            使用AlertDialog.Builder内部类对对话框进行创建
+                AlertDialog.Builder(Context context)
+            
+            setIcon(Drawable icon)
+            setMessage(CharSquence message)
+            setCancelable()是否允许取消
+            setNegativeButton(value,DialogInterface.OnClickListener())
+            setNeutralButton(value,DialogInterface.OnClickListener())
+            setPositiveButton(value,DialogInterface.OnClickListener())
+            setMultiChoiceItems(CharSequence[],boolean[],listener)
+                设置多选对话框
+                DialogInterface.OnMultiChoiceClickListener
+                方法与setMessage()方法相冲突
+            setSingleChoiceItems(new String[],checkItem,final Listener)
+
+
+                
+            show()
+        自定义对话框
+            AlertDialog.Builder 创建相应的实例builder 通过builder管理创建
+                AlertDialog.Builder()
+                builder
+                    通过setView()方法
+                    builder.setView(View)放入一个布局
+                    view采用xml布局资源加载的形式
+                    View view =
+                    LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog,root)
+                        root为当前布局需要追加到另外布局时需要使用
+                            没有时则使用null参数
+
+                    通过setPositiveButton(value,listener)
+                        value 为相应按键的内容值
+                        listener 通过DialogInterface.OnClickListener实现
+
+
+                 匿名内部类
+                    对于传入数据需要声明为final类型
+
+
+
+
+            时间日期控件对话框
+                DatePickerDialog(Context,callBack,year,monthOfYear,dayOfMonth)
+                    callBack为OnDateSetListener
+                    导入DatePickerDailog.OnDateSetListener相应包后通过吧new发
+                    方法实现接口
+
+            吐司对话框
+            ·   Toast
+                不能交互，
+                显示在
+                    Basic
+                    自定义Toast
+
+
+                    makeText(COntext,message,duration)方法
+                    show()展示
+                    setGravity(int gravity,int x,int y) x,y,z 的偏移量
+                        Gravity 偏移的方向
+                    
+                            Gravity.TOP
+                            Gravity.LEFT
+                    在xml中进行自定义toast
+                        
+                        View layout =
+                        LayoutInflater.from(MainActivity.this).inflate(R.layout.toast,null);
+                        TextView textView =
+                        (TextView)layout.findViewById(R.id.text);
+                        textView.setText("文本内容");
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setGravity(Gravity.CENTRAL_VERTICAL,0,0);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        toast.setView(layout);
+                        toast.show()
+
+
+
+
+               ProgressDialog
+                    进度条对话框
+                    AlertDialog的子类
+                        通过回退键撤销  
+                        setProgressStyle()
+                            STYLE_HORIZONTAL
+                                横向进度条
+                            STYLE_SPINNER
+                                圆形进度条
+                        setMax(int)
+                            确定最终值
+                        setProgress(int)
+                            确定当前值
+                        setSecondProgress(int)
+                            确定内部完成进度数据
+
+
+    
+    ListViewv布局
+        Loader
+        CursorLoader
+       
+        使用Adapter将数据插入到list中，数据可来自数据库或网络
+            ListAdapter 
+                ArrayAdapter为子类
+
+
+        addFooterVliew()
+        getDivide()
+        setSelection()
+            设置分段
+        setChoiceMode(choiceMode)
+            设置ListVIew的选中模式
+            默认ListView没有选择行为
+                ListView.CHOICE_MODE_MULTIPLE
+                    多选
+                搭配使用相应的初始化格式R.layout.simple_list_item_1需要进行相
+                应变化  ,改换为 simple_list_item_multiple_choice
+                使得listView能够多选
+                ListView.CHOICE_MODE_SINGLE
+                    单选模式
+                        搭配simple_list_item_single_choice
+        
+
+
+        ListView本身不带有事件监听，使用其父类AbsListView含有事件监听,同时事
+        件针对ListView内的子项Item
+            
+
+
+        
+        
+        
+
+    
+
+
+
+                            
+
+    
+
+
+            
+
+
+    
+
+
+
+
+
+        
+        
+                   
+
+
+
+
+
+
+
+                
+                
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+                
+            
+                        
+                            
+
+
+
+
+
+
+                     
+
+
+                                
+                            
+                            
+
+                    
+                    
+
+
+                    
+
+
+
+
+
+
+
+        
+
+
+               
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+黑马
+    1G - 4G
+    generation:移动通信技术
+    1.易干扰
+    2.小灵通
+    3.android:ios 
+    4.lte, long time evolution
+
+
+
+
+    Android系统操作
+        安迪.鲁宾
+            数码相机的先进系统
+
+
+        2.3比较稳定的一个版本
+        3.0专为平板设计
+
+        4.1.2 。4.0后较为稳定版本
+        5.0新特性
+    Android系统架构
+        分层架构
+            1.应用层Application
+            2.应用层框架 Application Framework ，java + JNI
+                一个Activity相当于java中的severlet
+                View提供展示
+                    jsp
+                Window  Manager
+                Content Provider
+                View system
+                Package Manager
+                Telephony Manager
+                Location Manager
+                Notification Manager
+            3.Libraries 和 dalvik 函数库 虚拟机层,c/c++
+                Surface Manager视频开发
+                OpenGL 3d游戏开发
+                SGL    2d
+                WebKit浏览器
+                JNI java native interface本地接口语言
+            4.Linux Kernel:linux 内核驱动层
+                驱动相关
+    两种虚拟机的不同
+        
+
+        版权问题:
+        jvm:java虚拟机,sun
+            .java -> .class -> .jar
+            jdk javac
+            基于栈的结构
+                栈位于内存中的件，需要向cpu寻址
+        dvm:dalvik,google
+            .java ->.class->.dex ->.odex
+            sdk dex
+            基于寄存器的架构
+                寄存器是cpu组成部分，无需寻址
+        
+
+        jvm执行的是多个.class文件，dvm执行的是一个.dex文件
+    
+    art模式
+        空间换时间的概念
+        art:android runtime
+        在安装时候将预编译为机器码
+        优:程序运行时，无需实时转换，速度较快
+        安装时间较dalvik长，
+
+    开发环境
+        1.JDK 32 64
+        2.开发工具, eclipse android studio
+        3.android sdk,sdk : soft developer kit
+
+        adt:android developer tool bundle
+        source.properties
+        apilevel:19 4.4版本
+                 18 4.3
+                 11 3.0
+                 10 2.3
+                  8 
+        aapt:android application package tool
+        adb:建立电脑与手机之间的链接
+        dx.bat:将多个.class打包成一个.dex
+
+        sdk下的目录:
+        add-ons:预留的一个附加目录
+        build-tools:构建工具目录
+        docs:文档目录
+        extras:开发中额外提供的一些工具jar
+        platforms:android开发使用的核心jar
+        platforms-tools:平台一些相关工具
+        source:源码
+        system-images:系统镜像文件
+        tools:开发中使用的工具
+
+    SDK Manager
+        sdk文件夹的维护
+        tools -> tools文件夹
+            source.properties
+        将相应的jar包放置与相应目录下
+
+
+        new 
+            AVD Name
+                ithemia74
+                12 480 * 800
+                128*720  
+
+       常用的分辨率 :
+
+       3.2  ------------ QVGA --------320*480
+       3.7  ------------ WVGA --------480*800
+       4.7  ------------ WXGA --------1280*720
+
+
+       Target 创建模拟器的版本
+            2.3.3
+            4.1.2
+       加速器成功使用Intel
+
+       否则直接使用ARM
+       HARDWARE keyBoard
+        
+            RAM:512 VM heap:16
+            snapshot
+
+
+       start 
+        
+    DDMS
+        Devices列出所有连线安卓设备
+        实体机开发
+            usb调试打开
+            安装相应驱动
+        file explorer查看当前设备所有
+        ap
+
+
+
+
+
+
+        
+
+    
+    
+    
+    ADB指令联系
+
+        SDK Manager安装
+            google usb 提供真机测试的驱动
+            将手机的开发者模式打开
+            USB调试打开
+            sdk路径下google中有usb driver
+            developer.android.com
+                tools
+                    workflow
+                        Using Hardware Devices
+                        USB DRIver
+                        安装OEM驱动
+                    tools help
+            sdk platform-tools
+                adb.exe
+                AdbWinApi.dll
+                AdbWinUsbApi.dll
+                 放置于c windows system32
+                 cmd 下使用adb
+    新建Andoid Project 
+        Minimium SDK 兼容的最低版本
+                Android 2.2
+        Target SDK
+        Complie With
+            当前ADT中的SDK
+
+        Create custom launcher Icon
+        create activity
+            自动创建一个Activity作为当前工程入口
+
+
+
+                  
+    Android常用布局
+        table div + css
+
+    
+    Andorid四大基本组件
+        1.Activity
+            扩展至
+                
+                ContextWrapper
+            基本的图像单元，没有最大、小化概念
+                三种概念
+                    1.运行状态
+                    2.停止状态
+                    3.暂停状态
+                生命周期
+                    onCreate onStart onResume onPause onStop onDestroy onRestart
+
+                    onPause() -> onResume()
+                    onStop() -> onRestart() -> onStart()
+
+                    finish()
+                        将当前的Activity进行关闭
+
+                在Activity中传递数据
+                    两种传递给TextView数据的方式
+                    1.通过Itent直接传输数据
+                            在创建页处使用putExtra(name,value)
+                            在响应页处调用getIntent()
+                                getIntent().getStringExtra("txt");
+                                传递相对较为简单的类型数据
+
+                        
+                    2.建立一个Bundle后，传递相应的资源树
+                        通过Bundle下
+                            putExtra相应的数据类型(数据)
+                        使用intent函数
+                            putExtras(Bundle)
+                            加入相应内容
+                           
+
+
+
+
+                常见操作
+                    在AndoridManifest.xml
+                        activity下设置相应的属性
+                    启动一个Activity
+                        创建一个类 继承于Activity
+                            在其java文件中重写onCreate()函数
+                            使用setContentView()
+                                参数为R下的资源
+                                    eg,R.layout.aty1
+                        在Manifest.xml中进行注册
+                            在Application下生成相应的<Activity> 标签
+                        在layout目录下新建相应的xml文件
+                        在activity_main.xml
+                            中增加相应的button控件
+                                相应Id写法为
+                                    android:id = "@+id/id号码"
+
+
+                        findViewById(R.id.相应的id号)
+                            返回一个view类型
+                                Button类型是view类型的子类
+                                ctrl+E识别报错
+                            首先通过setContentView()绑定相应的Activity后才能通
+                            过findViewById()查找
+                        setOnClickListener()
+                            传入相应的new View.OnClickListener() 
+                                    重写public void onClick(View kv)函数
+                                    在其中使用startActivity创建一个新的
+                                    在不需要新Activity返回数据的情况下
+
+                                    startActivityForResult(intent,requestCode)
+                                    返回数据，简单数据
+                                        setResult(resultCode,data)
+                                        在返回的Intent：w实例中使用set数据类型
+                                        Extra()来携带信息
+
+                                    
+                                   
+
+                            
+
+
+
+
+
+
+                    Activity
+                    launched
+
+                    onCreate() <---- onRestart()
+User navigates to the activity                    
+                    onStart()
+
+                    onResume()
+App process killed
+                    Activity
+                    running
+
+
+                    Another activity comes
+                        into the foreground
+Apps with higher priority 
+       need memory                 
+                    onPause()-------|
+
+                    onStop()
+
+                     The activity is
+                     no longer visible
+
+                    onDestroy()
+                        
+                        Activity
+                        Shut down
+
+
+            
+                    
+                
+        2.Service
+            Activity的生命周期较短
+            Service没有图形界面
+            启动一个Service需要建立一个Intent
+                通过
+                Intent serviceIntent  = new Intent(this,EchoService.class);
+                startService(serviceIntent);
+                stopService(serviceIntent);
+            在Service内部重写两个方法
+                对应Service的生命周期
+                onCreeate(Intent)
+                    Service创建
+                onDestroy(Intent)
+                    Service销毁
+            绑定服务
+                当Service启动时在重新绑定Service是不会创建新的Service的实例，即一个Service只有一个实例
+                在同时启动并绑定Service后只用同时执行unBindService以及stopService才能被销毁Service
+
+    startService 与 bindService区别
+        1.startService启动的服务当前Activity销毁后，Service是不会被销毁
+          bindService启动的服务当前Activity销毁后，Service会被销毁
+
+        2.通过Start,StopService只能启动、关闭服务，不能监听服务内部状态、与服
+        务通信
+        通过BindService与服务进行绑定
+
+            在Service内部创建Timer实例 与 TimerTask实例
+            
+
+
+
+
+
+
+
+
+                MainActivity 实现ServiceConnection接口
+                实现相应的方法
+                    onServiceConnected(ComponentName,IBinder)
+                        成功绑定时触发
+                    onServiceDisconnected(ComponentName)
+                        在Service崩溃时触发
+                    
+                调用
+                bindService(Intent,ServiceConneciton,flag)
+
+                    ServiceConneciton
+                        用来侦听Service相关状态
+                        可以使用当前的类来监听this
+                    flag 
+                        Context.BIND_AUTO_CREATE
+
+
+                    在使用bindService后将调用相应的Service将通过Intent指向使得
+                    其指定Service启动
+                    同时在相应的Service函数中
+                        IBinder onBind(Intent arg0)
+                            需要返回指定返回值使其绑定服务
+                            Binder类
+                        从外部访问Service内部需要定义一个内部类,并将其扩展自
+                        Binder
+                        public class EchoServiceBinder extends Binder
+                        并创建一个实例
+                        private final EchoServiceBinder echoServiceBinder =
+                        new EchoServiceBinder();
+
+
+                unbindService(ServiceConnection conn)
+
+
+            Service声明
+                新建一个类 扩展自android.app.Service
+                extends Service
+            在AndroidManifest.xml中配置
+                在Application Nodes中添加 
+            通过findViewById(R.id.相应的id)
+                对控件进行查找
+
+            通过实现OnClickListener实现对button的点击函数
+
+
+            Service为系统组件
+                创建与销毁不是由程序员控制，由操作系统控制
+                通过startService()，bindService()请求操作系统创建相应服务
+                
+            
+            LinearLayout线性布局
+                组件一个并列一个排列
+
+
+            Timer
+            创建一个timer从而能够实现任务的处理，
+                new Timer()
+                new TimerTask(){
+                        run 函数实现
+                        }
+                在创建TimerTask实例时，需要完成run函数实例
+
+                .schedule(TimerTask,delay,period)
+                
+            
+        Broadcast Receiver
+        1.概述
+            组件与组件之间通信的机制
+            同一应用程序、跨应用程序
+
+
+            运行效率低
+                传送数据较大、要求速度较快、不能使用Broadcast Receiver,通信频
+                率较大
+        2.声明
+            新建一个类，继承自BroadcastReceiver
+            重写onReceive
+                收到消息后会执行onReceive方法
+            在Manifest文件中通过Application Nodes中使用ADD
+                相应的Broadcast Reciever
+                通过
+                View.OnClickListener()
+         3.动态注册与注销广播接收器
+            注册
+                registerReceiver(receiver,filter)
+                    new IntentFilter(Action) 给Broadcast指定一个地址
+                        广播名.ACTION
+                        
+                    将receiver注册到filter地址上,任何程序向该地址发送信息‘广播Broadcast都可以监听到
+
+
+                    注册Intent ACTION格式
+                    public static final String ACTION = "包名.intent.action.广播名"
+            注销
+                unregisterReceiver(广播名)
+                传送的Intent需要使用另外的构造函数
+                    new Intent(广播名.ACTOIN)
+                    putExtrat(name,value)
+
+        Content Provider
+            在应用程序之间共享数据
+                指定URI
+
+            用法
+                例:读取联系人
+
+                创建操作ContentProvider的实例对象
+                    getContentResolver().query(uri,projection,selection,selectionArgs,sortOrder)
+                        返回一个Cursor对象
+                            通过Cursor的moveToNext()方法不断遍历查询内容
+                        getContentResolver().query(ContactsContract.Contacts.CONTENT_URI)
+                        projection
+                            查询条件
+                配置权限
+                    AndroidManifest.xml
+        
+
+        Intent
+            Intent对象
+                与基本组件向关联的对象
+                指定需要启动的目标组件
+            IntentFilter
+                对Intent进行过滤,用来描述基本组件的位置,地址
+
+
+                包含内容
+                    Component name
+                        eg.通过Component name来启动Activity
+                    Action
+                        指定一个要启动的目标
+                            eg.启动Service可以指定Service
+
+                    启动电话服务
+                        Intent.ACTION_VIEW
+                        设置相应的Data
+                        Intent i  =new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse("tel:10086"));
+                        startActivity(i);
+
+
+
+
+                        在Manifest文件下创建
+                            intent-filter 为Activity指定地址
+                            <activity>
+                                <intent-filter>
+                                    <acition android:name="intent所在的包名.intent.action.相应的组件名"/>
+                                    <category andorid:name="android.intent.category.DEFAULT"/>
+                                </intent-filter>
+                            </activity>
+                    category
+                        对IntentFilter进行分类
+                    Extra
+                    Flags
+                        用来指定被启动的组件的启动模式
+                    Intent filters
+                        指定基本组件的地址
+                            
+
+
+
+            显示Intent和隐式Intent
+                通过Component name进行Intent调用为显式Intent
+                通过Action进行Intent调用则为隐式Intent
+
+
+
+Andorid 布局
+    基本布局
+    FrameLayout
+        需要不用调整位置
+        没有X Y的概念，优势在于运行快，子对象不需要调整位置
+    LinearLayout
+        线性布局，元素一个一个排下
+        android:orientation=""
+            vertical垂直
+            horizonal水平
+        android:layout_weight
+            指明子对象所分割父级容器的分割比例
+
+    RelativeLayout  
+        相对布局
+        相对父级容器的边界
+        相对其余子元素的边界
+
+    TableLayout
+        水平方向的LinearLayout垂直方向的LinearLayout混合
+        呈现多行多列
+        
+        TabelRow水平布局
+        TableLayout垂直布局
+
+    
+
+
+     AbsoluteLayout绝对布局
+        子元素相对布局可以调整位置
+        Relative布局包括
+
+
+   通过 程序动态添删布局
+    
+
+        onCreate函数中
+            setCongtentView(R.layout.linear_layout)
+
+            layout
+                .addView
+                    增加相应的组件
+                    view width height
+                    width:
+                        FIL_PARENT
+                        MATCH_PARENT
+                            包含父组件的大小
+                        WRAP_PARENT
+                            根据内容设置大小
+                 .removeView
+            view 
+                setText
+                    设置组件内的文字
+
+    常用控件
+        android.widget
+            ListView
+                配置列表项内容
+                列表项所呈现的数据为相应类的toString方法返回值
+                ArrayAdaptor数组适配器
+                    ArrayAdapter<T>(context,textViewResourceId)
+                        contxt
+                            this
+                        textViewResource
+                            使用的项目的资源Id
+                            使用系统android.R
+                            使用自身创建的列表项
+                                在res layout中创建相应的xml file
+                                类型为TextView
+                            创建自身的列表子项类型
+                                src目录下
+                                创建相应的类文件
+                                可以为任意类型
+                        
+                .setAdapter()
+                .setOnItemClickListener()
+                实现接口
+                    OnClickListener
+                        onItemClick(AdapterView<?> parent, View view, int
+                        position,
+                        long id) 
+                        通过postion获取点击的列表项的位置
+                            adapter.getItem(position)
+
+
+                        使用Toast组件
+                        Toast.makeText(context, text, duration)
+                            Toast为提示框
+
+
+                    设置相应的列表项监听事件
+                    参数传入处理事件的处理器类
+
+                    实现自定义列表
+                        使用baseAdapter
+                        BaseAdapter为抽象类，在实现实例需要实现抽象方法
+                            getView(position,convertView,ViewGroup parent)
+                            创建一个视图并返回
+                            在需要呈现列表项时都会被执行
+                                convertView
+                                    回收的对象
+                                    当convertView不为空的时候，可以直接将其转
+                                    换为相应的列表项的组成部分
+
+
+                                将相应的资源转换为布局
+                                    使用相应布局的解释器
+                                        (相应布局)LayoutInflater.from(context).inflate(resource,root)
+                                            (LinearLayout)LayoutInflater.from(CustomListView.this).inflat()
+
+
+
+                                
+                            getItemId
+                            getItem
+                                传入位置，在指定位置获取相应的列表项
+                            getCount
+
+    
+
+
+
+
+    设置横竖屏幕切换不导致内容混乱
+<activity android:name="com.example.a8540w.atguigu_code.MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            > </activity>
+
+
+Androi动画
+    1.Veiw Animation(补间),只改变View的绘制效果,实际属性值未变、Drawable Animation(帧动画)、Property Animation()
+        

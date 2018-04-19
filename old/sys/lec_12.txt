@@ -1,0 +1,202 @@
+linux系统管理
+    磁盘管理，文件系统管理
+    RAID基础理论,LVM2
+    网络管理：TCP/IP协议，Linux网络属性配置
+    程序包管理：rpm，yum
+    进程管理：htop，glance,tsar 
+    sed和awk
+    Linux系统开机流程
+    内核管理基础知识;编译内核，模块
+    Linux系统剪裁
+        kernel+busybox
+    课外作业：LFS
+
+Linux磁盘管理    
+可编程中断设备 
+        IO Ports:I/O设备地址：  
+
+        一切皆文件:
+            open(), read(),write(),close(): 
+            
+
+            块设备：Block， 存取单位”块“
+            字符设备：char，存取单位”字符“，键盘
+
+            设备文件：关联至一个设备驱动程序，进而能跟与之对应硬件设备进行通信：    
+                设备号码：major number, 标识设备类型
+                次设备号：minor number，标识同一类设备下的不同设备
+
+
+                硬盘接口类型：
+                并行：
+                    IDE:133MB/s
+                    SCSI:640MB/s
+
+                串口：
+                    SATA:6Gbps
+                    SAS:6Gbps
+                    USB:480MB/s
+
+                    rpm:rotations per minute    
+
+                /dev/DEV_FILE 
+                    磁盘设备的设备文件命名
+
+
+                    centos5 
+                        IDE : /dev/hd
+                        SCSI,SATA,SAS,USB: /dev/sd
+                            不同设备：a-z
+                                /dev/sda,/dev/sdb
+                            同一设备的不同分区：1,2,3...
+                                /dev/sda1. /dev/sda5
+
+
+            机械式工作硬盘的基本机制
+                    track:磁道
+                    cylinder:柱面
+                    sector:扇区
+                        512bytes
+                    
+                    如何分区：
+                        按柱面来划分
+                    0磁道0扇区:512bytes
+                        mbr:master boot record
+                            446bytes:boot loader 
+                            64bytes：分区表
+                                16bytes:标识一个分
+                            2bytes:55AA
+
+                            4个主分区;  
+                                3个主分区+1扩展分区(N个逻辑分区 )
+                    问题：UEFI,GPT
+            分区管理工具：fdisk,parted,sfdisk       
+                fdisk:对于一块硬盘来讲，最多只能管理15分区
+                fdisk -l [-u] [device]
+                fdisk [device]
+                    子命令：管理功能
+                        p:print
+                        n:new 创建新的分区
+                        d:delete,删除   
+                        w:write,
+                        q;quit
+                        m:获取帮助
+                        l:列表所分区id  
+                        t:调整分区的id  
+                查看内核是否已经识别新的分区：
+                    cat /proc/partitions
+                通知内核重新读取硬盘分区表 
+                    partx -a /dev/DIVICE
+                          -n M:N
+                    kpartx -a /dev/DEVICE    
+                           -f:force 
+
+                    CentOS 5:使用partprobe
+                        partprobe [/dev/DEVICE]
+                        
+Linux文件系统管理
+    Linux文件系统：ext2,ext3,ext4,xfs,btrfs,reiserfs,jfs,swap   
+    swap:交换分区，将硬盘作为内存使用通常为2g左右 oracle,mysql hadoop
+    光盘：iso9600
+    Windows:fat32(vfs),ntfs
+    Unix:FFS,UFS,JFS2
+    网络文件系统：NFS,CIFS
+    集群文件系统：GFS2,OCFS2
+    分布式文件系统：ceph,
+        moosefs,mogilefs,GlusterFS,Lustre
+
+    
+    根据是否支持“journal” 功能
+        日志型文件系统：ext3, ext4,xfs,...
+        非日志型文件系统：ext2,vfat 
+     
+
+    文件系统的组成部分：
+        内核中的模块：ext4
+        用户空间的管理工具：mkfs.ext4,mkfs.vfat ,mkfs.xfs
+
+    Linux的虚拟文件系统：vfs
+        
+    创建文件系统：
+    cat /proc/filesystems    
+
+    创建文件系统：
+        (1)# mkfs.FS_TYPE /dev/DEVICE
+            ext4 
+            xfs     
+            btrfs
+            vfat
+        (2)# mkfs -t FS_TYPE /dev/DEVICE 
+        
+        -L 'LABLE':设定卷标
+       mke2fs:  ext系列文件系统专用管理工具
+        -t {ext2|ext3|ext4}
+        -b  {1024|2048|4096}
+        -L 'LABEL'
+        -j 相当于-t ext3
+            mkfs.ext3 = mkfs -t ext3 = mke2fs -j =mke2fs -t ext3
+        -i: 数据空间每多少个字节创建一个inode:此大小不应该小于block大小 
+        -N  为数据空间创建多少个inode
+        -m  为管理人员预留的空间占据比，默认5%
+        -O FEATURE[,...]:启用特性
+            -O ^FEATURE:关闭特性
+        
+
+       mkswap:创建交换分区
+            mkswap [option] device 
+                -L 'LABEL'
+
+            前提：调整其分区的id为82,
+            fdisk -t /dev/DEVICE 82
+            partx -a -n number /dev/DEVICE
+
+
+
+        blkid :块设备属性信息查看
+            blkid [OPTION]
+                -U UUID:根据指定的UUID来查找对应的设备
+                -L LABEL:显示出LABLE的的对应设备
+
+
+
+        e2label：管理ext系列文件系统的LABEL        
+            # e2label DEVICE [LABEL]
+        
+        tune2fs:重新设定ext系列文件系统可调整参数的值
+            -l:查看指定文件系统超级块的信息
+            -L 'LABEL';修改卷标
+            -m #:修改留给管理员的百分比
+            -j:将ext2升级为ext3
+            -O：文件系统属性的打开或者禁用
+            -o:调整文件系统的默认挂载选项
+            -U UUID:修改UUID号
+        
+        dumpe2fs:查看 
+            -h:查看超级块信息
+
+    文件系统检测：
+        fsck:File System Check
+            fsck.FS_TYPE 
+            fsck -t FS_TYPE 
+                 -a :自动修复
+                 -r :交互式修复 
+
+            Note:FS_TYPE一定要与分区上已经存在的文件类型相同;
+
+
+        e2fsck:ext系列文件专用的检测修复工具
+            -y 自动回答为yes    
+            -f 强制修复
+
+
+            
+
+            
+
+
+
+
+        内核 驱动程序(驱动数字签名)
+    cpu | 内存  |硬盘 |网络接口i/o设备
+
+

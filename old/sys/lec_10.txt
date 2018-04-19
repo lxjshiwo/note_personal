@@ -1,0 +1,135 @@
+grep,egrep,fgrep 文本过滤
+文件查找：
+    在文件系统上查找符合条件的文件：
+
+    文件查找:locate,find
+        非实时查找：(数据库查找) locate 
+        实时查找：find
+   locate: 
+        依赖于事先构建的索引：索引的构建是系统较为空闲时自动进行(周期任务)：手动更新数据库(updatedb)    
+
+        索引构建过程需要遍历整个根文件系统
+
+        工作特点：
+            查找速度快:
+            模糊查找：  
+            非实时间查找:
+        locate KEYWORD
+
+
+
+    find:
+        实时查找工具，通常遍历指定路径下的文件系统完成文件查找
+
+        工作特点：
+            查找速度略慢
+            精确查找:
+            实时查找：       
+        语法：
+            find [OPTION]...[查找路径][查找条件][处理动作]
+            查找路径:指定具体目标路径，默认当前目录：
+            查找条件:指定查找标准，可以文件名字.大小.类型,权限.等标准进行：
+            默认为找出指定路径下的所有文件：
+            处理动作：对符合条件的文件做什么操作：默认输出至屏幕
+
+            查找条件：
+                根据文件名查找：
+                    -name "文件名称":支持使用glob机制   
+                    *,?,[],[^]
+                    -iname "文件名称"：不区分字母大小写 
+                    -regex "PATTERN":以pattern匹配整个文件路径字符串，而不仅仅是文件名称
+                根据文件的属主，属组查找
+                    -user USERNAME: 查找属主为USERNAME的文件
+                    -group GRPNAME:查找属组为指定组的文件
+
+                    -uid UserID:查找属主为指定UID号的文件
+                    -gid GroupeID:查找属组为gid号的文件
+
+                    -nouser 查找没有属主的的文件
+                    -nogroup 查找没有属组的文件
+                    显示属主属组为502的文件为没有属主属组的文件
+                
+                根据文件类型查找：
+                    -type TYPE
+                        f:
+                        d:
+                        l:  
+                        s:
+                        d:
+                        c:
+                        p:  
+                组合文件：
+                    与：-a
+                    或：-o
+                    非：-not
+                    !A -a !B = !(A -o B)
+                    !A -o !B=!(A -a B)
+
+
+                根据文件大小来查找
+                    -size [+|-]#UNIT
+                        常用单位：K,M,G
+
+
+                        #UNIT: (#-1,#]
+                        -#UNIT:[0,#-1]
+                        +#UNIT:(#,oo)
+                根据时间戳来查找：  
+                    以“天”为单位：  
+                        -atime [+|-]#,
+                        #,[#,#+1)   
+                        +#,[#+1,OO]
+                        -#,[0,#)
+                        -mtime 
+                        -ctime
+                    以“分钟”为单位
+                        -amin
+                        -mmin
+                        -cmin
+
+                权限查找
+                    -perm [/|-]MODE
+                        MODE：精确权限匹配
+                        /MODE:任何一类用户权限(u,g,o)中只要有一位可以匹配即可：
+                        -MODE:每一类对象必须同时拥有其指定权限标准
+            处理动作：               
+                -print:默认处理动作，显示到屏幕
+                -ls:类似于对查找到的文件执行“ls -l”命令
+                -delete :删除查找到的文件   
+                -fls /PATH/TO/SOMEFILE：查找到的所有文件的长格式信息保存到指定的文件中
+                -ok COMMAND {}\;对查找到的每个文件执行由COMMAND指定的命令,要求确认
+                -exec COMMAND {}\;对查找到的每个文件执行由COMMAND指定的命令,不要求确认
+                {} :用来引用找到的每个文件的文件名本身
+                注意：find传递的找到的文件至后面指定命令时候，查找到所有符合条件的文件一次性传递给后面的命令；
+                如果后面的命令不可以接受如此多的参数，此时执行命令或许会失败，另一种方式可规避此问题：
+                find |  xargs COMMAND
+查找/var目录下属主为root，而且属组为mail的所有文件或目录
+find /var -user root -group mail 
+查找/usr目录下不属于root,bin或者haddoop的所有文件或者目录
+find /usr -not -user root -a -not -user bin -a -not -user hadoop
+find /usr -not -not \( -user root -o -user bin -o -user hadoop \) 
+
+查找/etc目录下最近一周内其内容修改过，同时属主不为root，也不是hadoop的文件或目录
+find /etc -mtime -7 -a -not -user root -a -not -user hadoop
+find /etc -mtime -7 -a -nor \( -user root -o -user hadoop \)
+
+查找当前系统上没有属主或属组，并且一周内被访问过的文件  
+find / -nouser -a -nogroup -a -atime -7
+查找/etc目录下大于1M而且类型为普通文件的所有文件或者目录
+find /etc -size +1M -type f
+
+查找/etc目录下所有用户都没有写权限的文件
+find /etc -not -perm /222
+
+查找/etc目录下至少有一类用户没有执行权限的文件
+find /etc -not -perm -111
+
+查找/etc/init.d目录下，所有用户都有执行权限，而且其他用户有写权限的文件
+find /etc/init.d -perm -113
+
+
+
+
+
+
+

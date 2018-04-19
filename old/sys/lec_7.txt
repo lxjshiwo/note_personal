@@ -1,0 +1,119 @@
+egrep及扩展的正则表达式
+    
+    egrep =grep -E
+    egrep [OPTIONS] PATTERN {FILE...}
+    扩展正则表达式
+        字符匹配：
+            .
+            []
+            [^]
+        次数匹配：
+            *
+            ?:0或1次：
+            +：1次或多次
+            {m}
+            {m,n}:
+        锚定：
+            ^
+            $   
+            \<,\b
+            \>,\b
+        分组：
+            ()
+        或者：
+        a|b 
+            C|cat =C或 cat
+练习;   
+1,显示当前系统上系统root,centos,或user1用户的默认shell和uid
+grep -E '(root|centos|user1)\>' /etc/passwd | cut -d: -f3,7
+
+2,找出/etc/rc.d/functions文件（centos6）中某单词后面跟一个小括号的行
+grep -E -o "^[_[:alpha:]]+\(\)" /etc/rc.d/functions
+
+
+3,使用echo输出一路径，使用egrep取出基名：
+grep -E "[^/]+/?$" | cut -d"/" -f1
+进一步地：使用egrep取出路径名字,类似于dirname命令结果
+
+dirname 
+
+4,找出ifconfig命令结果中1-255之间的数值
+
+5,找出ifconfig命令结果中的ip地址 
+
+
+fgrep:不支持正则表达式搜索：
+
+
+bash的基础特性：
+    变量类型：
+        数据存储,存储空间大小,参与运算种类：
+
+        字符型：
+        数值型：
+            整型
+            浮点型
+        强类型：定义变量时必须指定类型，参与运算必须符合类型要求,调用未声明变量为错误
+        弱类型：无须指定类,默认是字符型，参与运算自动进行隐式类型转换,变量无须提前定义可以直接调用
+            bash
+    bash中的变量种类：
+        变量生效范围：
+           本地变量:生效范围为当前shell进程：对当前shell除外的shell进程，包括当前shell的子shell进程均无效 
+           环境变量：生效范围为当前shell进程及其子程序， 
+           declare  -x paraname 
+           局部变量：生效范围为当前shell进程中某代码片段（通常指函数），
+           位置变量：$1,$2,...来表示，用于让脚本代码中调用通过命令行传递给它的参数
+           特殊 变量：$?返回上一条命令执行是否正常运行,$0,$#,$*,$@
+    
+
+        本地变量：
+            变量赋值：name=‘value’
+                可以使用引用
+                    value:
+                        (1)可以是直接字符串:name="username"
+                        (2)变量引用：name=“$usrname”
+                        (3)命令引用：name=`COMMAND`,name=$(COMMAND)
+            变量引用：${name},$name 
+                "":弱引用，其中的变量引用会被替换为变量值 
+                '':强引用；其中变量引用不会被替换为变量值，而保持原字符串
+            显示已经定义的所有变量
+            set
+            销毁变量：
+            unset name 
+
+
+
+
+        环境变量：
+            变量声明，赋值：
+                export  name=Value 
+                declare -x name=VALUE
+            变量引用：$name,${name}
+            显示所有环境变量：
+                export 
+                env 
+                printenv
+            销毁：
+                umnset name 
+
+            bash有许多内建的环境变量：PATH，SHELL，UID，HISTSIZE,HOME,  PWD,OLD,HISTFILE,PS1
+        变量命名法则
+        1,不能使用程序中的保留字
+        例如 if,for 
+        2,只能使用数字，字母以及下划线，且不能以数字开头
+        3,见名知义
+        只读变量：
+            readonly name 
+            declare -r name 
+        位置变量
+            在脚本代码中调用通过命令行传递给脚本的参数
+            $1,$2,...:对应调用第1,2等参数
+
+                shift [n] 
+
+
+            $0:命令本身
+
+            $*：传递给脚本所有的参数，作为一个字符串
+            $@:传递给脚本所有的参数，每一个参数为一个独立字符串
+            $#:传递给脚本参数的个数

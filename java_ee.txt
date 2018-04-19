@@ -1,0 +1,47 @@
+Servlet
+   1.CGI(common gateway inerface)
+        效率低，编写困难
+   2.asp
+        html+javascript+com
+   3.php
+        php+mysql+linux+apache
+        lamp
+   4.jsp
+        html+java片段+jsp语法+js
+        机器配置较高 class实例化后对象常贮内存
+
+b/s
+    1.开发成本低
+    2.管理维护简单
+    3.产品升级便利
+    4.对用户的培训费用低下
+    5.出现故障率低下
+
+    1.安全性不足
+    2.客户受浏览器限制
+c/s
+
+
+
+
+Servelet
+    java服务器端小程序
+        1.有服务器端调用和执行
+        2.按照Servelet规范开发
+
+
+Tomcat
+    Web服务器
+        开源servelet容器
+        1.web服务器
+            接收http请求、
+        2.jsp容器
+        3.servelet的容器
+
+        配置tomcat环境
+            JAVA_HOME=jdk主目录
+            TOMVAT_HOME=TOMCAT主目录
+            使用startup.bat
+            localhost:8080
+
+

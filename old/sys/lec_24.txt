@@ -1,0 +1,73 @@
+Linux的进程和作业管理
+    内核的功用：进程管理，文件系统，网络功能，内存管理，驱动程序，安全管理
+    用户模式<------->内核模式
+            模式切换    
+    Process:运行中程序的副本;
+
+        存在生命周期
+
+    Linux内核存储进程信息固定格式task_struct 
+        多个任务的task_struct组件的链表：task list
+
+    进程创建：
+        init
+            父子关系
+            进程：都由其父进程创建
+                fork(),clone()
+        进程优先级
+            0-139
+                1-99:实时优先级
+                100-139:静态优先级
+                    数字越小，级别越优先
+
+
+                Nice值：
+                    -20,19
+
+                Big O
+
+        进程内存:   
+            page frame 页框,用存储页面数据o
+                存储page
+
+                MMU:Memory Management Unit
+
+
+        IPC:Inter Process Communication 
+            同一主机上：
+                signal 
+                sim:shared memory
+                semerphor:
+            不同主机:
+                remote procedure call
+                socket:
+
+       Linux内核：抢占式多任务
+
+       进程类型：
+            守护进程：daemon,跟终端无关的进程
+            前台进程：跟终端相关，通过终端启动进程
+                注意;也可以把在前台启动的进程送往后台，以守护模式运行
+       进程状态：    
+            运行状态：  running 
+            就绪：ready
+            睡眠态：
+                可中断：interuptable
+                不可以中断：uninteruptable    
+            停状态：暂停于内存中，但不会被，除非手动启动之：stopped 
+            僵死态：zombie
+
+        进程分类：
+            CPU-Bound
+            IO-Bound
+
+        <linux内核设计与实现>  《深入理解linux内核》
+            
+
+
+
+
+        
+
+
+

@@ -1,0 +1,853 @@
+                  nginx lb iptables
+
+       nginx web                    nginx web
+                    
+                       nfs
+
+http:
+    应用层，面向对象协议
+   1,支持客户/服务模式请求
+   2,简单快速：客户向服务器请求服务时，只需传输请求方法和路径.每种方法规定客户与服务器的联系方式的不同
+   3,灵活：http允许传输任意类型的数据对象，正在传输的类型conteny-type加以记录
+   4,无连接:限制每次连接只处理一个请求服务器处理完客户的请求，并收到客户应答后，即断开连接，
+   5,无状态:对于事务处理没有记忆能力
+
+
+   http协议工作位置
+   在tcp/ip协议栈中的位置
+   http协议通常承载与TCP协议之上，
+    http 80 https 443
+                                    http
+                                         TLS,SSL
+                                   TCP
+                                   IP
+                                   数据链路层
+    http请求过程：
+    1,建立tcp连接
+        syn ---->
+            <---- ack
+        ack ---->
+            <-----established
+
+    2,web浏览器向web服务发送请求
+    3,web浏览器发送请求头信息
+        方法，协议内容，版本，
+        建立连接后，客户机发送一个请求给服务器，请求方式的格式为：
+        统一资源标识符(url),协议版本号，后面是mime信息包括请求修饰符,客户机信息和可能的内容
+    4,web服务器应答
+        服务接到请求后，给予相应的响应信息，格式为一个状态码，包括信息的协议版本号，成功或者错误代码，后面是mime信息包括服务器信息，实体信息和可能的内容
+    5,web服务器发送应答头信息
+    6,web服务器向浏览器发送数据
+    7,web服务器关闭tcp连接  
+
+
+    http头信息解读
+        http头域包括通用头，请求头，响应头和实体头四个部分
+        每个头一个域名,冒号(:)和值域三部分组成
+        GET
+        HEAD
+        POST
+        PUT
+        TRACE
+        OPTIONS
+        DELETE
+        并非所有的服务器都实现了这种方法，有的服务器还实现了自身特有的http方法
+        
+        通用头部
+            客户端和服务器端都可以使用的头部，可以在客户端，服务端和其他应用程序之间提供一些非常有用的通用功能，如Date头部
+            Cache-Control:空值缓存
+                no-cache 
+                max-age
+            Pragma
+            Transfer-Encoding 
+            web服务器标明自己对本响应消息体(不是消息体里面的对象)做了怎样的编码。比如分块(chunked),例如：Transfer-Encoding ：chunked
+            Connection
+                Connection表示是否需要长连接，如果Servlet看到这里的值为“keep-alive”,或者看到请求使用的是http1.1(1.1默认是进行持久连接)
+                keepalive
+                close
+        请求头部
+            Method Request-URL HTTP-VErsion ACCEPT
+                告诉web服务器自己接受什么介质类型，*/*表示任何类型,type/*,表示该类型下的所有子类型，type/sub-type
+            Accept-Encoding 
+                浏览器申明自己接收的编码方法，通常指压缩方法，是否支持压缩，支持什么压缩方法(gzip,deflate)
+                通常都会使用压缩，节约带宽
+            Host
+                请求头部
+            Referer
+                跳转信息的展现
+            User-Agent
+            nginx 收集数据日志，进行模型匹配
+        响应头
+           HTTP-Version Status-Code Reason-Phrase 
+           状态传回码
+            2xx
+            3xx 跳转 301永久跳转 302临时跳转
+            4xx 401 403 404客户端错误
+            5xx 501 502 503 504 服务端错误
+           last-modified:控制缓存
+           Etag:克服last-modified的秒级别的限制
+   HTTP常见实现方式
+        html(静态资源),php(动态资源),jsp,python
+        pv:page view ,一次页面的访问，静态页面，按照日统计，淘宝京东10亿级别服务端
+            首页       全站pv
+            列表页
+            详情页
+        uv:user view有多少个客户访问过 客户端   
+        active connection
+            活动连接数,与pv有区别，与资源分布的资源的位置,浏览器的并发数相关
+            简单的通过负载均衡层上观察
+                ss -s 
+            eg:
+                 访问网站一次
+                    静态资源加载 每个
+                       请求------》页面     ----> 图片server
+                                            ---->  静态资源server
+                                            ---->  首页server 
+                          短连接情况下
+                            访问  
+                              |          1)首先从index.html获得首页信息
+                              |          2)继续请求其他服务器获取资源
+                              V
+                         LB负载均衡器
+
+               img      css     js      img2    img3
+                    index.html          message
+               
+        qps
+            每秒查询的请求
+            eg: 
+            pv 2E --> active connection 100w --> qps 1-2w
+多路处理模型
+    MPM 是Apache2引入的一个概念，就是将结构模块化，把核心任务处理作为一个可插拔的模块，即MPM，使其针对不同环境进行优化，在着这
+    Prefork
+        实现了一个非线程型的，预派的web服务器
+        适合有突发响应的服务    
+    Worker
+        它也使用了多进程，每个进程有多线程
+        事先生成相应数量的进程，每个进程数量确定，适用于每日qps没有峰值的服务
+    event
+        worker模式的变种，它把服务进程从连接中分离出来，在开启KeepAlive场合下相对worker模式能够承受了的更高的并发负载
+
+    雪崩效应
+    I/O网络模型
+        阻塞blocking IO
+        非阻塞blocking IO
+        多路IO multiplexing IO
+        异步 asynchronous IO
+        事件驱动 signal driven IO
+    IO调用过程
+        IO发生时涉及的对象和步骤，
+            相对于一个network IO,涉及两个系统对象，一个是调用这个IO的process(or thread),另一个就是系统内核(kernel)
+        经历阶段
+            1)等待数据准备(Waiting for the data to be ready)
+            2)将数据从内核拷贝到进程中(Copying the data from the kernel to the process)
+
+
+                                               TCP服务器
+                                               socket()
+                                                    
+                                               bind()
+
+                                               listen()
+
+                                               accept()
+                                                  |一直阻塞，客户连接到达
+                                                  |
+                    TCP客户                       | 
+                    socket()                      |
+                                连接建立          |
+                    connect()<------------------->|
+                                TCP三次握手     
+               ------>wri e()---------------------->read()<---
+               |        |          数据(请求)         |       | 
+               |        |                         处理请求    |
+               |        |                             |       |
+               |        |                             |       |           
+               |        |                             V       |
+               ------re d()<---------------------write()------
+                                 数据(应答)
+                     close()--------------------->read()
+                                                   
+                                                 close()
+
+            阻塞
+
+
+            当用户进程调用了recvfrom 这个系统调用，kernel就开始了IO的第一个阶段，准备数据，对于network io来说很多时候数据在一开始嗨没有到达，这个时候kernel就要等待足够的数据到来，而在用户进程这边，整个进程会被阻塞。当kernel一直等到数据准备好，就会将数据从kernel中拷贝到用户内存，然后kernel 返回结果，用户进程才会解除阻塞状态,重新运行
+            blocking IO的特点就是在IO执行的两个阶段(等待数据和拷贝数据两个阶段)都被block
+                    Blocking I/O model
+
+                 application            kernel 
+                    recvfrom ---------> no datagram ready
+
+                                                            wait for data
+
+                                          datagram ready
+                                          copy datagram
+
+                                                             copy data from
+                                                             kernel to user
+                    process  <---------  copy complete
+                    datagram
+
+           除非特别指定，几乎所有IO接口(包括socket接口) 都是阻塞型,在调用send()的同时，线程将被阻塞 
+           解决机制1：多进程响应模型
+           解决机制2：非阻塞模型
+                    当用户进程发出read操作时，kernel中的数据未有准备好，此时并不会block用户进程，而是立刻返回一个error
+                    用户进程判断结果是一个error时，可以再次发送read操作,一旦kernel中的数据准备好，并且再次收到了用户进程的system call，马上就将数据拷贝到用户内存,返回
+
+           多路复用IO
+             select 和epoll
+                Select 同步阻塞
+                    1)每次调用select,需要将fd从用户态拷贝到内核态，开销在fd很多时会很大
+                    2)同时每次调用select都需要在内核遍历传递进来的所有fd,开销在fd很多时会很大
+                    3)select支持的文件描述符数量少，默认1024
+                异步模型-epoll
+                    支持一个进程打开大数目的socket描述符
+                    IO效率不随fd数目增加而线性下降
+                    使用mmap加速内核与用户空间的消息传递
+                    边缘触发和水平触发
+                异步模型
+                    Blocking I/O model
+
+                 application            kernel 
+                               system call
+                    aio_read ---------> no datagram ready
+                             <--------
+                                return
+
+                                                            wait for data
+
+process continue                          datagram ready
+        executin                          copy datagram
+
+                                                             copy data from
+                                                            kernel to user
+                                   deliver signal
+                   signal handler <---------  copy complete
+                    process    sepcified in aio_read
+                    datagram
+                    
+Nginx       
+    轻量级web服务器
+    反向代理服务及电子邮件(IMAP/POP3)代理服务器
+    缓存服务器
+    支持Rewrite重写规则
+    内置健康检测功能
+    节省带宽
+    稳定性高
+    模块化设计：模块可以动态编译
+    外围支持好：
+    支持热部署  
+    支持事件驱动，AIO,mmap性能优化
+    www.nginx.org
+                 
+                    
+Nginx(web server,web reverse proxy):
+    
+    http协议：80/tcp，HyperText Transfer Protocal
+        html:Hyper Text Mark Language
+
+        文本：HTTP/1.0,MIME
+        MIME:Multipurpose Internet Mail Extension
+            major/minor
+                text/plain
+                image/jpeg
+        URL:scheme://server_ip[:port]/path/to/source
+
+
+
+        http事务： request<--->response
+            request
+                <method><URL><version>
+                <HEADERS>
+                
+                <body>
+
+
+            response
+                <version><status><reason phrase>
+                <HEADERS>
+
+                <body>
+
+
+            协议格式：文本，二进制
+
+
+        method:
+            GET,HEAD,POST,PUT,DELETE,TRACE,OPTIONS
+        status:
+            1xx:信息类
+            2xx:成功类,200
+            3xx:重定向，301，302， 304 not modified
+            4xx:客户端错误类,403,404
+            5xx:服务器端口错误，502,504
+
+        HEADER:
+            通用首部
+            请求首部
+                If-Modified-Since,If-None-Match
+            响应首部
+            实体首部
+            扩展首部
+
+        web页面：多个资源
+            入口，资源引用，用户加速
+        认证：
+            基于IP认证
+            基于用户认证：
+                basic
+                digest
+        资源映射：
+            Alias
+            DocumentRoot
+        httpd:MPM
+            prefork:主进程生成多个子进程，每个进程处理一个请求
+            worker:主进程生成子进程，每个进程生成多个线程，每个线程响应一个请求，
+            event:主进程生成多个子进程，每个子进程响应多个请求
+        I/O类型：
+            同步和异步：synchronous,asyncronous
+                关注消息通知机制
+
+                同步：调用发出后不会立即返回，但一但返回，则返回即是最终结果
+                异步：调用发出后，被调用方立即返回结果，但返回并非最终结果，被调用者通过状态，通知机制等来通知调用者，或通过回调函数来处理结果
+
+            阻塞和非阻塞：block,nonblock
+                关注的是调用者等待被调用者返回结果时的状态
+                阻塞：调用者结果返回之前，调用者会被挂起：不可中断睡眠状态，调用者只有在等到返回结果后才能继续
+                非阻塞：调用者在结果返回之前，不会被挂起，即调用不会阻塞调用者
+        
+        I/O模型：
+            blocking IO:
+            nonblocking IO:
+            IO  multiplexing :复用型IO:prefork,work
+                select()   poll()
+            signal driven IO:事件驱动IO:event
+                通知：
+                    水平触发
+                        多次通知
+                    边缘触发
+                        只通知一次
+            asynchronous IO：异步IO
+
+            例如：一次read操作
+                (1)等待数据准备好，从磁盘到内核内存
+                (2)从内核复制到进程内存
+                IO 数据从内核内存至进程内存
+
+                web磁盘io和网络io
+
+
+            
+Nginx:engine X
+    Tengine
+    Regsitery
+
+    libevent:高性能的网络库
+        epoll():
+
+
+    Nginx特性：
+        模块化，较好的扩展性：不支持动态装卸载机制 Tengine允许动态装卸载
+        高可靠
+            master主控进程--->worker
+        低内存消耗
+            10000个keep0-alive模式下的connetion仅需要2.5mb内存
+        支持热部署
+            不停机更新配置文件，日志文件滚动，升级程序版本
+
+        支持事件驱动机制,AIO,mmap
+   
+   基本功能：
+        静态资源的web服务器,能缓存打开的文件描述符
+        http,smtp,pop3协议的反向代理服务器
+        支持缓存加速和负载均衡机制:
+        支持FastCGI(fpm,LNMP),uWSGI(Python)等
+        模块化(非DSO机制),过滤器zip,SSI及图像大小调整
+        支持SSL
+   扩展功能：
+        基于名称和ip的虚拟主机
+        支持keepalive
+        支持平滑升级
+        定制访问日志，支持使用日志缓冲区提供日志存储功能
+        支持url rewrite
+        支持路径控制
+        支持基于IP及用户的访问
+        支持速率限制，支持并发数限制
+
+
+   Nginx基本架构
+        一个master进程生成一个或多个worker进程
+        事件驱动：epoll(边缘触发),kqueue,/dev/poll
+            io复用器：select,poll,realtime signal
+        支持senfile,sendfile64
+        支持AIO
+        支持mmap
+   Nginx工作模式 :非阻塞，事件驱动，由一个master进程生成多个worker线程，每个worker响应n个请求
+  
+   模块类型:
+        核心模块
+        standard HTTP modules
+        Optional HTTP modules
+        Multi modules   
+        3rd party mofules
+   安装方法：
+        源代码：编译安装
+                1)get nginx.tar
+                tar -xf nginx.tar.gz
+                yum  install pcre-devel//提供编译环境实现poll扩展
+                group add -r nginx
+                useradd -g nginx -r niginx
+                ./configure --prefix=/usr/local/niginx --conf-path=/etc/niginx/nginx.conf --user=nginx  --group=nginx   --eror-log-path=/var/log/nginx/error.log --help-log-path=/var/log/niginx/access.log --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --with-http_ssl_modules --with-http_stub_status_modules --with-http_gzip_static_module --with-http_flv_module  --with-http_mp4_module --http-client-body-temp-path=/var/tmp/nginx/client --http-proxy-temp-path=/var/tmp/nginx/proxy --http-fastcgi-temp-path=/var/tmp/nginx/fastcgi  --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi
+                make && make install
+                mkdir -pv /var/tmp/nginx/{client,fastcgi,proxy,uwsgi}
+                /usr/local/nginx/sbin/nginx
+                ss -tnlp 查看80端口是否被监听
+        配置文件：
+            main配置段：全局配置段
+                event{}：定义event模型工作特性
+            http{}:定义http协议相关的配置
+
+
+            配置指令：要以分号结尾
+                directive value1 [value2.....]
+            支持使用变量
+                内置变量
+                    模块提供几种变量定义
+                自定义变量：
+                    set var_name value
+            主配置段的指令
+                用于调试，定位问题
+                正常运行必备配置
+                优化性能的配置
+                事件的相关配置
+        制作好的程序号，rpm包，deb包
+Nginx(2)
+    IO模型  nginx
+        
+        I/O模型
+            blocking nonblocking multiplexing event-driven,AIO
+
+        Nginx：non-blocking,event-driven,aio
+            hash load balancing method
+            backed ssl certificate verification
+            thread pools support 
+            proxy_request_buffering
+
+        主要配置段的指令
+            正常运行的必备配置
+                1,user USERNAME [GROUPNAME];
+                    指定运行worker进程的用户和组
+                    user nginx nginx;
+                2,pid /path/to/pid_file;
+                    指定nginx守护进程的pid文件;
+                    pid /var/run/nginx/nginx.pid
+                3,worker_rlimit_nofile #:
+                    指定所有worker 进程能够打开最大的文件句柄数字,默认1024对于高并发实现十分困难
+                  worker_rlimit_core #:
+            性能优化相关配置i
+                1,worker_processes #:
+                    worker进程的个数：通常应该略少于cpu物理核心数
+                2,worker_cpu_affinity cpumask:
+
+                    优点：提升缓存命中率 
+                    缺点：
+                    进程的缓存不会被失效,无法避免进程切换
+                    context switch:会产生cpu不必要的消耗
+                    cpumask:
+                    worker_cpu_affinity 00000001 00000010 0000000100;
+                    0011 第一颗和第二颗cpu
+                3,timer_resolution
+                    计时器解析度：降低此值,可以减少gettimeofday()系统调用次数
+                4,worker_priority number:
+                    指明worker进程的nice值
+                        -20 , 19
+                        100, 139
+                        nice值越小权限越高
+          事件相关的配置
+                1,accept_mustex {off| on}
+                    master调度用户请求至worker进程时使用负载均衡锁，no表示能让多个worker轮流地，序列化地去响应新请求
+                2,lock_file file:
+                    accept_mutex用到的锁文件路径
+                3,use [epoll | rtsig | select | poll]
+                    指明使用的事件模型：建议Nginx自行选择
+                4,worker_connections #;
+                    设定单个worker进程所能够处理的最大并发数目
+
+                    worker_connections * work_processes 
+          用于调试，定位问题
+                编译时候使用 --with-debug 开启debug功能
+                1,daemon {on | off}
+                    是否以守护进程方式运行nginx:调试时使用off;
+                2,master_process {on|off}
+                    是否以master/worker模型来运行nginx;调试时候可以设置为off
+                3,error_log file | stderr |syslog:server-address[,parameter-value] | memory:size [debug | info |notice |warn | error |crit |alert |emerg];
+                error_log 位置 级别;
+                若要使用debug级别，需要编译nginx时使用--with-debug选项
+           总结：
+            worker_proesses,worker_connections,worker_cpu_affinity,worker_priority
+
+            新改动配置生效的方式
+                nginx -s reload
+                    stop,quit,reopen
+
+
+
+         nginx作为web服务器时候使用的配置
+            http {}; 由ngx_http_core_module配置静态web服务器
+            http的配置段
+            配置框架：
+               http {
+                    upstream {
+                        ...
+                    }
+                    server{
+                        ...
+                        location URL{
+                            root "/path/to/somedir";
+                            ...
+                        }#类似于httpd中的<location>,用于定义URL与本地文件系统的映射关系
+                        location URL{
+                            if ...{
+                               ...
+                            }
+
+                        }
+
+                    }#每个server类似于httpd中的一个<VirtualHost>    
+                    server{
+                        ...
+                    }
+               }
+
+               注意:与http相关的命令仅能够放置于http,server,location,upstream,if上下文中，但有些指令仅应用于这5种上下文中的某些种
+         配置指令：
+                1,server {}
+                    定义一个虚拟主机
+                    eg:
+                        server {
+                            listen 8080;
+                            server_name www.magedu.com;
+                            root "/vhost/web1";
+                        }
+                2,listen
+                    指定监听的地址端口:
+                        listen address[:port];
+                        listen port;
+
+                3,server_name NAME [...]
+                    后可跟多个主机：名称还可以使用正则表达式(~)或通配符
+                        (1)先做精确匹配检查;
+                        (2)左侧通配符匹配检查: *.magedu.com
+                        (3)右侧通配符匹配检查:如mail.*
+                        (4)正则表达式匹配检查:如～^.*\.magedu\.com$
+                        (5)default_server:
+                4,root path:
+                    设置资源路径映射，用于指明请求资源的URL所对应的资源所在文档的文件系统上的起始路径;
+                5,location [= | ~ | ~* | ^~] uri {...}
+                    location @name {...}
+                    功能：允许根据用户请求的URI来匹配定义的location:匹配到时候：此请求将被相应的location匹配块中的配置所处理，例如做访问控制等功能：
+                    =:精确匹配检查，
+                    ~：正则表达式模式匹配检查，区分字符大小写;
+                    ~*:正则表达式模块匹配检查，不区分字符大小写
+                    ^~:URI的前半部分匹配，不支持正则表达式
+
+                    匹配的优先级：精确匹配(=),^~,~,~*,不带任何符号的location
+
+                6,alias path
+                    用于Location 配置段，定义路径别名 
+
+                    location /images {
+                        root "/vhost/web1"
+                    }
+
+                    http://www.magedu.com/images/a.jpg <--/vhost/web1/images/a.jpg
+                    location /images/
+                    {
+                        alias "/www/pictures";
+                    }
+                    http://www.magedu.com/images/a.jpg <--/www/picuture/a.jpg
+
+                    注意：root 表示指明路径为location "/" URL;alias表示路径映射，即location指令后定义的url是相对于alias所指明的路径而言的;
+
+
+               7,index file;
+                由index模块提供
+                默认主页面：
+                    index index.php index.html;
+               8,error_page code [...] [=code] URI |@name:
+                    根据http响应状态码来指明嗯特用的错误页面
+                    location /images {
+                        root "/vhost/web1"
+                        error_page 404 /404_cumstom.html
+                    }
+
+
+                    error_page 404 =200 /404_customed.html
+
+                    [=code]：以指定的响应码进行响应，而不是默认原来的状态
+
+                    nginx -t 测试配置文件的语法是否正确
+
+                9,基于IP的访问控制
+                    allow IP/NetWork
+                    deny  IP/NetWork 
+                10,基于用户的访问控制
+                    basic,digest
+
+                    auth_basic "";
+                    auth_basic_usr_file "/PATH/TO/PASSWD_FILE";
+                        帐号密码文件建议使用httpasswd来创建
+                        httpasswd -c -m /etc/nginx/users/.httpasswd.tom
+                11,https服务
+                
+                    生成私钥：生成证书签署请求，并获得证书
+                        
+                        serer {
+                            listen  443 ssl;
+                            server_name www.magedu.com;
+
+                            ssl_certificate /etc/ngninx/ssl/nginx.crt;
+                            ssl_certificate /etc/ngninx/ssl/nginx.key;
+
+                            ssl_session_cache   shares:SSL:1m;
+                            ssl_session_timeout  5m; 
+                            location /
+                            {
+                                root /vhost/web1;
+                                index index.html index.html;
+                            }
+                        }
+
+
+                 12,stub_status {on|off}
+                    仅能用于location上下文：
+                    server
+                    {
+                        listen 8080;
+                        server_name www.magedu.com;
+                        location
+                        {
+                            root "/vhosts/web1";
+                        }
+                        location /status
+                        {
+                            stub_status on;
+                            allow from 172.16.0.0/16;   
+                            deny all;
+                        }
+                    }
+
+                    Active  connnection: 6 #当前所有处于打开状态的连接数
+                    server accepts handled request #
+                    241 241 431     
+                    (1)接受进来的连接 
+                    (2)已经处理过的连接
+                    (3)已经处理的请求数,在保持连接的模式下此数量，可能会多余连接数量
+                    Reading:0 Writing: 1 Waiting: 5
+                        Reading :正处于接收请求的状态的连接数：
+                        Writing :请求已经接受完成，正在处于处理或发送响应的过程中的连接数
+                        Waiting :处于保持连接模式，且处于活动状态的连接数 keepalive 
+
+
+                  13,rewrite regex replacement flag:
+                    例如： 
+                        rewrite ^/images/(.*\.jpg)$ /imgs/$1 break;
+                        rewrite ^/imgs/(.*\.jpg)$ /images/$ last
+                        http://www.magedu.com/images/a/b/c/1.jpg -->  /imgs/a/b/c/1.jpg 
+
+                        ....
+                        rewrite ^/images/(.*\.jpg)$ /imgs/$1 last;
+                        rewrite ^/imgs/(.*\.jpg)$ /images/$ last;
+                        ....
+                        http://www.magedu.com/images/a/b/c/1.jpg -->  /imgs/a/b/c/1.jpg 
+
+                    对用户请求的重定向
+
+
+
+                    flag:
+                        last:此rewrite规则重写完成后,不再被后面的其他rewrite规则进行处理，而是由User Agent重新对重写后的URL再一次发起请求，并从头开始执行类似的过程：
+                        break:一旦此rewrite规则重写完成后，由User Agent对新的URL重新发起请求，且不会被当签location内的任何rewrite规则检查
+                        redirect:以302响应码（临时重定向），返回新的URL
+                        permanet:以301响应码(永久重定向)返回新的URL 
+                        
+
+                        location /
+                        {
+                            root "/vhosts/web1";
+                            rewrite ^/bbs/(.*)$ /forum/$1 break;
+                        }
+                   14,if 
+                    语法：if (condition) {...}
+                    应用环境：server ,location
+
+                    condition:
+                        (1)变量名：
+                            变量值为空串，或者以"0"开始，则为false,其他为true
+                        (2)以变量为操作数构成的比较表达式
+                            可使用=,!=类似的操作符号进行测试
+                        (3)正则表达式的模式匹配操作
+                            ~:区分大小写的模式匹配检查
+                            ~*:不区分大小写的模式匹配检查
+                            !~ 和 !~*:对上面两种测试结果取反
+                        (4)测试文件存在性：-f,!-f
+                        (5)测试指定路径为目录的可能性：-d,!-d
+                        (6)测试文件的存在性：-e, !-e
+                        (7)检查文件是否有执行权限：-x,!-x
+
+
+                     例如：
+                        if ($http_user_agent ~* MSIE) 
+                        {
+                            rewrite ^(.*)$ /mise/$1 break;
+                        }
+                            
+                  15,防盗链
+                    定义invalid_referer
+                    location ~* \.(jpg|gif|jpeg|png)
+                    {
+                        valid_referer none blocked www.magedu.com;
+                        if(invalid_referer)
+                        {
+                            rewrite ^/ http://www.magedu.com/403.html;
+                        }
+                    }
+
+                  16,定制访问日志
+                    log_format:
+                       
+
+                    可用变量为ngignx内置变量
+
+
+
+
+          网络连接相关配置：
+            1,keepalive timeout #
+                默认是75s
+            2,keepalive_requests #
+                在一个长连接上所能够允许请求的最大资源数
+            3,keepalive_disable [mise6|safari|none]
+                为指定的user Agent禁用长连接
+            4,tcp_nodelay on|off;
+                是否对长连接使用TCP_NODELAY选项
+            5,client_header_timeout #;
+                读取http请求报文首部的超时时长
+            6,client_body_timeout #;
+                读取http请求报文body部分超时时长
+            7,send_timeout;
+                发送响应报文的超时时长
+          fascgi的相关配置:
+            LNMP:php启用fpm模型
+
+
+
+
+
+
+
+
+
+
+                    cd /etc/pki/CA
+                    (umask 077,openssl genrsa -out private/cakey.pem 2048)
+                    openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 3655
+                    touch serial index.txt
+                    ehco 01 > serial 
+                    cd /etc/nginx 
+                    mkdir ssl
+                    (umask 077; openssl genrsa -out niginx.key 1024)
+                    openssl  req -new -key nginx.key =out nginx.csr
+                    `   设置的servername必须与互联网的服务器名相同
+                    openssl ca -in nginx.csr -out nginx.crt -days 3655
+
+                    nginx -t 检查语法
+                    nginx -s reload重新载入nginx
+
+                    firefox custom中
+
+
+
+
+
+
+
+
+                    server 
+                    {
+                        listen 80;
+                        server_name www.magedu.com;
+                        location / {
+                            root "/vhosts/web1"
+                        }
+                        location /images/{
+                            root "/vhost/images";
+                        }
+                        location ~* \.php${
+                            fcgipass
+                        }
+
+                    }
+
+                    
+
+
+                    server 
+                    {
+                        listen 8080;
+                        server_name www.magedu.com;
+                        location /
+                        {
+                            root "/vhosts/web1";
+                        }
+                        location /images/
+                        {
+                            root "/vhosts/images";
+                        }
+                        location ~* \.(txt|text)
+                        {
+                            root "/vhosts/text"
+                        }
+                    }
+                    
+                    nginx -s reload
+                        
+
+
+
+
+
+
+
+
+
+
+
+                vim /etc/nginx/niginx.conf
+                nginx -s 
+
+
+
+                    master请求用户将各个
+
+
+
+
+
+
+
+                                        
+
+
+
+    
+
+
+
+
+
+
+
+   

@@ -1,0 +1,530 @@
+1,证书持有者
+2,证书的CA
+3,完整性
+4,有效期内，未被吊销
+	私有CA：openssl
+		签证：CRL
+
+
+DNS and BIND
+	DNS:Domain Name Service ,协议(C/S: 53/udp,53/tcp)
+	BIND:Bakerley Internet Name Domain (www.)
+
+	TCP:面向连接的协议：
+	UDP:User Datagaram Protocal,无连接协议
+	本地名称解析配置文件：hosts
+		/etc/hosts
+		%WINDOWS%/system32/drivers/etc/hosts
+		1.1.1.1 www.magedu.com
+		1.2.2.2 www.apple.com
+		解析:名称转换
+		本地udp-->DNS服务器-->本地
+		本地ip地址-->目标网站
+	
+	Top level Domain:tld
+		com ,edu,mil ,gov ,net ,org,int
+
+		三类：组织域，国家域(.cn,.iq,.hk,.tw),反向域
+	DNS查询类型:	
+		递归查询：
+		迭代查询：
+	名称服务器：域内负责解析本域内的名称的主机
+		根服务器：13组服务器
+
+	解析类型：
+		Name--> IP
+		IP-->Name
+
+		注意:正反向解析是两棵不同的解析树
+	
+	DNS服务器的类型：
+		主DNS服务器：
+		辅助DNS服务器：
+		缓存DNS服务器：
+
+		主DNS服务器：维护负责解析区域内的解析库服务器,解析库由管理维护：
+		从DNS服务器：从主DNS服务器或者其他的从DNS服务器“复制”（区域传送）一份解析库
+			序列号：解析库的版本号：前提：主服务器解析库发生变化，其序列递增：
+			刷新时间:从服务器从主服务器请求同步解析库的时间间隔：
+			重试时长(小于刷新时间间隔)：从服务器请求同步解析库失败时候，再次尝试的时间间隔
+			过期时长：从服务器始终联系不到主服务器时，多久之后放弃从服务器角色，停止提供服务库
+			“通知”机制：主服务器在发生变化后会通知从服务器
+			
+
+
+		区域传送：
+			全量传送：传递整个解析库
+			增量传送：传递数据库变化的那一部分
+	DNS:
+		Domain
+			正向：FQDN--> IP
+			反向：IP -->FQDN
+
+			各需要一个解析库来负责域名正向与反响的解析
+			正向区域
+			反向区域
+
+		FQDN:Full Qualified Domain Name 
+			www.magedu.com.
+			www简写的主机名
+
+
+
+
+
+
+
+	一次完整的查询请求经过的流程：
+	Client --> hosts文件--> DNS service 
+		Local Cache -->DNS Server (recursion)-->Server Cache --> iteration (迭代)
+
+	解析答案：
+		肯定答案：正确的解析了所要的答案
+		否定答案：请求的条目不存在等原因导致无法返回结果：
+
+
+		权威答案：
+		非权威答案：
+	区域解析库：由众多RR组成
+		资源记录：Resource Record ,RR
+			记录类型：A(internet addres),AAAA,PTR,SOA,NS,CNAME,MS,
+	
+			SOA:Start Of Authority ，起始授权记录，一个区域解析库有且仅有一个SQA记录，而且必须为解析库的第一条记录： 
+			A:internet Adress:作用：将 FQDN --> IP
+			AAAA:FQDN --> IPv6
+			PTR:Pointer , IP --> FQDN 
+			NS:Name Server,专用于标明当前区域的DNS服务器
+			CNAME:Cannonical Name,正式名称，别名记录
+			MX: Mail Exchanger 邮件交换器，标明当前哪个是邮件服务器(实现邮件交换的服务器)
+				Linuxedu@126.com
+
+		资源记录定义的格式:
+			语法：name [TTL] IN rr_type value 
+
+			注意：
+				(1)TTL可以全局继承：
+				(2)@可用于引用当前区域的名字：
+				(3)同一个名字可以通过多条记录定义多个不同的值，此时DNS服务器会以论调方式响应;
+				(4)同一个值有多个不同的名字，通过多个不同名字指向同一个值进行定义,此仅表示通过多个不同的名字可以找到同一个主机
+
+
+			SOA:
+				name:当前区域的名字，例如magedu.com
+				value:
+				有多部分组成
+				(1)当前区域的主DNS服务器的FQDN，也可以使用当前区域的名字，
+				(2)当前区域管理员的邮箱地址，但地址中不能用@符号，一般用.替换，例如linuxedu.magedu.com
+				(3)(主从服务协调属性的定义以及否定答案的统一的TTL)
+				例如：
+				magedu.com. 8640 IN SOA ns.magedu.com. nsadmin.magedu.com (
+				2015042201 ;序列号
+				2H    	   ;刷新时间
+				10M	   ;重试时间
+				1W	   ;过期时间
+				1D	   ;否定答案的TTL值
+
+				)
+			NS:
+				name:当前区域的名字：
+				value：当前区域的DNS服务器的名字，例如：ns.magedu.com.:
+				注意：一个区域可以有多个ns记录:
+				例如：
+				magedu.com. IN NS ns1.magedu.com
+				magedu.com. IN NS ns2.magedu.com
+				注意：
+					(1)相邻的两个资源记录的name相同的时候，后续的可以省略：
+					(2)对NS记录而言,任何一个ns记录的服务器名字，都应该在后续有一个A记录
+
+			MX:
+				name：当前区域的名字
+				value:当前区域的某邮件服务器(smtp服务器)的主机名字：
+				value之前应该有一个数字(0-99),表示此服务器的优先级,数字越小则优先级越高
+				例如：
+				magedu.com. IN MX 10 mail.magedu.com
+					    IN MX 20 mail.amgedu.com. 
+				注意:
+					(1)对MX记录而言,任何一个MX记录的服务器名字，都应该在后续有一个A记录
+			A:
+				name:某主机的FQDN,例如，www.mgedu
+				value:主机名对应主机的ip地址
+				例如：
+					www.magedu.com. IN A 1.1.1.1
+					www.magedu.com. IN A 1.1.1.2
+
+					mx1.magedu.com. IN A 1.1.1.3
+
+					mx2.magedu.com. IN A 1.1.1.3
+
+				注意：
+
+					*.magedu.com. IN A 1.1.1.4
+					magedu.com  IN A 1.1.1.4
+					避免用户写错名称时给，可以使用范语言进行解析特定地址
+			AAAA:
+				name:FQDN
+				value:IPv6
+
+			PTR:
+				name:IP	,有特定的格式，把IP地址反过来写：1.2.3.4 --> 4.3.2.1 有特定后缀in-addr.arpa. 所以完整写法为： 4.3.2.1 in-addra.arpa.
+				value:FQDN
+
+
+				例如:
+					4.3.2.1 in-addr.arpa. IN PTR www.magedu.com
+					简写成：
+						4  IN  PTR www.magedu.com
+					注意：网络地址加后缀可省:主机地址依然需要反写
+		CNAME:
+			name:别名的FQDN
+			value:正式名字的FQDN
+
+			例如：
+
+				web.magedu.com  IN CNAME www.magedu.com
+					
+
+DNS服务系统基础知识，DNS资源记录定义方法
+	
+	dns:udp,tcp 名称解析服务,53/udp,53/tcp
+
+	查询：
+		递归查询，迭代查询
+
+	解析：正向，反向：
+		权威答案：
+		非权威答案：
+	
+	主,从dns服务器：区域传送
+		全量传送
+		增量传送
+	
+		
+
+
+		SOA:
+			序列号，刷新时间，重试时间，过期时间，否定的应答TTL
+			H,D,M,w默认为s
+
+
+		BIND:
+			RR类型：A,PTR,NS,MX,CNAME,SOA,AAAA
+
+		语法：
+			name [TTL] IN rr_type value 
+
+
+DNS and BIND (2)
+	
+	子域授权：每个域的服务器，都是通过其上级名称服务器在解析库进行授权的：	
+	 
+		类似根域授权tld：
+			.com. 	IN	NS	ns1.com
+			.com.	IN	NS	ns2.com
+			ns1.com	IN	A	2.2.2.1
+			ns2.com	IN	A	2.2.2.2
+
+		magedu.com. 在.com的名称服务器上，解析库中田间资源记录：
+			magedu.com. 	IN	NS ns1.magedu.com.
+			magedu.com. 	IN	NS ns2.magedu.com.
+			magedu.com. 	IN	NS ns3.magedu.com.
+            ns1.magedu.com. IN  A   3.3.3.1
+            ns2.magedu.com. IN  A   3.3.3.2
+            ns3.magedu.com. IN  A   3.3.3.3
+
+
+          glue record: 粘合地址
+
+
+    域名注册：
+       代理商：万网，新网,godaddy.com
+
+       注册完成后：向自己用专用服务来解析：
+        
+        (1)管理后台：把NS记录指向的服务器，和a记录指向的服务器地址修改为
+
+    BIND的安装配置：
+        
+        dns服务：程序包名字bind,程序名named
+        
+        程序包:
+            bind (提供服务)
+            bind-libs(提供包)
+            bind-utils(检测服务是否成功)
+            
+            bind-chroot: /var/named/chroot/
+
+        bind:
+            服务脚本：/etc/rc.d/init.d/named
+            主配置文件：/etc/named.conf ,/etc/named.rfc1912.zones /etc/rndc.key(域共享密钥)
+            
+
+
+
+
+            解析库文件：/var/named/ZONE_NAME.zone()
+                注意：
+                (1)一台物理服务器可以同时为多个区域提供解析 
+                (2)必须要有根区域文件:named.ca
+                (3)应该有两个甚至更多（如果包括ipv6,应该更多）实现localhost本地回环地址的解析库：named.localhost named.loopback 
+                @当前主机的名称 
+                /etc/named.conf
+
+
+
+            rndc: remote name domain controller (默认下只能提供本地服务，默认与bind安装在一起，且只能通过172.0.0.1来连接named进程，提供辅助性的管理功能)
+                953/tcp
+
+    主配置文件:
+        全局配置:options{}
+        日志子系统配置：logging {}
+        区域定义：本机能够为那些zone进行解析,就要定义那些zone
+            zone "ZONE_NAME" IN {}
+            directory 区域解析库放置的位置option中最关键的一项
+            
+           注意：任何服务程序如果期望能够通过网络被访问，至少应该监听在一个能与外部主机通信的ip地址上：
+            
+   缓存名称服务器的配置
+        监听外部地址即可：
+        
+   dnssec:
+       建议测试时候关闭dnssec服务
+
+       dnssec-enable yes;    
+       dnssec-validation yes; 
+       dnssec-lookaside auto; 
+
+       bindkeys-files "/etc/named.iscdlv.key"
+       manged-keys-directory "/var/named/dynamic"
+       注释或者修改为no  
+       作为DNS服务器recursion yes  选项必须开启
+       
+
+
+
+            rpm -ql bind-utils
+            dig,host,nslookup为检测使用,手动检测解析是否正常
+            yum info bind-chroot
+            yum install bind -y 
+            rpm -ql bind  | less 
+            /var/log/named.log服务器日志文件
+
+  主DNS名称服务器：
+        (1)在配置文件中定义区域
+            zone    "ZONE_NAME" IN
+                    {
+                            type {master |slave |hint | forward };
+                            file "ZONE_NAME.zone";
+                    }
+         (2)定义区域解析符文件
+            出现的内容
+                宏定义：
+                资源记录：
+             注意：在*.zone文件中没有注释文件
+         可以通过修改resolv.conf  nameserver 文件来改变默认的域名解析服务器
+         dig测试的使用方法:
+            dig [-t type ] name [@server]
+            dig用于测试dns系统,因此，不会查询host文件进行解析：
+            查询选项：
+                +[no]trace :跟踪解析过程
+                +[no]recurse:进行递归解析  
+            测试反向解析:
+                dig -x IP @server
+            模拟区域传送
+                dig -t axfr ZONE_NAME @SERVER
+                dig -t axfr magedu.com @172.16.100.11
+                dig -t axfr 11.100.16.172.in-addr.arpa.@172.16.100.11
+                * IN A IP实现任何网址对主要服务器的映射
+        host命令：
+            host [-t type] name [SERVER]
+                
+        nslookup命令:
+            nslookup [-option] [name | -] [server ]
+            
+            交互模式：
+                nslookup>
+                    server IP: 指明使用哪个DNS server 进行查询
+                    set q=RR_TYPE:指明查询的资源类型：
+                    NAME:要查询的名称:
+     反向区域:
+        
+        区域名称：网络地址反写.in-addr.arpa.
+        172.16.100. --> 100.16.172.in-addr.arpa 
+
+        (1)定义区域
+            zone "ZOME_NAME" IN
+            {
+                    type {master| slave | forward};
+                    type "网络地址.zone"
+            };
+        (2)定义定义解析库文件
+            注意：不需要MX,A,以为PTR为主要
+
+            实例：
+            
+		$TTL 86400
+		$ORIGIN 100.16.172. in-addr.arpa. 
+		@   IN  SOA     ns1.magedu.com.  admin.magedu.com (
+		                   2015042201 
+		                   1H
+		                   5M
+		                   7D
+		                   1D )
+		
+		    IN NS       ns1.magedu.com.
+		    IN NS       ns2.magedu.com.
+		11  IN PTR      ns1.magedu.com.
+		11  IN PTR      www.magedu.com.
+		12  IN PTR      mx1.magedu.com.
+		12  IN PTR      www.magedu.com.
+		13  IN PTR      mx2.magedu.com.
+
+
+
+    主从复制：
+        1,应该为一台独立的名称服务器(需要为一台缓存服务器，allow-query {any;}; recurssion yes;)
+        2,主服务器的区域解析库文件中必须有一条NS记录是指向从服务器
+        3,从服务器只需要定义区域，而无需提供解析库文件;解析库文件应该放置于/var/named/slaves/目录中;
+        4,主服务器应该允许从服务器作区域传送(在修改了主服务器的解析库后,SOA序列号增加1);
+        5,主从服务器时间应该同步，可通过ntp进行
+        6,bind程序的版本应该保持一致，否则应该从服务器版本较高
+
+            定义从服务器的方法:
+                zone "ZONR_NAME" IN {
+                        typr slave;
+                        masters {MASTER_IP;};
+                        file "slaves/ZONE_NAME.zone";
+                        };
+                eg.zone "magedu.com" IN {
+                        type slave;
+                        masters {172.16.100.11;};
+                        file "slaves/magedu.com.zone";
+                };
+
+
+    rndc:
+        rndc --> rndc (953/tcp)
+        
+        rndc COMMAND    
+
+        COMMAND:
+            reload:重载主配置文件和区域解析库文件
+            reload zone:重载区域解析库文件
+            retransfer zone:手动启动区域传送过程，而不管序列号是否增加
+            notify zone:重新对区域传送发通知 
+            reconfig:重载主配置文件
+            querylog:开启或者关闭查询日志,处于错误定位时候才需要启用该过程
+            trace:递增debug级别;
+            trace LEVEL:指定使用的级别：
+            flush :清空缓存
+
+       
+
+
+
+
+
+
+
+
+            /var/log/messages
+            查看日志文件    
+
+
+                    
+
+                
+
+    在缓存名称服务器的基础上增加zone的定义  
+    编辑RFC /etc/named.rfc1912.zone
+    增加
+    zone "magedu.com" IN {
+            type master;
+            file "magedu.com.zone";
+            }
+    在.conf文件中的directory 目录下
+    创建新文件magedu.com.zone
+    named-checkconf 检查named.conf.rfc1912.zones
+    named-checkzone "magedu.com(区域)" /var/named/magedu.com.zone(区解析文件)
+    ps aux|grep named查看运行的权限
+    ll /etc/named.conf -l 
+    chmod 640 magedu.com.zone
+    chown :named magedu.com.zone 
+    service named restart   
+    rndc status 
+    默认在未指明使用的ip地址的情况下使用/etc/resolv.conf中中的ip地址解析
+    dig -t A www.magedu.com @172.16.100.11
+    修改后使用service named reload 重新载入使得修改马上生效
+   rndc reload  
+   创建文件magedu.zone
+   
+	$TTL 86400
+	$ORIGIN magedu.com. //宏定义默认情况下不加后缀的都有这个名称
+	@   IN  SOA     ns1.magedu.com.  admin.magedu.com (
+	2015042201 
+	1H
+	1M
+	7D
+	1D )
+	
+	IN NS       ns1
+	IN NS       ns2
+	IN MX  10   mx1
+	IN MX  10   mx1
+	ns1 IN A        172.16.100.11
+	ns1 IN A        172.16.100.12
+	MX1  IN A        172.16.100.13
+	MX2  IN A        172.16.100.14
+	www  IN A       172.16.100.11
+	ftp  IN CNAME   www
+
+
+
+
+
+            
+            
+            
+
+            
+            
+        
+
+
+
+
+
+
+	
+
+				
+
+
+
+
+
+
+
+
+
+			
+			
+
+
+			
+
+
+
+
+
+
+		
+
+
+
+
+	IANA
+	
+
+
+	
+

@@ -1,0 +1,231 @@
+CentOS的启动流程
+    
+    Linux kernel+rootfs:
+
+        kernel:进程管理，内存管理,网络管理,驱动程序,文件系统，安全功能
+        rootfs:
+            glibc
+
+        库：函数的集合,function,调用接口
+            过程调用：procedure 
+            函数调用：function 
+
+
+        程序：
+
+
+    内核设计流派：
+        单内核设计：Linux
+            把所有功能集成于一个程序：
+        微内核设计：Windows,Solaris
+           每种功能使用一个单独子系统实现： 
+
+
+
+        Linux内核特点：
+            支持模块化 .ko 
+            支持模块的动态装载和卸载:
+
+
+            组成部分：
+                核心文件：/boot/vmlinuz-VERSION-release
+                    ramdisk 
+                        CentOS 5: /boot/initrd-VERSION-release.img
+                        CentOS 6:/boot/initramfs-VERSION-release.img
+                模块文件：/lib/modules/VERSION-release  
+
+        CentOS 系统启动流程：
+            
+            POST:加电自检：
+                ROM:CMOS:
+                    BIOS：Basic Input and Ouput System 
+
+                    ROM+RAM:
+                BOOT Squence:
+                    按照次序查找引导设备，第一个引导程序的设备即为本次启动用到的设备；
+                    
+                    bootloader :引导加载器，程序
+                        windows:ntloader 
+                        Linux:
+                            LILO:Linux Loader 
+                            GRUB:Grand Uniform Bootloader   
+                                GRUB 0.x:GRUB Legacy
+                                GRUB 1.x:GRUB2
+
+                                
+                            功能：提供一个菜单,允许用户选择要启动的系统或者不同版本，把用户选定的内核装载到内存中的特定空间中，解压，展开，并把系统的控制权移交给内核 BIOS终止
+                        MBR: 0磁道0扇区
+                            446:bootloader
+                            64: fat
+                            2: 55AA标记是否有效
+
+                        GRUB:
+                            bootloader:1st stage:
+                            disk :2nd stage     
+
+                kernel:
+                    自身初始化：
+                        探测可识别到的所有硬件设备
+                        加载硬件驱动程序：（有可能会借助于ramdisk加载驱动）
+                        以只读方式挂载根文件系统
+                        运行用户空间的第一个应用程序：/sbin/init
+                        init程序的类型：
+                            SysV:init ,CentOS 5 
+                                配置文件： /etc/inittab 
+                            Upstart:init CentOS 6
+                                配置文件： /etc/inittab /etc/init/*.conf
+                                            /etc/init.d
+                            Systemd:systemd,CentOS 7
+                                配置文件： /usr/lib/systemd/system /etc/systemd/system 
+
+
+                        ramdisk:
+                            
+                            内核中的特性之一：使用缓冲和缓存来回对磁盘上的文件访问
+                            ramdisk --> ramfs(改进为内存中文件系统)
+                            CentOS 5:initrd,工具程序：mkinitrd
+                            CentOS 6:initramfs 工具程序：mkinitrd,dracut 
+
+                        系统初始化：
+                        POST-->BootSequence(BIOS)-->BootLoader(MBR)-->kernel(ramdisk)-->rootfs(只读)-->init 
+
+                /sbin/init
+
+                    CentOS 5:
+                        
+                        运行级别： 为了系统的运行和维护等应用目的而设定
+                            
+                            0-6: 七个级别：
+                                0:关机：
+                                1:单用户模式(root,无须登陆)，single,维护模式
+                                2:多用户模式，会启动网络功能，但不会启动NFS，维护模式，
+                                3:多用户模式，正常模式：文本界面
+                                4:预留级别:可同3级别    
+                                5:多用户模式 ，正常模式，图形界面
+                                6:重启
+
+                            默认级别：
+                                3,5 
+
+                            切换级别：
+                                init #
+
+                            查看级别：
+                                run-level
+                                who -r
+
+
+
+                    配置文件： /etc/inittab 
+                        
+                       每一行定义一种action以及与之对应的action          
+                            id:runlevel:action:process 
+                                action:
+                                    wait : 切换到此级别运行一次：
+                                    respon: 此proccess终止，就重新启动之；
+                                    initdefault:设定默认运行级别:proces忽略
+                                    sysinit:设定系统初始化方式，此处一般为/etc/rc.d/rc.sysinit
+                                    ...
+
+                            
+                            eg: 
+                            id:3:initdefault:
+                            si::sysinit:/etc/rc.d/rc.sysinit    
+                            
+                            l0:0:wait:/etc/rc.d/rc 0
+                            l1:1:wait:/etc/rc.d/rc.1
+                            l0:2:wait:/etc/rc.d/rc 2
+                            ....
+                            l6:6:wait:/etc/rc.d/rc 6
+
+                            说明:rc 0--> 意味着读取/etc/rc.d/rc0.d/
+                                K*:K##*
+                                S*:S##*
+
+                                for srv in /etc/rc.d/k*;do
+                                    $srv stop
+                                done 
+
+                                for srv in /etc/rc.d/rc0.d/s*;do 
+                                    $srv start 
+                                done
+                        
+                            chkconfig命令：
+                                查看服务在所有级别的启动或关闭设定的情形：
+                                    chkconfig: [--list] [name]
+                                     
+                                添加：
+                                    SysV的服务脚本放置于/etc/rc.d/init.d    (/etc/init.d)
+
+                                    chkconfig --add name
+                                        
+                                    #！/bin/bash 
+                                    #
+                                    #chkconfig: LLLL nn nn
+
+                                删除：
+                                    chkconfig --del
+
+                                修改制定级别的链接类型：
+                                    chkconfig [--level levels ]  name <on |off |reset>
+                                        --level LLLL ：指定要设置的级别：省略为2345
+
+                            注意：正常级别下,最后启动的服务S99local没有链接至/etc/rc.d/init.d一个服务脚本，而是指向/etc/    rc.d/rc.local脚本，因此：不便或者不需写为服务脚本放置于/etc/rc.d/init.d/目录，并且又想开机自动运行的命令，可以直接放置于/etc/rc.d/rc.local文件中
+
+                                tty1:2345 :respawn:/usr/sbin/mingetty tty1
+                                tty2:2345 :respawn:/usr/sbin/mingetty tty1
+                                tty3:2345 :respawn:/usr/sbin/mingetty tty1
+                                .....
+                                tty6:2345 :respawn:/usr/sbin/mingetty tty1
+                                    
+                                    mingetty会调用login程序
+
+                        /etc/rc.d/rc.sysinit :系统初始化脚本
+                            (1)设置主机名字；
+                            (2)设置欢迎信息
+                            (3)激活udev和selinux
+                            (4)挂载/etc/fstab 文件中定义的文件系统:
+                            (5)检测文件系统，并以读写方式重新挂载根文件
+                            (6)设置系统时间
+                            (7)激活swap设备
+                            (8)根据/etc/sysctl.conf文件设置
+                            (9)激活lvm以及software raid设备
+                            (10)加载额外的驱动设备
+                            (11)清理操作
+
+
+                        总结： /sbin/init --> (/etc/inittab )-->设置默认运行级别-->运行系统初始化脚本，完成系统初始化-->关闭对应下需要关闭的服务，启动需要启动的服务-->设置登陆终端
+
+                CentOS 6: upstart 配置文件
+                    /etc/inittab,   /etc/init/*.conf 
+
+                注意：/etc/init/*.conf 文件语法,遵循upstart配置 文件语法格式
+
+            启动系统时候：设置其运行级别为1
+            进入grub    
+            借助initramfs实现
+            在内核的行上开始进入编辑（e） 额外传入参数（1 S single ） b键入开始进入root用户使用passwd改变密码
+            init    
+                                
+                            
+
+
+
+                        
+                            
+
+
+
+                        
+
+
+                
+
+            
+
+
+            
+
+
+        
+

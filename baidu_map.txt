@@ -1,0 +1,42 @@
+baidu地图开发
+    LawXiJun
+    VCdRpuTIRHYTGj5TV22EGQnw1dfbrUds 	
+
+
+    Mainifest.xml中添加授权
+    地图使用的相应应用授权
+    uses-permission
+	    android:;name="android.permission.*"
+	        ACCESS_NETWORK_STATE
+	        ACCESS_FINE_LOCATION
+	        INTERNET
+	        WRITE_EXTERNAL_STORAGE
+	        ACCESS_WIFI_STATE
+	        CHANGE_WIFI_STATE
+	        READ_PHONE_STATE
+
+    添加对屏幕的支持
+    supports-screens
+        增加相应的的属性
+            android:largeScreens="true"
+	        android:normalScreens="true"
+	        android:resizeable="true"
+	        android:anyDensity="true"
+    将相应的jar包放置于libs目录下
+        BaiduLBS_Android
+        armeabi
+        
+    BMapManager       
+        destroy()
+        start()
+        stop()
+        
+
+
+
+    
+
+
+     
+        
+

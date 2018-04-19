@@ -1,0 +1,22 @@
+蓝牙操作
+    5-10m距离  
+    常用连接耳机、鼠标、和移动通讯设备
+
+
+
+1.BluetoothAdapter
+    该类的对象代表了本地的蓝牙适配器
+2.BluetoothDevice
+    代表了一个远程的Bluetooth设备
+
+
+手机与电脑配对只能通过手动配对
+
+AndroidManifest.xml
+    增加相应的permission
+        BLUETOOTH
+1.获得BluetoothAdapter对象
+2.判断当前设备中是否拥有蓝牙设备
+3.判断当前设备中的蓝牙设备是否已经打开
+4.得到所有已经配对的蓝牙设备对象
+    BluetoothDevice

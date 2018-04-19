@@ -1,0 +1,159 @@
+NFS:network file system 
+    文件系统内核，内核中实现
+    RPC:Remote Procedure Call Protocal 
+        函数调用(调用远程主机上的函数)
+        一部分功能本地程序
+        另一部分由远程主机完成  
+
+
+        半结构化数据
+            XML:eXtended Mark Language 
+            JSON:轻量级别
+            RESTful:
+
+    NFS:
+        监听在2049/tcp/udp
+
+        v1,
+        v2,udp
+        v3,
+        v4
+            pNFS:parallell 
+        基于ip地址的认证
+        RPC:公共共享功能
+            portmaper 
+
+            rpcinfo -p   -
+        身份认证不:集中于某服务器完成
+        nfs服务器:mountd nfsd idmapd
+        rpm -q nfs-utils
+        lsmod | grep nfs
+        mkdir /shared/nfs -pv 
+        vim 
+
+ 58.62.172.140
+    查看NFS服务器端共享的文件系统
+        showmount -e NFSSERVE_IP
+    挂载NFS文件系统
+        mount -t nfs SERVER:/PATH/TO/SHAREDNFS  /PATH/TO/MOUNT_POINT
+    /etc/exports:
+        文件系统    客户端(选项)客户端(选项)
+            客户端：IP，FQDN 或DOMAIN,NETWORK
+                /shared/nfs 172.16.200.7(no_root_squash ,rw) 172.16.0.1(ro)
+                /var/ftp   172.16.0.1(ro)   172.16.200.7(ro)
+                exportfs -ar
+            常用选项:
+                secure:这个选项是默认的 使用1024以下的tcp/ip端口实现NFS指定insecure可以禁用此选项
+                rw:这个选项允许NFS,客户机进行读/写访问，缺省是只读的
+                async:异步这个可以改进性能，
+                no_wdelay:
+                nohide:
+                no_subtree_check:这个选项关闭子树检查，子树检查会执行一些不想忽略的安全性检查，缺省选项是启用子树检查
+                mp:(mountain-path):通过显式地声明这个选项，NFS要求挂载所导出目录
+                fsid=num:这个选项都在NFS故障恢复中使用，如果希望实现NFS的故障恢复，
+
+
+        用户映射选项包括：
+            root_squash:这个选项不允许root用户访问挂载上来的NFS卷
+            no_root_squash:这个选项允许root用户访问挂载上来的NFS卷
+            all_squash:这个选项对于公共访问的NFS卷,非常常用，限制所有的UID和GID只使用匿名用户，缺省设置是no_all_squash 
+            anonuid 和 anongid:这两个选项将匿名UID和GID修改成特定用户和组账户
+                NFS通过uid来识别用户
+
+
+        eg，
+            通常将配置用户写为
+            /path/of/share yourserver(insecure,rw,async,no_root_squash)
+
+
+
+
+        exportfs：维护exports导出文件的文件系统表的专用工具
+            exportfs -ar:重新导出所有的文件系统
+            exportfs -au:关闭导出所有文件系统
+            exportfs -u FS:关闭指定的导出的文件系统
+
+        showmount :
+            showmount -e 
+            showmount -d
+            showmount -a:已经导出的nfs系统被那些主机挂载
+
+
+        客户端口开机自动挂载nfs
+            /etc/fstab 
+                SERVER:/PATH/TO/EXPORTED_FS/mount_point nfs defaults,_netdev 0 0 
+        客户端挂载可使用特殊选项
+            Client 
+                Mounting remote directories
+                Before  mounting remote directoruies 2 daemons  should be be started first:
+                    rpcbind
+                    rpc.statd
+                rsize 的值是从服务器读取的字节数
+                wszie 是写入服务的字节数字,默认1024（过于小） 使用较高数字提高传输效率，如8192  
+                 timeo 超时时间
+ 
+
+
+ 总结：
+    1,客户端的表示方法
+    2,导出选项  
+        rw 
+    3,exportfs和showmount
+
+
+
+
+
+
+
+
+    主配置文件：/etc/exprots 每一行是一个nfs文件系统
+       directory(or file system) client1(option1,option2) client2(option1,option2)  
+              client :
+                    single host
+                    netgroups
+                    wilcards
+                    IP network
+              /shared/nfs 172.16.200.7(rw)  172.16.0.1(ro)
+              showmount -e 172.16.100.7
+              mount -t nfs 172.16.100.7:/shared/nfs /mnt
+              cd /mnt 
+              
+    RPC服务:pormanager 
+    rpcinfo :   report rpc information
+
+
+    rpm -q nfs-utils //nfs在内核中，通常不需要安装
+    lsmod |grep nfs
+
+
+    出现access denied by server while mounting 问题
+    通过cat /var/log/messages | grep mount 查看问题
+    1,使用了非法端口，通常不可以使用大于1024的端口
+        设置配置文件/etc/exports用户选项中加入 insecure 一项
+        重启nfs,
+    2,NFS版本问题
+    编辑/etc/sysconfig/nfs文件
+    需在
+    #Turn off v4 protocal support
+    下
+    #RPCNFSDARGS="-N 4" 前的注释删除
+    保存重新挂载nfs
+    如挂载不上尝试
+    mount -t nfs -o nolock server:/path/to/share /mnt/path
+    3,查看客户端挂载的目录是否具备读写权限，添加相应权限
+    4,nfs读物器中/etc/hosts中设置了客户机ip对应域名去掉
+
+
+
+
+
+
+                    
+
+
+    NIS:Netowork Information 
+
+        
+        
+

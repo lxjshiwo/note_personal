@@ -1,0 +1,131 @@
+nsswitch:
+    名称解析：
+        name:id
+    认证服务:
+            
+
+    nsswitch:network service switch 网络服务转换,解决名称解析
+
+        解析库：
+            文件,MySQL,NIS(网络信息系统),LDAP,DNS,dbm
+            通用框架,与各存储交互的实现
+                /usr/lib64/libnss*,/lib64/libnss*(64位)
+                配置文件：
+                    db:store1,store2,...
+
+                    每种存储中查找结果的状态
+                    STATUS => success | notfound | unavail | tryagain
+                    每种状态采取的行为
+                    ACTION => return | continue 
+
+                    host:files nis [NOTFOUND=return ]dns
+                    
+
+                # getent database [entry]
+
+    pam:plugable authentication module
+        
+        认证库：
+            文件，MySQL,LDAP,NIS
+            /lib/security (32位)
+            /lin64/security (64位)
+            通用框架，与各存储交互的实现，以及多种辅助功能:
+                /lib64/security/
+
+            配置文件:/etc/pam.conf 
+                /etc/pam.d/*
+
+                通常每个应用使用一个文件配置:
+                    配置文件中的每行定义一种检查规则:
+                    格式：
+                        type    control  module-path  module-arguments
+                        type:检查功能类别
+                            auth:帐号的认证和授权
+                            account:与帐号管理功能相关的非认证功能
+                            password:用户修改密码时密码检查规则 
+                            session:用户获取到服务之前，或使用完成后未退出进行的附加性操作    
+                        control:同一种功能的多个检查之间如何进行组合
+                            两种实现机制:
+                                1,使用一个关键词定义：
+                                  简单机制：
+                                    required
+                                    requisite  //一票否决
+                                    sufficient //一票通过,b不通过参考其他选项  
+                                    optional   //可选
+                                    include    //包含其他文件中指定类别的规则包括
+                                2,使用一个或多个键值对 status=action 形式进行的组合表示
+                                   复杂机制：[status1=action1,status2=action2]
+                                        status:返回状态,ok,
+                                        action:ok,done,die,ignore,bad,reset
+                                module-path:模块路径
+                                    /lib64/security:此目录下的模块引用可以使用相对路径
+                                module-arguments:模块参数
+
+
+
+                                eg,
+                                    修改ssh的认证机制
+                                    cp ssh ssh.orig
+                                    vim ssh
+                                        auth    required  pam_shell.so//查找相关使用的shell是否为/etc/shells文件中的shell
+                                        pam_rootok只要使用root均可以
+                                        pam_deny一票否决
+                                        pam_permisson一票通过
+                           模块：
+                            (1)pam_shells.so
+                            (2)pam_limit.so
+                                模块通过读取用户配置文件完成用户对系统资源的使用控制
+                                  /etc/security/limits.conf
+                                  /etc/security/limits.d/*
+
+                               <domain><type><item><value>
+                                    domain  对哪些用户进行控制
+                                            username
+                                            @groupname
+                                            wilcard
+                                                *:所有用户
+                                    type    hard:由root设定，通过kernel强制生效 
+                                            soft:
+                                            -:二者同时限定
+                                    item    
+                                            对哪类资源进行限制
+                                            core    limits the core
+                                            nofile   用户同时最大打开文件数字
+                                            rss 常驻内存集的最大大小
+                                            cpu cpu时间限定
+                                            nproc   同时启动的进程数目最大数量      
+                                            maxlogins:  最大登录次数
+                                            sigpending:挂起的信号最大数量   
+                                            msgqueue:所能够使用的POSIX消息队列能够占用的最大内存空间：
+
+
+                                    ulimit -n #:文件数量
+                                    ulimit -u #:进程数量
+
+
+
+                                            
+
+
+                                    limit resources限制用户可以使用的资源
+                                    ulimit
+
+
+                                        
+                                    
+
+                                        
+                                    
+
+                             
+                
+
+
+
+
+
+
+
+            nsswitch.conf
+            host:files
+

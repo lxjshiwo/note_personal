@@ -1,0 +1,29 @@
+
+Measure操作 
+    measure操作主要用于计算视图大小，即视图的宽度长度，在view中定义为final类型
+    ，要求子类型不能修改，measure()函数中又会调用下面的函数
+
+    (1)
+        onMeasure()
+    (2)
+        setMeasuredDimension(width,height),保存计算结果
+
+Layout操作
+    设置试图在屏幕中显示的位置，在view中第一位final类型,要求子类不能修改
+    layout()函数中有两个基本操作
+
+    setFrame(l,t,r,b)
+    onLayout()
+
+draw操作
+    draw操作利用前两部得到的参数，将视图显示在屏幕上
+    调用onDraw()空函数
+
+    getX()
+    getRawX()
+        相对于整个屏幕
+
+    
+    
+
+        

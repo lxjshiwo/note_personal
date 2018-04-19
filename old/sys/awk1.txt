@@ -1,0 +1,130 @@
+
+7,控制语句
+	if(condition) {statements}
+	if(condition) {statements} else {statements}
+	while (condition) {statements}
+	do {statements} while (conditon)
+	for(expr1,expr2,expr3) {statement}
+	break
+	continue 
+	delete array[index]
+	delete array
+	exit
+	( statement)
+
+
+awk 进阶
+	7.1 if-else
+
+		语法：if(condition) statement {else statement}
+		awk -F: '{if($3>=1000) print $1,$3}' /etc/passwd
+		awk -F: '{if($3>=1000) {printf "Common user: %s\n",$1}else{printf "root or Sysuser:%s\n",$1} }' /etc/passwd
+		awk -F: '{if($NF=="/bin/bash") print $1}' /etc/passwd
+		awk '{if(NF>5) print $0}' /etc/fstab
+	df -h
+		显示使用比率超过一定阶段的磁盘设备
+		df -h |  awk -F[%] '/^\dev/ {print $1}'| awk '{if($NF>=20) print $1}'
+		使用场景：对awk取得的整行或者某个字段做条件判断
+
+	7.2while 循环
+		语法：while (condition) statement
+		条件真进入循环，条件假退出循环
+	
+	使用的场景：对一行内的多个字段进行逐一类似处理时使用，对数组中的各个元素进行处理；
+	awk '/^[[:space:]]*linux16/{i=1;while(i<NF) {print $i,legth($i),i++}}' /etc/grub2.cfg
+	awk '/^[[:space:]]*linux16/{i=1;while(i<NF) {if(length($i)>=7) {print $i,legth($i)};i++}}' /etc/grub2.cfg
+
+	7.3do-while循环
+		语法:do {statement} while(condition)
+			意义：至少执行一次循环体
+	7.4 for 循环
+		语法：for (expr1;expr2;expr3) {statement}
+			for(variable assignment;condition;iteration process)
+			awk '/^[[:space:]]*linux16/{for(i=1;i<NF;i++) {print $i,legth($i),i++}}' /etc/grub2.cfg
+		特殊用法:
+			遍历数组中的元素；
+			语法：for(var in array) {for body}
+	7.5 switch语句
+		语法：switch(expression) {case VALUE1 or /REGEXP/ : statement; case VALUE2 or /REGEXP/ ;case VALUE3 or /REGEXP/ ;...default :statement}
+
+	7.6 break 和continue 
+		break [n]
+		continue 
+
+	7.7next
+		提前结束对本行的处理直接进入下一行
+	
+		awk -F: '{if($3%2!=0) next;print $1,$3}' /etc/passwd
+8.array
+	关联数组：array[index:expression]
+		index expression	
+			(1)可使用任意字符:字符串要使用双引号，单引号引用program 
+			(2)如果某数组元素在事先并不存在，在引用的时候，awk会自动创建此元素，并将其值初始化为“空串”
+			若要判断数组中是否存在元素，则要使用"index in array"格式进行
+
+			weekday["mon"]="Monday"
+			
+
+		若要遍历整个数组,需要使用for循环
+
+			for(var in array) {for body}
+			awk 'BEGIN{weekdays["mon"]="Monday",weekdays["tue"]="Tuesday";for(i in weekdays) {print weekdays[i]}}'
+			注意:var 会遍历array 每个索引
+			netstate -tan | awk '/^tcp\>/state[$NF]++ END{for(i in
+			state) {print i,state[i]}}'
+			systemctl status httpd.service 	查看服务是否开启
+
+			awk '{ip[$1]++} END{for (i in ip) {print i,ip[i]}}' /var/log/httpd/access_log 
+			统计/etc/fstab中每个文件系统出现的个数
+			awk '/^UUID/{fs[$3]++}END{for (i in fs) {print i,fs[i]}}' /etc/fstab
+			统计文件中每个单词出现的次数
+			awk '{for(i=1;i<=NF;i++) {count[$i]++}} END { for(i in count){print 1,count[i]}}' /etc/fstab
+
+9,函数 
+	9.1 内置函数
+		数值处理：
+			rand() 取0和1之间的一个随机数
+		字符串处理：
+			length([s])
+			sub(r,s,[t]):以r表示的模式查找t所表示的内容,并将第一次出现的替换为s所代表的内容	
+			split(s,a[,r])以r为分隔切割字符，并将切割后的结果保存至a所表示的数组中
+			netstat -tan | awk '/^tcp\>/ {split($3,ip,":");count[1]++} END{ for(i in count ) {print i,count[i]}}'
+			count() 
+
+	9.2 自定义函数
+
+
+
+
+
+				
+
+
+
+
+
+
+	 	
+
+
+	
+	
+
+
+
+
+
+	
+
+	
+
+
+			
+
+
+
+
+	
+
+
+

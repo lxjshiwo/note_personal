@@ -1,0 +1,143 @@
+GUI:图形shell
+CLI:命令行的shell
+内核的功能：
+进程管理 
+内存管理 
+文件系统
+网络功能
+硬件驱动
+安全机制
+批处理系统：
+
+Multics 
+ken,
+    space Travel
+dec;
+    PDP-11,PDP-7
+Unics --> Unix
+B-->C
+    VAX
+PDP-
+
+BILL Joy:BSRG
+
+BSD:Berkeley System Distribution 
+
+System V
+
+81,Microsoft ,Xenix
+
+CP/M-->DOS
+
+jobs 
+Xerox:复印机
+PARK
+
+FreeBSD
+OpenBSD
+NetBSD
+
+Sun MicorSystem
+
+Sun os -->Solaris 
+
+CSH
+
+Windows NT Server 
+
+Andrew: Minix
+Linus:Linux
+
+80,Stallman,Freedom
+
+GNU: GNU is Not Unix 
+GPL:General Public license 
+
+开源：
+自由：
+自由获取，自由修改，自由学习 
+Emacs:文本编辑器
+gcc:GNU C Complier 
+bash:
+
+Linux:glibc,gcc
+
+GNU/Linux
+
+源代码：c-->编译成二进制（交叉编译）
+
+ABI:Aplication Binary Interface `
+
+Rethat
+SLS
+Debian 
+SUSE
+将元代码编译成可用 
+发行商：release 
+
+kernel :2w
+
+Debian,dpt 
+RetHat,rpm
+
+Ubuntu:Mint 
+
+CentOS:Community ENterprise OS
+
+Linux:3.7
+RHEL 3.0 ,4.0 ,5.0,6.0 
+
+linux 基本原则 
+1.由目的单一的小程序组成，组合小程序完成复杂任务 
+2.一切皆文件
+3.尽量避免捕获用户借口
+4.配置文件保存问纯文本格式
+GUI接口：
+CLI接口：
+        命令提示符，prompt,bash(shell)
+            #:root
+            $:普通用户 
+        命令：
+
+命令格式：
+    命令 选项 参数
+        选项：
+            短选项： -
+                多个选项可以组合 -a -b=-ab  
+            长选项： --word
+        参数：命令的作用对象
+
+使用凭证：
+
+root,redhat
+
+虚拟终端（terminal）:ctrl+atl+F1~
+                    ctrl+alt+F7 图形界面 
+                    start x &
+GUI:
+    Gnome
+    KDE
+    XFace
+
+CLI:
+    sh
+    bash
+    csh 
+    zsh
+    ksh 
+    tcsh 
+
+root,student,visitor
+
+su: switch user 
+# su[-l] 用户名
+
+#passwd 
+密码复杂性原则：
+1.使用4中类别字符中至少3种
+2.足够长，大于7位
+3.使用随机字符串；
+4,定期更换
+5.循环周期足够大 
+
+

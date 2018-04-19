@@ -1,0 +1,190 @@
+Flask
+    轻量级的微内核框架
+    Django 全
+    FLask没有orm
+    有路由 有模板 没有缓存没有后台 没有数据验证
+
+
+    Python包管理工具
+        eazy_install 
+        pip 
+            pip install 
+            pip uninstall 
+            pip list
+        
+        全局安装
+    Flask应用基本构成
+    from Flask import flask
+    Flask路由
+        @app.route()
+            默认请求方式为get
+            @app.route('/',methods=['POST'])
+            localhost:port/xxxx
+            @app.route('/user/<id>',methods=['POST'])
+                def user(id)
+                    return id
+        from Flask import request 
+            request.args.get()
+                eg.
+                    localhost:port?id=xxxx
+                    @app.route('/query_user')
+                    def query_user():
+                        id = request.args.get('id')
+        
+    Flask反向路由
+        import url_for
+        @app.route('/query_url')
+        def query_url():
+            return url_for('query_url')
+    
+
+    Flask模板
+        模板引擎
+            jinjia2
+        
+        模板简单实用
+            import render_template
+            return render_template(template,var_name=var)
+            在模板中
+                {{var_name}}
+                通过.取得相应的属性
+
+            创建相应的models.py创建相应的传输数据类
+                from models import 类名
+
+
+        条件语句
+            {% if %}
+                statement
+            {% else %}
+                statement
+            {% endif %}
+                
+        循环语句
+            {% for var in var_list%}
+            statement
+            {% endfor %}
+
+        模板继承
+            提高代码复用
+        模板
+            {% block content%}
+            {% endblock %}
+        子类
+
+            {% extends "模板名称"%}
+            {% block content %}
+            {% endblock %}
+
+        消息提示与异常处理
+            消息闪现机制
+             import flash
+             配合使用
+                app.secret_key = '密码'
+             flash("提示语句")
+
+             在模板中
+                {{ get_flashed_message()[number]}}
+            
+            
+       消息提示与异常处理          
+            定义app.secret_key flask通过screct_key对消息进行加密
+            使用flash("警告消息")
+
+
+       异常处理
+        装饰器
+            @app.errorhandler(相应的错误)
+                eg:
+                    @app.errorhandler(404):
+                    def not_found():
+                        return render_template("404.html")
+            abort(错误代号)
+                eg:abort(404)
+
+        
+
+        CGI
+            运行在服务器上的程序，提供客户端HTML页面的接口，
+            不限定使用语言
+
+
+            每次CGI请求都要生成一个程序副本来运行
+            FastCGI
+            mod_perl
+
+
+
+            CGI程序都接受一些环境变量，这些环境变量可有:
+                CONTENT_TYPE:指示传递来的信息的类型
+                HTTP_COOKIE:客户机的COOKIE
+                REMOTE_ADDR:发送请求的客户机的IP地址
+                REQUEST_METHOD:脚本被调用的方法，GET和POST方法
+                    GET方法数据信息会包含在请求的URL上,以?URl与变量分割,&变量间相互分割
+                        可被浏览器缓存  
+                        会保存在历史记录中
+                        有长度限制
+                        不应用与敏感场合
+
+
+            Python中的自带服务器
+                BaseHTTPServer:提供基本的web服务
+                SimpleHTTPServer:包含执行GET请求的SimpleHTTPRequestHandler类
+                CGIHTTPServer:
+
+
+
+             python -m CGIHTTPServer 8081
+                
+                创建目录
+                    cgi-bin
+                        main.py
+                    views
+                编写CGI程序
+                开启服务器
+                使用浏览器访问
+        
+        
+        
+        Web开发                     
+            框架
+                可重用
+                成熟，稳健
+                可扩展性良好
+
+
+                支持动态网站、网络应用程序
+                接收HTTP请求并处理、分派代码、产生HTML、创建HTTP响应
+                包括:URL路由、数据库管理、模板引擎等
+
+
+                着重业务逻辑
+                高度可重用
+
+
+             MVC
+             ORM Object-relational Mapping
+             URL Route
+             Template
+
+
+             Django
+
+             微框架
+                聚焦业务代码
+                逻辑需要开发
+                安装较多模块大小增大
+
+
+             Flask
+                保持核心简单、易于扩展
+                不包含数据库抽象层，表单验证等，可以添加扩展
+                
+
+
+                
+            
+            
+
+
+

@@ -1,0 +1,209 @@
+useradd [options] USERNAME 
+    -u UID
+    -g GID  
+    -G GID,...
+    -c "COMMENT"
+    -d /path/to/somedirectory 
+    -s SHELL  
+    -m 创建家目录-k将SKEL目录(shell的基本配置文件目录)下的文件一起复制到家目录下
+    -M 不创建家用户的家目录
+    -r：添加系统用户 通常不能登陆系统 不创建家目录
+
+/etc/login.defs 
+环境变量：
+    PATH
+    HISTSIZE
+    SHELL
+/etc/shells:指定了当前可以使用的shell的路径
+
+userdel:默认不会删除USER的家目录
+userdel [options] USERNAME
+        -r 删除用户的同时删除家目录
+
+id：查看用户的属性信息
+    id [options] USERNAME
+       -u 
+       -g
+       -G
+       -n 现实名称非id
+finger:查看用户帐号信息
+finger USERNAME
+
+修改用户帐号属性：
+usermod 
+    -u UID
+    -g GID事先存在的组
+    -G GID,此前的附加组覆盖
+    -a -GG GID 额外指定新的附加组
+    -c 
+    -d改变家目录-m将此前的文件移动到新的家目录下
+    -s
+    -e 过期时间
+    -l改变用户的名字
+    -L锁定账户
+    -U解锁帐号
+chsh:更改用户的shell
+chfn:更改用户的注释信息
+
+密码管理：
+passwd [USERNAME]
+    --stdin 从标准输入读取密码
+    -l锁定用户
+    -u解锁用户
+    -n 
+    -d 删除用户的密码
+
+echo "redhat" | passwd --stdin user
+pwck :检查用户帐号完整性
+组管理：
+groupadd 
+    -g GID
+    -r 添加系统用户组
+
+groupmod:
+    -g GID
+    -n GRPNAME
+
+groupdel:
+
+gpasswd:为组设定密码
+newgrp  GRPNAME<-->exit
+
+创建一个用户mandriva ,其id号为2002基本组为distro （组id为3003） 附加组为linux
+# groupadd -g 3003 distro 
+# groupadd linux
+# useradd -g distro -G linux mandriva   
+创建一个用户fedora ,全名为Fefora Community ,默认shell为tcshell  
+useradd -c "Fedora Community" -s /bin/tcsh fedora 
+修改mandriva 的id 号为4004,基本组为linux 附加组为distro和fedora
+# usermod  -u 4004 -g linux -G fedora,distro mandriva 
+给fedora加密码，并设定最短使用期限为2天，最长为50天
+passed -n 2 -x 50 fedora 
+mandriva 的默认shell 改为/bin/bash  
+usermod -s /bin/bash mandriva
+添加系统用户hbase，且不允许登陆系统
+# useradd -r -s /sbin/nologin hbase 
+
+chage:
+    -d；最近一次修改时间
+    -E:过期时间
+    -I: 非活动时间  
+    -m:最短使用期限
+    -M:最长使用期限
+    -w:警告时间
+
+权限管理：
+r:
+w:
+x:
+
+
+三类用户
+u:属主
+g:属组
+o:其他用户
+
+chown:改变文件属主 只有管理员可以
+# chown USERNAME file... 
+    -R：修改目录及其内部文件的属主
+    --reference=/path/to/somefile file...其属主属组一起改变为与目标文件一样 
+chown USERNAME:GRPNAME file,... 同时改变属主和属组
+
+#chgrp GRPNAME file...
+    -R
+    --reference=/path/somefile file...
+
+chmod:修改文件权限
+修改三类用户的权限：
+chmod MODE file,...
+    -R 
+    --reference =/path/to/somefile file...
+修改某类用户的权限：
+u,g,o,a
+chmod 用户类别=MODE file
+chmod go=rw /tmp/abc
+chmod g=rx,o= /tmp/abc
+修改某类用户的某位权限：
+u,g,o,a
+chmod 用户类别+|- MODE file 
+chmod u-x /tmp/abc
+chmod u+x,g-x /tmp/abc
+新建一个没有家目录的用户openstack
+useradd -M openstack
+复制/etc/skel到/home/openstack
+cp -r /etc/skel /home/openstack
+改变/home/openstack及其内部文件的属主属组均为openstack
+chown -R openstack；openstack /home/openstack
+/home/openstack及其内部文件，属组和其他用户没有任何访问权限
+chmod -R go= /home/openstack 
+
+手动添加用户hive 用户组为5000,附加组为mygroup
+/etc/group
+mygroup:hive
+hive:x:5000:
+/etc/passwd
+hive:x:5000:Hive:/home/hive:/bin/bash
+/etc/shadow
+hive:!!:time:0:9999:7:::
+计算最后修改的时间time bc $(date +%s)/86400 scale=2 保持两位精度
+cp -r /etc/skel /home/hive 
+chown -R hive.hive /home/hive 
+chmod -R go= /home/hive
+openssl passwd(redhat)
+openssl passwd -1 -salt '12345678'(加入用户的随机八位数字)
+在/etc/shadow 中加入生成的密码
+passwd hive 
+
+umask:遮罩码
+创建文件：666-umask
+创建目录：777-umask 
+# umask
+# umask 022
+
+umask 023
+文件：666-023=643 
+应该为644
+文件默认没有执行权限 如果有执行权限则直接将权限加1
+目录：777-023=754
+使用户的umask为027则其附属的组的权限全都没有
+
+
+
+
+站在用户的角度，shell的类型：
+登陆式shell:
+    正常通过某终端登陆的shell
+    su - USERNAME
+    su -l USERNAME
+非登陆式shell:  
+    su USERNAME
+    图形终端下打开命令窗口
+    自动执行的shell脚本
+
+bash的配置文件：
+全局配置：
+        /etc/profile,/etc/profile.d/*.sh,/etc/bashrc
+
+个人配置：
+        ~/.bash_profile,~/.bashrc
+profile类的文件：
+    设定环境变量
+    运行命令或脚本
+
+bashrc类的文件：
+    设定本地变量
+    定义命令别名
+
+
+
+登陆式shell如何读取配置文件
+/etc/profile-->/etc/profile.d/*.sh-->~/bash_profile-->~/.bashrc -->/etc/bashrc
+
+非登陆式shell
+~/.bashrc-->/etc/bashrc -->/etc/profile.d/*.sh
+
+
+.bash_profile
+echo"hello"
+脚本解释器
+命令总结：useradd,groupadd,su,id,   useradd,userdel,groupmod,passwd,newgrp,pwck,gpasswd,chage,chsh,chfn,finger,

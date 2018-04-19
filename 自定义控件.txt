@@ -1,0 +1,43 @@
+1.系统自带控件进行修改
+2.自定义一个类继承view
+3.自定义一个类继承ViewGroup
+
+
+增加减少相应控件的功能
+尽量采用系统控件去实现，自定义控件增加工作量或者带来新bug
+a.View和ViewGroup的区别
+b.Android中的事件传递
+c.View 的原理
+
+文本控件:TextVIew和EditText
+图片控件:ImageVIew
+按钮控件：Button ImageButton
+进度条 ProgressBar
+单选按钮    radioButton CheckBox
+复选按钮
+状态开关按钮 toggleButton
+时钟控件    AnalogClock DigitalClock
+日期与时间选择控件DatePicker和TimePicker
+
+
+
+系统控件重新组合
+    1.优酷菜单
+        默认情况下，大图片覆盖小图片使得小图片不可选择，将声明顺序由大到小则可选
+        
+    2.广告效果
+    3.下拉框
+
+自定能继承View
+    自定义开关
+    自定义属性
+    水波纹
+    练习人快速索引
+
+自定义继承ViewGroup
+    仿VIewPager功能
+    侧滑删除菜单
+
+
+
+

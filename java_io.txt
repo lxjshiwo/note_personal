@@ -1,0 +1,378 @@
+    
+实现eclipse utf-8编码
+    window --> preference --> content
+    window --> preference --> java
+
+
+
+1.io编程
+    1.文件流的基本概念
+        文件子啊程序中以流的形式操作
+
+                输入流
+        内存 <-------------  文件
+            --------------->
+                输出流
+
+        数据项内存流动输入流，反之输出流
+    2.掌握文件编程的方法
+    3.把握字节流和字符流
+
+
+    数据源的一种
+
+
+
+
+    File
+
+
+    FileDescriptor        | ByteArrayInputStream
+    RandomAccessFile      | FileInputStream
+                          |
+                          |
+    InputStream   <-------|
+
+
+
+
+                        |
+    OutputStream<-------|
+
+
+                   | CharArrayRreader
+                   | PipeReader
+                   | StringReader
+    Reader  <------| BufferedReader  ------LineNumberReader
+                   | InputStreamReader -----FileReader
+                   | FilterReader     ------PushbackReader
+  
+  
+  
+   Writer<-------|  CharArrayWriter
+                 |-----------------------PipeWriter
+                 |  StringWriter
+                 |  OutputStreamReader  ----FileWriter
+                 |-----------------------FilterWriter
+                 |  BufferedWriter
+                 ------------------------PrintWriter
+   
+   
+    
+   
+   
+   
+   java流分为两类 
+        1.字节流:可以用于读写二进制文件及任何类型的文件 byte
+        2.字符流:可以用于读写文本文件，不能操作二进制文件 
+
+                字节流       字符流
+        输入    InputStream     Reader  
+        输出    OutputStream    Writer
+
+
+   File类
+    import java.io.*;
+    File(String,pathname)
+     通过将给定路径的名字符串转换为抽象路径名来创建一个新的File实例
+        .getAbsolutePath()
+            操作系统分配最小空间为4kb
+        .length()
+            大小
+        .canRead()
+        .canWrite()
+        .exixts()
+        .createNewFile()
+        .mkdirs()
+        .isDirectory()
+        .listFiles()
+        .getName()
+
+常用io流 
+    文件字节流
+        可以操作任何类型的文件
+        因为File没有读写的方法需要使用InputStream
+    
+    FileInputStream
+        .read(byte[] b)
+            从此输入流中将最多 b.length个字节的数据读入一个byte数组中
+            后面加入字节对象
+            返回读入缓冲区的字节总数，如果因已经到达文件末尾而没有更多数据则返
+            回-1
+
+            IOException
+            一定要关闭相应的文件流
+            防止于finally异常抛出处
+        String([字节数组,0,字节数])
+            将byte转换为String
+    FileOutputStream
+        .write()
+            byte[]
+            int 
+            byte[] b,int off,int len
+            \r 确定
+            \n 换行符号
+
+
+            将String转换为byte
+                String.getBytes()
+
+        
+     文件字符流
+
+     FileWriter   
+        .read()
+            char[]  int start int off 
+
+
+
+
+                输出流
+                    Writer
+                    OutputStream  字节
+        内存    --------------->   文件
+                <--------------- 
+                输入流
+                    Reader
+                    InputStream
+
+     缓冲字符流
+        BufferedReader
+        BufferedWriter
+            直接操作String
+
+
+            *br = new BufferedReader("path")报错
+                constructer undefined
+        创建方法
+            先创建一个FileReader对象
+            FileReader fr = new FileReader(path)
+            再升级为BufferedReader
+            BufferedReader br = new BufferedReader(fr);
+
+
+            .readLine()
+                支持整行读取
+
+
+创建一个记事本        
+    文件选择组件
+        JFileChooser
+
+/*
+ * 我的记事本（界面加功能）
+ */
+
+package com.test7;
+
+
+import java.io.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+
+public class NotePad extends JFrame implements ActionListener
+{
+
+    //定义需要的组件
+    JTextArea jta = null;
+    //菜单条
+    JMenuBar jmb = null;
+    //定义JMenu
+    JMenu jm1 = null;
+    //定义JMenuItem (JMenuBar里面的项目)
+
+    JMenuItem jmi1 = null;
+    JMenuItem jmi2 = null;
+
+
+
+
+
+
+	public static void main(String[] args) {
+		// TODO 自动生成的方法存根
+        NotePad np = new NotePad();
+
+	}
+
+
+    //构造函数
+    public NotePad()
+    {
+        jta = new JTextArea();
+        jmb = new JMenuBar();
+        jm1 = new JMenu("文件");
+        //设置助记符
+        jm1.setMnemonic('F');
+        jmi1 = new JMenuItem("打开");
+        jmi2 = new JMenuItem("保存");
+        //注册监听
+        jmi1.addActionListener(this);
+        jmi1.setActionCommand("open");
+
+        jmi2.addActionListener(this);
+        jmi2.setActionCommand("save");
+
+
+        //加入
+        this.setJMenuBar(jmb);
+        //把jm1放入jmb
+        jmb.add(jm1);
+       
+        //把item放入Menu中
+        jm1.add(jmi1);
+        jm1.add(jmi2);
+
+
+
+        //放入JFrame
+        this.add(jta);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(400,300);
+        this.setVisible(true);
+
+    }
+
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO 自动生成的方法存根
+       //判断式哪个菜单被选中
+       if(arg0.getActionCommand().equals("open"))
+       {
+            //System.out.println("open");
+            //推荐组件JFileChooser
+            //文件选择组件
+            JFileChooser jfc1 = new JFileChooser();
+            jfc1.setDialogTitle("请选择文件");
+            //使用默认方式
+            jfc1.showOpenDialog(null);
+            //显示
+            jfc1.setVisible(true);
+
+            //得到用户选择的文件全路径
+            String filename = jfc1.getSelectedFile().getAbsolutePath();
+            FileReader fr = null;
+            BufferedReader br = null;
+            try
+            {
+            	fr = new FileReader(filename);
+            	br = new BufferedReader(fr);
+                //从文件读取并显示到jta
+                String s = "";
+                String allCon = "";
+                while((s = br.readLine()) != null)
+                {
+                    allCon += s + "\r\n";
+
+                }
+                //将内容防止于jta
+                jta.setText(allCon);
+            }
+            catch(Exception e)
+            {
+            	e.printStackTrace();
+            }
+            finally 
+            {
+                try {
+					fr.close();
+					br.close();
+				} catch (IOException e) {
+					// TODO 自动生成的 catch 块
+					e.printStackTrace();
+				}
+ 	
+            }
+
+       }
+       else if(arg0.getActionCommand().equals("save"))
+       {
+    	   System.out.println("save");
+            //出现保存对话框
+            JFileChooser jfc = new JFileChooser();
+            jfc.setDialogTitle("另存为...");
+            jfc.showSaveDialog(null);
+            jfc.setVisible(true);
+            //得到用户希望吧文件保存到何处，绝对路径
+            String filename = jfc.getSelectedFile().getAbsolutePath();
+            //准备写入到 指定文件即可
+            FileWriter fw = null;
+            BufferedWriter bfw = null;
+            
+            try {
+				fw = new FileWriter(filename);
+				bfw = new BufferedWriter(fw);
+				bfw.write(this.jta.getText());
+			} catch (IOException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+            finally
+            {
+            	try
+            	{
+            		bfw.close();
+            		fw.close();
+            		
+            	}
+            	catch(Exception e)
+            	{
+            		e.printStackTrace();
+            	}
+            	
+            }
+
+       }
+			
+	}
+
+}
+
+        
+        
+数据库 
+    a.字段
+    b.字段类型
+    c.表行
+    d.表列
+    e.记录
+
+    对表进行增加，删除，修改
+    DDL
+        CREATE DROP ALTER
+    DML
+        INSERT UPDATE DELETE
+    DQL
+        SELECT
+    DCL
+        GRANT REVOKE COMMIT(保持原子性) ROLLBACK
+
+
+    创建数据库
+        --注释
+        CREATE DATABASE database_name
+        USE database_name
+        GO执行
+        CREATE TABLE table_name (col_name1 datatype,...)
+
+
+        --添加数据
+        INSERT INTO table_name VALUES(value1,value2...)
+        --查询数据
+        SELECT * FROM 
+        --删除表(表结构和数据一起删除)
+        DROP TABLE table_name
+
+    
+            
+        
+    
+    
+
+
+
+

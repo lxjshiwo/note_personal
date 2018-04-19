@@ -1,0 +1,362 @@
+bind安装:bind bind-libs,bind-utils
+正向解析区域：
+    (1)zone "ZONE_NAME" IN
+    {
+            type master;
+            file "ZONE_NAME.zone";
+            };
+    (2)区域解析库
+        SOA,NS,MX,A,CNAME
+反向解析区域：
+    (1)zone "Reverse_Net_Addr.in-addr.arpa" IN
+    {
+            type master;
+            file "SOMEFILE.zone"
+            };
+    (2)区域解析库
+        SOA,NS,PTR
+
+   测试工具：dig,host,nslookup
+   
+   主从同步：
+        主服务器，授权允许同步：
+            (1)NS记录
+            (2)授权允许区域传送
+        从服务器：
+            (1)只需定义区域
+
+
+
+
+DNS and BIND (3)
+
+    子域授权:分布式数据库
+
+    正向解析区域的子域方法：
+        
+        定义一个子区域：
+            ops.magedu.com. IN  NS  ns1.ops.magedu.com. (在3级上依然不为A,则标明这是一个子域解析库,子域和父域不需要在统一个域名内)
+
+            ops.magedu.com. IN  NS  ns2.ops.magedu.com. 
+            ns1.ops.magedu.com. IN  A   1.1.1.1
+            ns2.ops.magedu.com. IN  A   1.1.1.2
+            fin.magedu.com  IN  NS  ns1.fin.magedu.com.
+            fin.magedu.com  IN  NS  ns2.fin.magedu.com.
+            ns1.ops.magedu.com. IN  A   3.1.1.1
+            ns2.ops.magedu.com. IN  A   3.1.1.2
+
+        定义转发服务器：
+            注意：被转发的服务器需要能够为请求者做递归，否则，转发请求不进行;
+            默认情况下BIND中的dnssec是打开认证的，为了能让父子域的服务器相互能够进行通行，需要将父子域的named.conf 文件中的dnssec关闭，
+            dnssec-enable no;
+            dnssec-validation no;
+            
+            (1)全局转发: 凡是非本机所负责解析的区域的请求，统统转发给指定的服务器：
+            first:先递归后迭代
+            Options
+            {
+              forward {first|only};
+              forwarders {IP;}
+            }
+            (2)区域转发：仅转发特定区域的请求至某服务器,对未有增加的区域无法进行解析：
+			zone "ZONE_NANE" IN {
+			type forward;
+			forward{first|only}; 
+			forwarders {IP;}
+			}
+            
+
+            注意：关闭dnssec功能：
+            dnssec-enable no;
+            dnssec-validation no;
+                同时开启区域转发，和全局转发的情况下，会先进行区域转发,精确查找地址，然后再进行全局转发
+			
+
+            在父域服务器上定义文件
+            在子域服务器上定义域文件：
+            zone "ops.magedu.com" IN
+            {
+                    type master;
+                    file "magedu.com.zone";
+            };
+            
+            /var/named/ops.magedu.com.zone
+            $TTL 1d
+            $ORIGIN ops.magedu.com.
+            @   IN  SOA     ops.magedu.com. admin.ops.magedu.com. 
+            {
+                        2015042501
+                        1H
+                        10M
+                        3D
+                        1D
+                    }
+                IN  NS  ns1
+                IN  NS  ns2
+            ns1 IN  A   172.16.100.12
+            ns2 IN  A   172.16.100.19
+            www IN  A   172.16.100.20
+            *   IN  A   172.16.100.20
+            chmod 640 ops.magedu.zone
+            chown :named ops.magedu.com
+
+            
+
+            forward first;
+            forwarders {172.16.100.1};
+
+            rndc reload 
+BIND中的基础的安全配置：
+    acl:把一个或者多个主机归并为一个集合，并通过一个统一的名字进行调用
+        acl acl_name{
+            IP;
+            ip;
+            net/prelen;
+        };
+
+        实例：
+            acl mynet{
+                    172.16.0.0/16;
+            }
+        bind有4个内置的acl:
+            none:没有一个主机
+            any:任意主机
+            localhost:本机
+            local:本机
+            localnet:本机的IP同掩码运算后
+
+        注意：acl只能先定义，后使用;因此，其一般定义在配置文件options的前面
+
+    访问控制的指令：
+        allow-query {}:允许查询的主机;白名单放置在options中对所有的zone生效，放置在单个zone文件中只对单个zone生效
+        allow-transfer {}:允许区域传送的主机：白名单
+        allow-recursion {}:允许递归的主机
+        allow-update {}:允许更新区域数据库中的内容 
+            
+bind view:        
+    逻辑子容器
+    视图：
+        一个bind服务器可以定义多个view,每个view中可以定义一个或者多个zone，每个view用来匹配一组客户端：  
+        多个view内可能需要对同一个区域进行解析，单使用不同的区域解析库文件;
+
+        view VIEW_NAME {
+                match-clients {};
+
+                }
+        注意：
+            (1)一旦启用了view,所有的zone都只能定义在view中， 
+            (2)仅有必要在匹配到允许递归请求的客户所在view中定义根区域   
+            (3)客户端请求到达时,是自上而下检查每个view所在服务的客户端列表;
+
+    步骤：
+        (1)将 named.conf 中的 zone “.”区域的命名
+
+
+
+        acl myenet {
+                172.16.0.0/16;
+                127.0.0.0/8;
+                }
+       在rfc文件中写入
+       view internal{
+               match-clients {mynet;};
+               allow-recursion {mynet;};    
+               }
+
+       zone "." IN {
+               type hint;
+               file "named.ca";
+               }
+
+
+       view external 
+       {
+               match-clients {any;};
+               zone “magedu.com” IN {
+                       type master;
+                       file "magedu.com.external";
+                       allow-update {none;};
+                       };
+
+               };
+
+
+     CDN:Content Delivery Network
+
+
+     智能dns:
+        dnspod
+        dns.la
+      
+    本地编译安装bind
+    yum groupinstall "Development Tools" "Server Platform   Development"
+    lftps
+    get bind(rpm包)
+    bye 推出
+    tar xf bind(rpm包)
+    
+    useradd -r  named
+    groupadd -r -g 53 named
+    useradd -u 53 -g named named -r 
+    ./configure --prefix=/usr/local/bind9 --sysconfig=/etc/named/ --disable-ipv6  --disable-chroot  --enable-threads
+    make 
+    make install
+
+
+    在安装好后需要进行一些列的配置
+    未在/etc/rc.d目录下有配置文件则无法使用service调用
+
+    vim /etc/profile.d/name.sh
+        export PATH=/usr/local/bind9:/usr/local/bind9/sbin:$PATH    
+    ./etc/profile.d/name.sh
+        
+    echo $PATH //将named的目录也纳入管理
+    则可以使用named-checkconf文件
+    
+    vim /etc/ld.so.conf.d/named.conf //导出库文件
+             /usr/local/bind9/lib
+    lsconfig -v重新读取文件
+    
+    ln -sv /usr/local/bind9/include /usr/include/named//导出头文件
+
+    vim /etc/man.config//编辑man文件
+        MANPATH /usr/local/bind9/share/man
+    man named
+
+    编辑named.conf文件
+        options {
+                directory "/var/named";
+                };
+       zone "." IN
+       {
+               type hint;
+               file "named.ca";
+       };
+
+       zone "localhost" IN  
+       {
+               type master;
+               file "   localhost.zone";
+               allow-update {none;};
+               };
+       zone "0.0.127.in-addr.arpa" IN  
+       {
+               type master;
+               file "named.local";
+               allow-update {none;};
+       };
+
+       mkdir /var/named  
+       在/var/named目录下创建自身需要的文件
+        1) 13个根节点的名称
+            dig -t NS . @IP > /var/named/named.ca//IP为一个dns服务器
+            vim localhost .zone
+
+               
+               localhost.zone文件 
+                $TTL    1d
+                @   IN  SOA     localhost.  admin.localhost.    (
+                2015042501
+                1h
+                5m
+                7d
+                1d
+     )
+                    IN  NS      localhost.
+                localhost IN    A   127.0.0.1
+
+            vim named.local
+               named.local文件
+                $TTL    1d
+                @   IN  SOA     localhost.  admin.localhost.    (
+                2015042501
+                1h
+                5m
+                7d
+                1d
+     )
+                    IN  NS      localhost.
+                1   IN  PTR     localhost.  
+
+               chmod 640 ./*
+               chown :named *
+               chmod 640 /etc/named/named.conf
+               chown :named /etc/named/named.conf
+               ls -l
+               named -u named -f-g -d  3
+               ss -tunlp
+               named -u named
+               killall named
+           以上配置完成缓存dns服务器，
+               完成区域服务器
+               vim /etc/named.conf
+
+               zone "magedu.com" IN
+               {
+                       type master;
+                       file "magedu.com.zone";
+                       allow-update {none;};
+               }; 
+
+               vim /var/named/magedu.com.zone
+               chmod 640 magedu.zone
+               chown :named magedu.com.zone
+               named -u named
+               
+
+               $TTL 86400
+               $OPRIGIN magedu.com.
+               @    IN  SOA ns.magedu.com.  admin.magedu.com.
+               (
+               2015042501
+               2h
+               10m
+               1w
+               1d
+               )
+                    IN  NS  ns
+               ns   IN  A   172.16.100.11
+               www  IN  A   172.16.100.22
+
+               使用rndc 
+               rndc-confgen -h 
+               卡住可能式熵池不够用
+               rndc-confgen -r /dev/urandom > /etc/named/rdc.conf
+               将相应的需要复制的内容复制到named.conf中
+               .,$-1 s@^#@@g
+
+               killall named
+               killall -SIGHUP named
+               rndc status
+               rndc reload
+
+               通过提供服务脚本从而使得service 服务可以使用
+
+            在编译的目录下有 contrib/目录
+            queryperf补充性质的工具
+            编译完成后直接在使用的方式
+            cp queryperf /usr/local/bind9/bin/
+            vim test    
+                magedu.com IN   A   
+            
+            queryperf   -d  test    -s 172.16.100.11    
+
+
+
+       
+
+
+     
+
+    isc.org 
+        bind-9.8
+        bind-9.9
+        bind-10
+
+
+
+
+
+    
+
+

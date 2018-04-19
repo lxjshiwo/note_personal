@@ -1,0 +1,11 @@
+weex
+    vue 技术构建原生应用
+    Vue html css js
+    Vue Node npm css javascript
+
+难点:坑多，Vue知识，原生应用，htmlcssweb
+搭建开发环境:
+    1.国内网络
+    2.搭建耗时
+    3.
+

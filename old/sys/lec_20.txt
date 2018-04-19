@@ -1,0 +1,433 @@
+CentOS系统上rpm管理程序包
+    安装,卸载,升级,查询,校验,数据库维护
+
+
+    安装：
+         rpm {-i|--install} [install-options] PACKAGE_FILE ... 
+            -v：verbose 
+            -vv
+            -h:以#号显示程序包嘎u能力执行进度，每个#表示%2
+
+
+            rpm -ivh PACKAGE_FILE ...
+
+                [install -options]
+                    --test：测试安装，但不真正执行安装过程;dry run模式
+                    --nodeps:忽略依赖关系
+                    --replacepkgs:重新安装  
+
+                    --nosignature:不检查来源的合法性
+                    --nodigest:不检查包的完整性 
+
+                    --noscripts:不执行脚本
+                        %pre:安装前脚本 --nopre
+                        %post:安装后脚本 --nopost
+                        %preun:卸载前脚本 --nopreun 
+                        %postun:卸载后脚本 --nopostun    
+    升级:
+        rpm {-U|--upgrade}  [install-options] PACKAGE_FILE ...
+        rpm {-F|--freshen}  [install-options] PACKAGE_FILE ...
+            upgrade:安装有旧版程序包，则升级；如果不含旧版程序包，则安装
+            freshen:安装有旧版程序包，则升级；如果不含旧版程序包，则不执行升级操作 
+            rpm -Uvh PACKAGE_FILE
+            rpm -Fvh PACKAGE_FILE
+
+            --oldpackage:降级：用旧版程序包替换新版程序包
+            --force:强行升级    
+
+        注意：(1)不要对内核进行升级操作:Linux支持多内核版本相存，因此直接安装新版本
+              (2)如果原程序包的配置文件安装后曾被修改，升级时候，新版本提供的同一个配置文件并不会直接覆盖，而是把新版本的文件重命名(FILENAME.rpmnew)后保密
+    查询：
+        rpm{-q|--query}[select-options][query-options]
+             
+
+        [select-option]
+            -a 所有包
+            -f:查看指定的文件由那些程序包生成的
+            -p /PATH/TO/PACKAGE_FILE:针对尚未安装的程序包文件做查询操作
+
+            --whatprovides CAPABILITY:查询指定的CAPIBILITY由那个包所提供
+            --whatrequires CAPABILITY:查询指定的CAPIBILITY由那个包所依赖
+
+        [query-options]
+            --changelog:    查询rpm包的changelog
+            -c --configfiles: 查看配置文件
+            --conflicts :查看包会与那些文件相互冲突
+            -d: 查询程序的文档
+            -i: --info 
+            -l:查看指定的程序包安装后生成的所有文件
+            --scripts :程序自带的脚本片段
+            --triggers  
+            -R:查询指定的程序包所依赖的CAPABILITY
+            --provides:列出指定程序包所提供的CAPIBILITY 
+
+        用法：
+            -qi PACKAGE, -qf FILE, -qc PACKAGE, -ql PACKAGE, -qd PACKAGE
+            -qpi PACKAGE_FILE, -qpl PACKAGE_FILE,...
+            -qa
+
+
+    卸载：
+        rpm{-e |--erase } [--allmatches] [--nodeps] [--noscripts ]
+        [--notriggers] [--test] PACKAGE_NAME ...
+        --nodeps 忽略依赖关系
+
+    校验：
+        rpm{-V |--verify} [select options] [verify options]
+
+        S file Size differs
+        M Mode differs  (includes permissions and file type)
+        5 digest (formerly MD5 sum) differs
+        D device major/minor number mismatch 
+        U User ownership differs
+        G Group differs
+        T mTime differs
+        P capabilities differ 
+
+    包的来源合法性验证
+        完整性验证：
+
+        公钥加密：
+            对称加密：加密，解密使用同一密钥
+            非对称加密：密钥是成对的
+                public key:公钥,可以公开 
+                private key:密钥，不能公开
+        导入所需要的公钥：
+            rpm --import /PATH/FROM/GPG-PUBKEY-FILE
+            centOS 7发行版光盘提供的密钥文件:GPG-PUBKEY-FILE-CentOS-7
+
+    数据库重建：
+        rpm {--initdb | --rebuildb}
+            initdb:初始化
+                如果事先不存在数据库，则新建之，否则，不执行任何操作
+
+            rebuilddb:重建
+                无论当前是否存在,直接创建数据库
+
+回顾：Linux程序包管理器，rpm管理包
+    
+    rpm命令
+        安装：-ivh，--nodeps,--replacepkgs
+        卸载：-e,--nodeps
+        升级：-Uvh,-Fvh,--nodeps,--oldpackages
+        查询：-q,-qa,-qf,-qi,-qd,-q --scripts.-q changelog,-q --provides,
+        -q --requires
+        校验： -V
+
+        倒入GPG密钥：--import,-K,--nodigest,--nosignature
+        数据库重建：--initdb,--rebuilddb
+
+Linux程序包管理(2)：
+
+    CentOS:yum,dnf
+    
+    URL:ftp://172.16.0.1/pub/
+
+    YUM: yellow dog,Yellow Update Modifier
+
+    yum repository: yum repo
+        存储了众多的rpm包，以及包的相关元数据文件（放置于特定目录下，repodata）;
+        repodata 所在目录，就是仓库指向的路径
+
+        文件服务器：    
+            ftp://
+            http://
+            nfs://
+            file:// 
+
+    yum客户端
+        配置文件：
+            /etc/yum.conf 为所有仓库提供公共配置
+            /etc/yum.repos.d/*.repo 为仓库的指向提供配置信息    
+
+        仓库的定义：
+        [repositoryID]
+        name=Some name for this repository
+        baseurl=url://path/to/repository/ 等号两边不可以有空格
+        enabled={1|0}
+        gpgcheck={1|0}在安装前是否检查其来源性和
+        repo_gpgcheck={1|0}
+        gpgkey=URL gpg的密钥文件
+        enablegroups={1|0}是否支持在组
+        failovermethod={roundrobin|priority}默认为轮询
+            默认为：roundrobin
+        bandwith:贷款
+        username password 当某些服务器不支持匿名访问的时候则需要设定这两个值
+        cost= 
+             默认每个都为1000
+
+        将url设定为网页中出现repodata的网页 
+        repo不被启用时其enable=0
+
+
+    yum命令用法;
+        yum [options] [command] [packages...]
+        
+
+    显示yum仓库
+        repolist [all|enabled|disabled]
+
+    显示程序包
+        list 
+             list [all | glob_exp1] [glob_expr2] [...]
+             yum list {avaliable|installed |updates} [glob_exp1]
+    安装程序包
+        install package1 package2 package3 ....
+        reinstall package1 package2 package3 ....(重新安装覆盖形式安装)
+        
+
+    升级指定程序包
+        update [package1] [package2] ...
+
+        downgrade [package1] [package2] ...(降级)
+    
+    检查可以升级的包
+        check-update 
+
+    卸载程序包：
+        remove | erase package1 package2
+
+    查看程序包的信息：
+        info [...]
+    查看指定的特性(可以是某文件)是由那个程序包所提供：
+        provides | whatprovides feature1 [feature2] ...
+    清理本地缓存：
+        clean [packages | metadata | expire-cache |rpmdb |plugins |all ]
+
+    构建缓存：
+        makecache 
+
+    搜索相关信息：
+        search string1 [string2] ...
+
+        以指定的关键字搜索程序包名以及summary 信息  
+    
+
+    查看指定包所依赖的capabilities 
+        deplist package1 [package2] [...]
+
+    yum事务历史
+        yum history [info |list |packages-list|stats]
+
+    安装及升级本地程序包
+        localinstall  rpmfile1 [rpmfile2] ...
+
+    包组管理相关命令：
+        groupinstall group1 [group2] [...]
+        groupupdate group1 [goup2] [...]
+        grouplist group1 [group2] [...]
+        groupremove group1 [group2] [...]
+        groupinfo group1 [...]
+
+    建立一个指向本地cdrom的本地yum源
+    mount -r /dev/cdrom /media/cdrom 
+    mount 查看
+    cd media/cdrom 查看到有repodata
+
+    cd /etc/yum.repos.d
+    创建local.repo 文件
+
+
+    [base]
+    name=CentOS 7 Relaese 7.1 
+    url=ftp:///media/cdrom
+    enabled=1
+    gpgcheck=0
+
+yum
+    使用光盘作为本地Yum仓库
+    (1)挂载光盘至某目录：例如/media/cdrom
+        mount -r -t iso9600 /dev/cdrom /media/cdrom
+    (2)创建配置文件
+    [CentOS7]
+    name=
+    baseurl=
+    gpgcheck=
+    enabled=
+yum的命令行选项
+    --nogpgcheck:禁止gpg check
+    -y :自动回答为yes 
+    -q：静默模式
+    -disablerepo=repoidglob:临时禁用此处指定的repo
+    -enablerepo=repoidglob:临时启用此处指定的repo
+    --noplugins:禁用所有插件
+yum的repo配置文件中可用的环境变量
+    $releasever:当前OS的发行版的主版本号
+    $arch:平台
+    $basearch:基础平台
+    $YUM0-$YUM9
+    
+    
+
+    http://mirrors.magedu.com/$releasever/$basearch/os 
+
+创建yum仓库
+    
+    createrepo [options] <directory>
+        -basedir 选择创建的目录
+
+    createrepo ./
+
+程序包的编译安装：
+    testapp-VERSION-release.src.rpm 未经过编译的rpm包-->安装后使用rpmbuild命令制作成二进制格式的rpm包，然后再安装：
+
+        源代码-->预处理-->编译(gcc)-->汇编-->链接-->执行
+
+
+        源代码组织格式：
+            多文件：文件中的代码之间，很可能存在跨文件依赖关系；    
+
+            项目管理工具
+            c,c++:make(configure -->Makefile.in-->makefile)
+            java：maven 
+
+            编译安装的步骤：
+            ./configure:
+                (1) 通过选项传递参数，指定启用特性，安装路径：执行时会参考用户的指定以及makefile.in文件生成makefile
+                (2)检查依赖到的外部环境
+            make 
+                根据makefile文件，构建应用程序
+            make install: 
+
+        开发工具
+            autoconf:生成configure脚本
+            automake: 生成Makefile.in   
+
+        安装前查看install,readme文件
+
+
+        开源程序源代码
+            官方自建站点：
+            代码托管：  
+                sourceforge
+                github  
+                code,google.com
+
+        c/c++: gcc (GNU C Complier)
+
+        编译c源代码：            
+            前提：提供开发工具以及开发环境
+                开发工具：make,gcc
+                开发环境：开发库，头文件
+                    glibc:标准库
+
+                通过"包组"提供开发组件
+                    CentOS 6:"Developementv Tools" "Server Platform Developement",
+
+
+            第一步，configure脚本
+                选项：指定安装位置，指定启用特性
+
+                --help:获取支持使用的选项
+                    选项分类：
+                        安装路径设定:
+                            --prefix=/PATH/TO/SOMEWHERE:指定默认安装位置
+                            --sysconf=/PATH/TO/SOMEWHERE:配置文件安装位置
+
+                        System types:   
+
+
+                        Optional Pakages:
+                            --with-PACKAGs   
+
+
+                        Optional features:
+                            --disable-FEATURE
+                            --enable-FEATURE[=ARG]
+
+                第二步 make  
+                第三步 make install 
+
+            安装后的配置：
+                (1)导出二进制程序目录到PATH环境变量中
+                    编辑文件/etc/profile.d/NAME.sh
+                            export PATH=/PATH/TO/BIN:$PATH  
+
+                (2)导出哭文件路径
+                    编辑/etc/ld.so.conf.d/NAME.conf
+                        添加新的库文件所在目录至此文件中
+
+                    让系统重新生成缓存：
+                        ldconfig[-v]
+                (3)导出头文件
+                    基于链接的方式实现
+                    ln -sv
+
+                (4)导出帮助手册
+                    编辑/etc/man/config文件
+                        添加一个MANPATH
+
+
+练习：  
+    1,yum的配置和使用：包括yum .repository的创建
+    2,编译安装appache 
+
+
+
+
+
+
+
+             
+
+
+
+    
+
+        
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+        
+    查看提供的特性
+        help [command]
+
+
+        vim CentOS-Bese.repo 
+        [base]
+        name=BASE Repo on 172.16.0.1
+        baseurl=http://172.16.0.1/cobbler/ks_mirror/CentOS-6.6-x86_64/  
+        gpgcheck=0;
+
+        [epel]
+        name=Fedora EPEL for EL6 x86_64
+        baseurl=http://172.
+        
+
+
+
+
+    不允许多个rpm安装同时进行
+
+/var/lin/rpm
+
+
+                
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+

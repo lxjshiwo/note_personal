@@ -1,0 +1,1221 @@
+LAMP:
+    
+    a:apache,
+    m:mariadb,mysql,
+    p:php,perl,python
+
+
+    LAMMP:
+        memcached
+    LNMP：
+
+    静态资源：静态内容，客户端从服务器端获得的资源的表现形式与原文件相同：
+    动态资源：通常式程序文件:需要在服务器执行之后，将执行结果返回给客户端：
+    CGI:Common Gateway Interface通用网关接口
+    fastcgi:
+
+
+    程序=指令+数据
+
+
+    yun install php php-mysql mariadb-server
+    rpm -ql mariadb 
+    systemctl start  mariadb-service 
+
+    httpd+php:
+        modules:
+            安装了php-mysql 模块后，会增加php.conf配置文档
+            使用systemctl restart httpd.service 后报错，可能是因为修改的配置文件出现了错误,应该/etc/httpd/conf.module.d/00-mpm.conf重新修改配置文件加载不同的模块
+        cgi :
+        fastcgi(fpm)
+
+
+    请求流程:
+    Client --> (http) --> httpd --> (cgi) --> applocation server (program file) --> (mysql ) --> mariadb 
+
+
+    CentOS 7:
+        程序包：httpd,php,php-mysql,mariadb-server 
+            注意：php要求httpd使用prefork MPM,
+        启动服务：
+            systemctl start httpd.service
+            systemctl start mariadb.service 
+    CentOS 6:
+        程序包：httpd,php,php-mysql,mysql-server 
+        启动服务：
+            service httpd start
+            service mysqld start
+
+        测试
+            php程序执行环境：
+                test.php
+                <?php
+                    phpinfo();
+                ?>
+            测试php程序与mysql通信
+                test2.php
+                    <?php
+                        $conn = mysql_connnect('HOST','USERNAME','PASSWORD'); // '127.0.0.1' , 'root', ''
+                        if ($conn)
+                            echo "OK";
+                        else 
+                            echo "Failure";
+
+                        mysql_close();
+                    ?>
+
+
+        部署wordpress 
+            
+        unzip wordpress.zip
+        cp -a wordpress /var/www/html
+        cp wp-config-sample.php wp-config.php
+        vim wp-config.php 
+                define ('DB_NAME','wpdb') ;
+                define ('DB_USER','wpuser');
+                define ('DB_PASSWORD','wppassword');
+                define ('DB_HOST','localhost');
+                define ('DB_CHARSET','utf8');
+        mysql 
+            GRANT ALL ON wpdb.* TO 'wpuser'@'localhost' IDENTIFIED BY 'wppasswd'
+            GRANT ALL ON wpdb.* TO 'wpuser'@'127.0.0.1' IDENTIFIED BY 'wppasswd'
+            CREATE DATABASE wpdb
+            FLUSH PRIVILEGES    
+
+            exit
+
+        mysql -uwpuser -pwppasswd
+            SHOW DATABASES
+
+        tr -d  'a-zA-Z0-9' < /dev/unrandom |head -30|md5sum
+
+
+        phpMyAdmin:
+            mariadb的WebGUI 
+            unzip 
+            cp -a phpfile /www/htdocs
+            ln -sv phpfile pma 
+            cd pma
+            cp config-sample.inc.php config.inc.php
+            vim
+            yum install php-mbstring
+           
+
+        php解释器如何与mariadb交互
+            解释器无需要与mariadb交互,那些用到数据存储系统的程序才需要与数据存储交互
+            
+            存储系统：
+                文件系统：文件
+                SQL:MariaDB,Oracle,MSSQL,...
+                NoSQL:redis,mongodb,hbase...
+                NewSQL:
+
+php:
+    1,Scanning  
+    2,Parsing
+    3,Compilation
+    4,Execution
+
+
+    1,APC(Alternative PHP Cache)
+        http://pecl.php
+    2,eAccelerator
+        http://eacclerator.net/
+    3,XCache
+        http://xcache.lighttpd.net/
+    4,Zend Optimizer 和Zend Guard loader
+        http://www.zend.com/en/products/guard/runtime-decoders
+    5,NuSphere PhpExpress
+
+
+
+回顾：
+lamp,php
+    amp:Client --> http协议 --> httpd --> cgi协议 --> application server --> (program file) mysql 协议 --> mysqld
+    httpd+php:
+        httpd:prefork:libphp5.so
+        httpd event or woker:libphp5-zts.so
+    cgi:
+    fpm:
+
+
+    php:超文本预处理器  
+        zend engine 
+            opcode
+            excute
+
+
+            scaning --> parsing --> compilation --> excution
+
+LAMP(2)
+    
+    php:
+        
+        php解释器
+        配置文件：/etc/php.ini /etc/php.d/*.ini
+        配置文件（php.ini）在php启动时被读取，对于服务器模块版本的php,仅在web服务器启动时读取一次，对于CGI和CLI版本，每次本调用都会被读取
+         
+        ini:
+            [Foo]:section header
+            directive = value
+            ;:注释符
+
+            [SECTION]
+
+
+         [MYSQL]
+         allow_persistent  是否允许持久连接
+         default_socket
+         [MYSQLi]
+
+php.ini核心配置选项;http://php.net/manual/zh/ini.core.php
+http://php.net/manual/zh/ini.list.php
+          
+
+    mariadb(mysql):
+        数据结构模型：层次模型，网状结构，关系模型
+            
+          关系模型:
+            二维关系:row column
+        
+
+        关系型数据库的一种开源实现：
+        数据管理系统：DBMS
+
+
+        (1)第一范式(INF)
+        数据的每一列都是不可以再分割的，而不能是
+        (2)第二范式(2NF)
+        行可以单独标识,最次两行不可完全一样
+        (3)第三范式(3NF)
+        要求一个关系中不包含已在其他关系已包含的非主关键字的信息,每个字段除非是主键不允许在多张表中出现，属性不依赖其他非主属性，也就是在2NF的基础上
+
+        关系型  
+
+       RDBMS:
+        Mysql:Mysql,MariaDB,Percona-Server
+        PostgreSQL:简称为pgsql --> EnterpriseDB
+        Oracle:
+        MSSQL:
+        
+
+
+
+DBA:
+                
+
+                SQL语句
+
+
+          计划执行器        分析器
+          操作求解器        优化器
+
+
+
+          事务     文件和存取接口     恢复
+          管理器                     管理器
+
+          锁       缓存管理器
+          管理器   
+                   磁盘空间管理器
+
+
+
+
+        事务：
+            多个操作被当作一个整体对待
+            tom,jerry
+            8000，5000
+            8000-2000, 5000+2000
+            ACID:
+                A:原子性：
+                C:一致性:
+                I:隔离性:
+                D:持久性:
+            SQL:Structure Query Language
+                结构化查询语言：
+
+
+            数据存取协议：应用层协议，c/s
+                S:server监听于套接字，接受并处理客户端口的应用请求
+                C:client
+                    程序接口
+                        CLI
+                        GUI
+                    应用编程接口
+                        ODBC库:Open DataBase Connection
+            基础概念：
+                约束：constraint,向数据表提供的数据要遵守的限制 ：
+                    主键：一个或多个字段组合，填入的数据必须能在本表中唯一标识本行，必须提供数据，即NOT NULL：
+                       一个表只能有一个
+                    惟一键：一个或多个字段组合，填入的数据必须能在本表中唯一标识本行，允许为NULL
+                        一个表可以存在多个
+                    外键：一个表中某字段可填入数据取决于另外一个表的主键已经有的数据
+                    检查性：
+
+                索引：将表中一个或多个字段中的数据复制一份另存，并且此些数据需要按照特定次序排序存储
+
+
+                关系运算：
+                   选择:挑选出符合条件的行(部分)
+                   投影：挑选出需要的字段:
+                   连接：
+              数据抽象：
+                    物理层：决定数据的存储格式，即RDBmS在磁盘上如何组织文件 
+                    逻辑层：描述DB存储什么数据，以及数据存在什么样的关系
+                    视图层:描述DB中的部分数据：
+              关系模型的分类：
+                    关系模型：
+                    实体-关系模型：
+                    基于对象的关系模型 
+                    半结构化的关系模型
+              MariaDB:
+
+
+                    Unireg:
+                    
+
+                    安装Mysql:
+                        源代码：编译安装
+                        二进制格式程序包：展开至特定路径，并经过简单配置后便可以使用 
+
+                        程序包管理器的程序包：
+                            rpm:
+                                OS vender
+                                项目官方
+                            deb
+
+
+                    mariadb.org
+
+
+                    Mariadb的特性：
+                            插件式存储引擎:存储管理器有多种实现版本，功能特性均有可能略有差别,用户需要灵活选择
+
+                            存储引擎也称呼为表类型
+
+                            (1) 支持更多存储引擎
+                                MyISAM --> Aria,
+                                InnoDB -->XtraDB
+                            (2) 诸多扩展和新特性
+                            (3)提供较多测试组建
+                            (4)true open source 
+                     安装和使用mariadb
+                        CentOS 7: 直接提供 
+                        (1)
+                            直接安装mariadb 
+                            yum install mariadb-server mariadb
+                            systemctl start mariadb 
+                            systemctl stop mariadb 
+                            systemctl restart mariadb 
+                            systemctl enable mariadb
+                            mysql -u root -p
+                                初次没有密码
+                         (2)
+                          wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+                          rpm -ivh mysql-community-release-el7-5.noarch.rpm
+                          yum install mysql-community-server
+                          service mysqld restart
+                          mysql -u root
+
+                          set password for 'root'@'localhost' =password('password');
+                          rpm -qa |grep mariadb
+                            
+                          配置编码
+                          /etc/my.cnf
+                          [mysql]
+                          default-character-set = utf-8
+                          这里的字符编码必须和/usr/share/mysql/charsets/Index.xml中一致。
+
+                          把在所有数据库的所有表的所有权限赋值给位于所有IP地址的root用户。
+                          grant all privileges on *.* to root@'%'identified by 'password';
+                          create user 'username'@'%' identified by 'password';  
+
+
+
+
+                        CentOS 6:
+                            mariadb 配置文件
+                                通用二进制格式安装过程
+                                (1)准备数据目录
+                                    以/mydata/data
+                                (2)配置mariadb
+                                    groupadd -r -g 306 mysql
+                                    useradd -r -g 306 -u 306 mysql
+                                    tar xf mariadb
+                                    ln -sv
+                                    cd /usr/local/mysql      
+                                    chown -R root:mysql ./*
+                                    scripts/mysql_install_db --datadir=/mydata/data --user=mysql
+                                    cp sopport-files/mysql.server /etc/rc.d/init.d/mysqld
+                                    chkconfig -add mysqld
+                                (3)准备配置文件
+                                    配置格式：类ini格式，为各程序军通过单个配置文件提供配置信息
+                                        [prog_name] 
+                                        
+
+                                    配置文件查找次序：
+                                        /etc/my.cnf --> /etc/mysql/my.cnf -->   --default-extra-file=/PATH/TO/CONF_FILE --> ~/.my.cnf 
+                                            //如果有配置段的名字相同则越后找到的越是标准
+                                       #mkdir /etc/mydsql
+                                       # cp support-files/my-large.cnf /etc/mysql/my.cnf
+                                       添加3个选项  
+                                       datadir = /mydata/data
+                                       innodb_file_per_table = on //每张表单独的配置文件
+                                       skip_name_resolve = on
+                                        
+                                        mysqld_safe
+                                        mysqld_multi  多实例的mysql
+                                        
+
+
+                                       自己创建目录
+                                       mkdir /etc/mysql
+                                       cp support-files/my-large.cnf /etc/mqysql/my.cnf
+                                       vim /etc/mysql/my.cnf
+                                                [client] //客户端配置
+                                                [mysqld] 服务器端
+
+                                                port监听的端口
+                                                thread_concurency 线程数目，通常为cpu数量×2 
+                                                添加datadir = /mydata/data
+
+                                                    skip_name_resolve = on
+                                                    innodb_file_per_table = on 
+                                       内存在4g以上则可以使用 my-inodb-heavy-4G.cnf
+                                            service mysqld start
+
+
+
+                                       Mariadb程序的组成：
+                                            C:
+                                                mysql:CLI交互式客户端程序
+                                                mysqldump,mysqladmin...
+                                            S:
+                                                mysql_safe
+                                                mysqld
+                                                mysqld_multi
+                                      客户端与服务端
+                                      服务器监听的两种socket地址：
+                                            ip socket:监听在tcp的3306端口,支持远程通信
+                                            unix sock:监听在一个sock文件上(/tmp/mysql.sock, /var/lib/mysql.sock),仅支持本地通信
+                                                server:localhost,127.0.0.1
+                                      命令行交互式客户端程序：mysql
+                                            mysql:
+                                                -u USERNAME: 指明用户名:默认为root
+                                                -h HOST：服务器主机地址:默认为localhost
+                                                -p PASSWORD:用户的密码:默认为空
+                                                在第一次进入mysql后需要使用
+                                                SET PASSWORD = PASSWORD('密码') 修改相应的密码
+
+                                                注意：mysql用户帐号由两部分组成：'USERNAME'@'HOST';
+                                                HOST用于限制此用户可以通过哪些远程主机连接mysql服务;
+                                                    支持使用通配符
+                                                        %:匹配任意长度的任意字符
+                                                            172.16.0.0/16 172.16.%.%
+                                                        _:匹配任意单个字符
+                                                mysql_secure_installation:安全初始化
+                                                    mysql -u root -ppasswd
+                                                        /usr/local/mysql/bin/mysql_secure_insallation
+
+
+
+                                                        use mysql
+                                                        SELECT User,Host,Password FROM user
+                                                            exit 
+                                                 命令：
+                                                    客户端命令：本地执行
+                                                        mysql > help
+                                                        每个命令类都完整形式和简写格式
+                                                            status,\s
+
+                                                    服务端命令：通过mysql协议发往服务器执行并取回结果
+                                                        每个命令都必须有命令结束符号:默认为分号
+                                                        SELECT VERSION()
+
+
+                                            关系型数据库的常见组件：
+                                                数据库：database
+                                                表：table
+                                                    行:row 
+                                                    列:column
+                                                索引：index
+                                                视图：view
+                                                用户：user  
+                                                权限：privilege
+
+                                                存储过程：procedure
+                                                存储函数：function
+                                                触发器：trigger
+                                                事件调度器：event schedule
+
+
+
+                                      SQL语句：
+                                        DDL:Data Defination Language
+                                            CREATE,DROP,ALTER
+
+                                        DML:Data Mainipulation Language
+                                            INSERT,DELETE,UPDATE,SELECT
+                                            GRANT,REVOKE
+
+                                        数据库：
+                                            CREATE DATABASE|SCHEMA [IF NOT EXITS]'DB_NAME';
+                                            DROP DATABASE|SCHEMA [IF EXITS] 'DB_NAME';
+                                                
+                                                CHARACTER SET 'character set name'
+                                                COLLATE 'collate name'
+                                            查看所有支持的字符集： SHOW CHARACTER SET
+                                            查看支持所有排序规则：SHOW COLLATION
+                                         表：
+                                            CREATE TABLE [IF NOT EXISTS]tb_name (col1 datatype 修饰符，col2 datatype 修饰符) ENGINE=''
+
+                                            查看所有的引擎：
+                                            SHOW ENGINES;
+
+                                            查看表：
+                                            SHOW TABELS (FROM db_name  )
+                                            查看表结构:DESC [db_name.]tb_name
+                                            删除表：
+                                            DROP TABLE [IF NOT EXISTS] tb_name;
+                                                对象存储:
+                                                    TEXT:不区分大小写
+                                                        small
+                                                        mdedium
+                                                        long 
+                                                    BLOB:区分大小写
+                                                        small
+                                                        medium
+                                                        long 
+                                                    内置类型：
+                                                        ENUM
+                                                        SET
+                                            数据类型：
+                                                字符型:
+                                                    定长字符型CHAR(#)不区分大小写,BINARY(#)区分大小写
+                                                    变长字符型VARCHAR(#),VARBINARY(#)
+                                                数值型：
+                                                    精确数字型
+                                                        整型:int
+                                                            tinyint 一个字节
+                                                            smallint:小整型2字节
+                                                            mediumint：3bytes
+                                                            int:4bytes
+                                                            bigint:8bytes
+                                                        十进制:decimal 
+                                                    近似数值型
+                                                        单精度浮点
+                                                            float
+                                                        双精度浮点
+                                                            double
+
+
+
+                                            修饰符：
+                                                NOT NULL:非空约束
+                                                 DEFAULT VALUE :设定默认值
+
+
+
+
+
+
+
+                                            获取命令使用帮助：
+                                                mysql >HELP KEYWORD
+                                            查看：
+                                                mysql> SHOW DATABASES
+                                                步骤操作：
+                                                1)创建一个表
+                                                    CREATE DATABASE IF NOT EXISTS testdb ;
+                                                    use testdb ;
+                                                    CREATE TABLE tbl1 (id int NOT NULL,name VARCHAR(100) NOT NULL,age tinyint);
+                                                    SHOW TABLES;
+                                                    SHOW DATABASE;
+
+
+
+
+
+
+                            1,停止mysqld
+                            service mysqld stop     
+                            rpm -e mysq-server
+                            rm /val/log/mysqld.log.rpmsave
+                            lftp
+                            cd Source/
+                            mget 
+                             2,创建一个mysql用户
+                             groupadd -r mysqld     
+                             id mysql 
+                             tar xf madiadb -C /usr/local //展开一定要在/usr/local 目录下程序要求 或者在该目录下创建连接即可
+                             cd /usr/local 
+                             ln -sv marisdb mysql 由于创建后需要命名为mysql创建连接名称为mysql 
+                             3,将/usr/bin目录下的属主仍为root ,属组改为mysql
+                             cd mysql/
+                              chown -R root:mysql ./*
+                             4,data目录为存储数据的位置
+                                数据可以放在btfs上,也可以使用lvm2文件系统
+                                创建逻辑卷
+                                fdisk /dev/sda
+                                p
+                                n
+                                3   
+                                +20G
+                                w
+                                partx -a /dev/sda
+                                partx -a /dev/sda
+                                fdisk /dev/sda
+                                t
+                                3
+                                8e
+                                w
+                                partx -a /dev/sda
+                                pvcreate /dev/sda3
+                                vgs
+                                vgcreate myvg /dev/sda3
+                                lvcreate -L 10G -n  mydata myvg
+                                make2fs -t ext4 
+                                yum insatall xfsprogs //安装xfs需要额外使用的程序包
+                                modprobe xfs
+                                modinfo xfs
+                                mkfs.xfs /dev/myvg/mydata
+                                mkdir /muydata
+                                vim /etc/fstab
+                                    /dev/myvg/mydata /mydata    xfs     default     0  0      
+                                mount -a 
+                                mount 
+                                cd /mydata/
+                                ll
+                                chown mysql.mysql data    
+                                cd /usr/local
+                                ls scripts/ // 生成重要的原始表格的脚本位置
+                                        mysql_install_db
+                                mysql_install_db --help
+                                scripts/mysql_install_db --user=mysql --datadir=/mydata/data
+
+                                ls /mydata/data
+                                ls support-files/
+                                    mysql.server
+                                cp support-files/mysql.server /etc/rc.d/init.d/mysql.d  
+                                chkconfig --add mysqld
+                                chkconfig --list mysqld
+
+
+
+23_date
+
+MariaDB基础
+    关系：二维关系 表(行，列)
+    设计范式：
+        第一范式;字段是原子性的
+        第二范式:存在可用主键
+        第三范式：任何表都不应该有依赖其他表的非主键的字段
+    约束，主键，唯一键,外键,检查性约束
+    MariaDB安装方式：
+        源码编译安装：
+        通用二进制格式: 
+        包管理器(rpm,deb)
+            OS vender,程序官方：
+
+
+
+    SQL:
+        数据库组件：数据库，表，索引,视图，用户，权限
+            存储过程：存储函数，触发器，事件调度器      
+        创建数据库，设计数据表
+            字段：字段名，数据类型,数据类型的修饰符,约束
+        DDL,DML,DCL
+            DDL:CREATE,DROP,ALTER  
+            DML:INSERT(REPLACE),DELETE,UPDATE,SELECT
+            DCL:GRANT,REVOKE
+
+
+        数据类型：
+            字符：
+                变长字符：VARCHAR(#),VARBINARY(#)
+                定长字符：CHAR(#),BINARY(#)
+                内建类型：ENUM,SET
+                对象：TEXT,BOLB
+            数值：
+                精确数值：
+                    整型：INT   
+                        TINYINT,SMALLINT,INT,MEDIUMINT,BIGINT
+                    十进制：
+                近似数值： 
+                    单精度:FLOAT
+                    双精度:DOUBLE
+           日期时间：
+                日期：DATE
+                时间：TIME
+                日期时间：DATETIME
+                时间戳：TIMESTAMP
+                年份：
+                    YEAR(2),YEAR(4)
+
+
+
+
+            修饰符：
+                所有类型适用：
+	                NOT NULL
+	                DEFAULT
+	                UNSIGED
+                    PRIMARY KEY
+                    UNIQUE KEY
+                数值型适用:
+                    UNSIGED
+                    AUTO_INCREMENT
+
+            字段修饰符号：
+
+
+
+
+
+            数据库：
+                CREATE DATABASE [IF NOT EXITS] 'db_name'
+                    CHARACTER SET [=] CHARSET
+                    COLLATE [=] collate
+
+                SHOW CHARACTER SET;
+                SHOW COLLATIONS;
+
+                DROP DATABASE [IF EXISTS] 'db_name';
+
+
+           基础应用：
+
+            表：
+                CREATE TABLE [IF NOT EXISTS] 'table_name' (col1 type1,col2 type2...)
+                    col type1
+                    PRIMARY KEY(col1,...)
+                    INDEX(col1,...)
+                    UNIQUE KEY(col1,...)
+               表选项:
+                    ENGINE [=] engine_name
+                    ROW_FORMAT [=] {DEFAULT | DYNAMIC |FIXED | COMPRESSED | REDUNDANT| COMPACT} 
+                    TABLE_SPACE
+                    SHOW ENGINES;
+
+               获取帮助:
+                    
+
+                    mysql > HELP CREATE TABLE;
+               
+               查看创建命令：
+                    SHOW CREATE TABLE tbl_name
+               查看表状态
+                    SHOW TABLE STATUS LIKE 'tbl_name'\G
+
+
+
+           DROP TABLE [ IF EXISTS]'tbl_name'
+
+
+           ALTER TABLE 'tbl_name'
+                字段：
+                    添加字段：add        
+                        ADD col1 data_type [FIRST | AFTER col_name ]
+                    删除字段：DROP
+                    修改字段：alter, change,modifiy 
+                索引：
+                    添加索引:add
+                    修改索引：drop
+                表选项：
+                    修改:
+
+
+         查看表上的索引：SHOW  INDEXES  FROM  [db_name].tbl_name    
+
+
+         索引：
+            索引是特殊的数据结构:定义在查找时作为查找条件的字段： 
+
+            索引：要有索引名称，可以有字段名称;
+
+            创建索引：
+                CREATE INDEX  index_name ON tbl_name (index_col_name,...)
+            删除索引： //索引只要不使用便删除
+                DROP INDEX index_name on tbl_name
+
+
+       DML:INSERT,DELETE,SELECT,UPDATE
+            INSERT INTO:
+                INSERT INTO tbl_name [(col_name,...)] {VALUES | VAULE}(val1 ,...) ([expr |default],....),....
+            SELECT: 
+                SELECT  col1,col2 ... FROM  tbl_name;   
+                SELECT  col1,col2 ... FROM  tbl_name [WHERE clause][ORDER    BY 'col_name'][desc] [LIMIT] 
+
+                    字段表示
+                        *:所有字段
+                        as:字段别名，col1 AS alias1;
+                            空 IS NULL
+                            非空：IS NOT NULL
+                    WHERE clause :
+                        操作符：
+                            >, < ,==,<= ,>=,!=
+                            BETWEEN AND:
+                            LIKE:模糊匹配
+                                % :任意长度的字符串
+                                _:任意单个字符
+                            RLIKE:
+                            基于正则表达式
+                           SELECT * FROM students WHERE name RLIKE '.*u*'
+                           SELECT * FROM students WHERE name RLIKE '.*[A-G]u*' 
+                        条件逻辑操作
+                            and:
+                            or:
+                            not:
+                DELETE FROM :
+                    DELETE FROM tbl_name [WHERE clause ] [LIMIT] [m,in] | ORDER BY col_name [DESC] 
+                UPDATE:
+                    UPDATE tbl_name SET col=newval,col2=newval,...[WHERE clause ] [DESC] [LIMIT [m,]n];
+
+
+           DCL:
+
+
+
+           用户及帐号及权限管理：
+                用户帐号：'user@nost'
+                    user:用户名字
+                    host:此用户访问mysqld 服务允许通过哪些主机远程创建连接
+                        IP,网络地址，主机名，通配符(%和_)
+                    禁止检查主机名字：
+                        my.cnf, [mysqld]
+                        skip_name_resolve = yes 
+            创建用户账户：
+                CREATE USER 'username'@'host' [IDENTIFIED BY 'password'];
+                    CREATE USER 'wpuser'@'%' IDENTIFIED BY 'wps@ss';
+                    use mysql
+                    SELECT User,Host,PassWord,Password FROM
+                    mysql -uwpsuser -h172.16.100.9 -p 
+
+
+            删除用户:
+                DROP USER 'username'@'host';
+            授权：
+                权限：管理权限,数据库，表，字段，存储例程
+                
+                GRANT priv_type ,.... ON [object_type] db_name.tb_name|fun_name|proc_name TO'user'@'host' [IDENTIFY BY 'password'] [WITH GRANT OPTION]
+
+                    priv_type: ALL [PRIVILEGES]
+                    db_name.tb_name:
+                        *.*:所有库的所有表
+                        db_name.*:指定库的所有表
+                        db_name.tb_name:指定库的指定表
+                        db_name.routine_name:指定库的存储例程
+            查看指定用户获得的权限：
+                SHOW GRANTS FOR 'user'@'host';  
+                SHOW GRANTS FOR CURRENT_USER;
+            回收权限：
+                REVOKE priv_type,....ON db_name.tb_name FROM 'user'@'host'  
+
+
+         MariaDB服务进程启动时会读取mysql库中的所有授权表至内存中
+            (1) GRANT或REVOKE等执行的权限操作会保存于表中，MariaDB的服务进程 会自动重读授权表
+            (2)对于不能够或者不能及时重读授权表的命令，可以手动让mariadb的服务进程重读授权表格:
+                mysql > FLUSH PRIVILEGES;   
+
+
+    LAMP组合的编译安装:
+        httpd+php
+            modules:把php编译成httpd的DSO对象
+                prefork:libphp5
+                event,worker:libphp5-zts
+                       --enable-maintainer-zts
+            cgi:
+            fpm(fastcgi);php作为独立的服务
+
+
+        httpd对fastcgi协议的支持：
+            httpd-2.2:需要额外安装fcgi模块:
+            httpd-2.4:自带fcgi模块
+
+        安装次序：
+            httpd,MariaDB,php
+            编译安装
+            CentOS 6:
+            yum groupinstall "Development Tools" "Server Platform Development" -y       
+            yum install pcre-devel -y
+
+            CentOS 7:   
+            1,
+            get apr.tar.bz2 apr-util.tar.bz httpd-2.4.tar.bz2 phpMyAdmin.zip
+            tar xf      
+            ./configure --prefix=/usr/local/apr-util  --with-apr=/usr/local/apr
+            make && make install
+            2,httpd
+
+            ./configure --prefix=/usr/local/apache --sysconfdir=/etc/httpd24 --enable-so  --enable-ssl --enbale-cgi --enbale-rewrite -with-zlib --with-pcre -with-apr=/usr/local/apr    --with-apr-util=/usr/local/apr-util --enbale-modules=most   --enable-mpms-shared=all --with-mpm=event 
+            make && make install
+            cd /etc/rc.d/init.d
+            cp httpd httpd24
+            vim httpd24
+                 apachectl=/usr/local/apache/bin/apachectl 
+                 httpd=${HTTPD-/usr/local/apache/bin/httpd}
+                 pidfile=${PIDFILE-/usr/local/apache/bin/httpd24} //在httpd.conf文件中也有关于PIDFILE的定义,两者需要保持一致才可以 /usr/local/apache/logs/httpd.pid
+            chkconfig   --add httpd24
+            chkconfig   --list httpd24
+            hash -r //移除所有的缓存
+            vim /etc/profile.d/httpd.sh
+                export PATH=/usr/local/apache/bin:$PATH
+            ./etc/profile.d/httpd.sh
+            httpd -r 
+            hash
+            service httpd24 start
+            ss -tnl 80端口
+            httpd -M//装载的模块
+            cd /etc/httpd
+            vim httpd.conf
+                :/LoadModule 查看启用的模块
+            3,MariaDB
+            mariaDB.tar.gz
+            tar xf mariaDB.tar -C /usr/local
+            mkdir -pv /mydata/data
+            cd /usr/local
+            ln -sv mariaDB mysql
+            cd mysql
+            chown -R root.mysql ./* 
+            scripts/mysql_install_db --datadir=/mydata/data/ --user=mysql
+            mkdir /etc/mysql
+            cp support-files/my-large.cnf /etc/mysql/my.cnf
+            vim /etc/mysql/my.cnf
+                datadir = /mydata/data
+                innodb_file_per_table = on
+                skip_name_resolve = on
+            cp support-files/mysql.server /etc/rc.d/init.d/mysqld
+            chkconfig --add mysqld
+            service mysqld start
+            4,php
+            CentOS 7:
+            rpm -q php 
+            1,解决好依赖源
+                yum -y groupinstall "Desktop Platform  Development"
+                yum -y install bzip2-devel libmcrypt-devel
+                yum -y install libxml2-devel
+                 
+
+            2,编译安装php
+            tar xf php.tar.bz2
+            cd php
+            ./configure  --prefix=/usr/local/php --with=/usr/local/musql --with-openssl --with-mysqli=/usr/local/mysql/bin/mysql/bin/mysql_config --enable-mbstring --with-freetype-dir --with-jpeg-dir --with-zlib --with-libxml-dir=/usr --enable-sockets  --with-apxs2=/usr/local/apache/bin/apxs --with-mcrpyt --with-config-file-path=/etc --with-config-file-scan-dir=/etc/php.d --with-bz2  --enable-maintainer-zts
+            说明:
+            1,为了支持apache的worker或event两个MPM,编译时使用了--enable-maintainer-zts选项
+            2,如果使用PHP5
+            3版本为了连接Mysql数据库，可以指定mysqld,这样在本机不需要先安装Mysql或者Mysql开发包了，mysqld从php 5
+            3开始使用,可以编译时候绑定到它(而不是具体的Mysql客户端绑定形成依赖 ),但是从5.4开始它就是默认选项
+            ./configure --with-mysqld=mysqld --with-pdo-mysqlnd --with-mysqli=mysqlnd
+            make && make installs
+            为php提供配置文件
+            cp php.ini-production /etc/php.ini
+            编辑apache配置文件httpd.conf,以为apache支持php:
+            vim /etc/httpd/httpd.conf
+            :/AddType 
+            1)添加下面两行
+                 AddType application/x-httpd-php .php //所有.php结尾的类型识别
+                 AddType application/x-httpd-php-source .phps
+            :/DirectoryIndex
+            2),定位在DirectoryIndex index.php index.html
+
+            而后重新启动httpd,或让其重新载入配置文件即测试php是否已经正常工作
+            service httpd24 reload
+            service httpd24 restart
+            service httpd24 status
+            cd htdocs/
+            mv index.html index.php
+            vim index.php
+
+
+            测试页面index.php示例如下
+                <?php
+                    $link = mysqld_connnect('127.0.0.1','root','magedu');
+                    if($link)
+                        echo "Success";
+                    else
+                        echo "Failure";
+
+                    mysqld_close();
+                 ?>
+            unzip phpMyAdmin
+            mv phpMyAdmin /usr/local/apache/htdocs/pma
+            cd 
+            cp config.sample.inc.php config.inc.php
+            vim config.inc.php
+                $cfg['blowfish_secret'] = 'blowfish_secretcode'
+            /usr/local/mysql/bin/mysql
+            use mysql
+            UPDATE  user SET password=PASSWORD('mageedu') WHERE User='root'
+            SELECT User,Host,Password FROM user;
+            DROP  USER ''@'localhost';
+            DROP  USER ''@'node1.magedu.com';
+            SElECT User,Host,Password FROM user;
+            FLUSH PRIVILIEGES;
+
+            压力测试
+            ab -c -n 100 http://172.16.100.6/pma/index.php
+
+
+            编译xcache为php加速
+            xcache.tar.bz
+            cd xcache 
+            /usr/local/php/bin/phpize  //需要使用这一步生成响应configure文件
+            ./configure --enable-xcache --with-php-config=/usr/local/php/bin/php-config 
+            mkdir /etc/php.d
+            cp xcache.ini   /etc/php.d
+            vim xcache.ini
+                extension = /usr/local/php/extensions/no-debug-zts-20100525/xcache.so
+                xcache.size = //为xcache 分配的缓存大小
+            service  httpd24 reload
+
+
+            部分2配置apache-2.4.9以fpm方式的php
+            tar xf php.tar.bz2
+             ./configure  --prefix=/usr/local/php --with=/usr/local/musql --with-openssl --with-mysqli=/usr/local/mysql/bin/mysql/bin/mysql_config --enable-mbstring --with-freetype-dir --with-jpeg-dir --with-zlib --with-libxml-dir=/usr --enable-sockets --enable-fpm  --with-mcrpyt --with-config-file-path=/etc --with-config-file-scan-dir=/etc/php.d --with-bz2  
+             service httpd24 stop
+             cd /etc/httpd24
+             mv httpd.conf httpd.conf.mod_php
+             cp httpd.conf.bak httpd.conf
+           为php提供配置文件
+           mkdir /etc/php5{,.d}
+           cp php.ini-production /etc/php.ini
+           
+
+
+            为php-fpm提供SysV init脚本 并将其添加至服务列表：
+            cp sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm
+            chmod +x /etc/rc.d/init.d/php-fpm
+            chkconfig --add php-fpm
+            chkconfig --list php-fpm
+
+            为php-fpm提供配置文件
+            cd etc/
+            cp php-fpm.conf.default php-fpm.conf
+            cp /usr/local/php5/etc/php-fpm.conf.default /usr/local/php5/etc/php-fpm.conf
+            vim php-fpm.conf 
+                pm.max_children = 50
+                pm.start_servers = 5
+                pm.min_spare_servers = 2
+                pm.max_spare_servers = 5
+                pid = /usr/local/php/var/run/php-fpm.pid
+            service php-fpm start
+            ps aux |grep fpm
+
+        配置httpd-2.4.9  
+
+        1,启用httpd的相关模块
+        在Apache httpd 2.4以后已经专门有一个针对fastCGI的实现，此模块为mod_proxy_fcgi.so,它其实是作为mod_proxy.so模块的扩展，因此者两个模块都要加载
+        LoadModule proxy_module modules/mod_proxy.so
+        LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
+
+        2,配置虚拟主机支持使用fcgi
+        在相应的虚拟主机中添加类似如下的两行
+            ProxyRequest Off 
+            ProxyPassMatch ^/(.*.php)$  fcgi://127.0.0.1:9000/PATH/TO/DOCUMENT_ROOT/$1
+
+
+        http://www.mageedu.com
+
+        /web/host1/admin/index.php
+        fcgi://127.0.0.1:9000/web/admin/index.php
+
+        
+
+        例如;
+        <VirtualHost *:80>
+            DocumentRoot "/www/magedu.com"
+            ServerName  magedu.com
+            ServerAlias www.magedu.com
+
+
+         ProxyRequests Off //关闭正向代理
+         ProxyPassMatch ^/(.*.php)$  fcgi://127.0.0.1:9000/www/magedu.com/$1 //把以为.php结尾的文件请求发送到php-fpm进程，php-fpm至少需要知道运行的目录和URL,
+
+         <Directory "/www/magedu.com">
+            Options none
+            AllowOverride   none
+            Require all granted
+         </Directory>
+     </VirtualHost>
+
+
+     3,编辑apache配置文件httpd.conf,让apache能识别php格式的页面，并支持php格式的主页
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+             
+
+
+
+
+
+
+
+
+
+                    
+
+
+
+
+            eg:
+                CREATE  DATABASE testdb
+                use testdb
+                CREATE  TABLE students (id int UNSIGED NOT NULL PRIMARY KEY,name VARCHAR   (20) NOT NULL,age tinyint UNSIGED)
+                CREATE  TABLE students (id int UNSIGED NOT NULL  KEY,name VARCHAR   (20) NOT NULL,age tinyint UNSIGED ,PRIMARY KEY(id,name))
+                DESC student
+                ALTER TABLE students ADD UNIQUE KEY(name)
+                ALTER TABLE students ADD INDEX(age)
+                SHOW INDEXES FROM students 
+                CREATE INDEX
+                INSERT INTO students VALUES (1,'Yang Guo','m'),(2,'Guo Xiang','f');
+                INSERT INTO  stidents (sid,name) VALUES (3,'zan  ')
+                SELET * RFRON  students
+
+                
+
+                                 
+
+
+
+                         
+
+
+
+        
+
+锁实现资源的竞争
+        
+
+
+        
+    
+
+
+
+
+
+
+
+
+                
+                
+
+
+
+
+
+
+
+
+
+     
+        
+
+
+
+
+
+

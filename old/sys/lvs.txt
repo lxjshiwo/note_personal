@@ -1,0 +1,311 @@
+Linux Cluster
+    LB:负载均衡
+    HA:高可用
+
+WEB Arch:
+
+虚拟化和云计算
+
+自动化运维工具：ansible,puppet,zabbix
+
+大数据处理平台：hadoop 2,storm,spark,zookeeper
+
+PaaS,ELK
+
+
+LB:
+    Cluster:
+        
+        LAMP:
+
+        httpd --->应用程序--->数据库管理系统
+
+        系统扩展的方式:
+            scale up:向上扩展，更换性能更好的主机
+            scale out:向外扩展,增加更多的主机
+        集群类型：
+            LB:负载均衡集群,load Balancing 
+            HA:高可用集群，High Availability
+            HP:高性能集群，High Performancing 
+
+            Aavailability=平均无故障时间/所有时间
+            Aavailability=90%,95%,99%,99.5%,99.99%
+
+
+            DNS服务有缓存导致负载均衡的效果差
+            在存储位置需要考虑读写分离
+
+
+		                               读操作
+		              ---->应用程序-----------> 从服务器 从服务器
+		             /                 \ 写操作      |复制/复制
+		        http ---->应用程序----- ----->  主要服务器
+		             \                 /
+负载均衡器/调度器     ---->应用程序----
+		        http
+
+
+        系统：
+            可扩展性
+            可用性
+            容量
+                单个时间内完成的总量
+            性能
+                单位时间内的通过量,响应时间
+
+        系统运维:可用 --> 标准化 --> 自动化
+
+            www.top500.org
+        构建高可扩展性系统的重要原则：
+            在系统内部尽量避免串行化和交互
+        GSLB:Global Service Load Balancing 
+            SLB:Service Load Balancing 
+        CDN:内容分发网络
+
+        总结
+            分层：
+            分割：
+            分布式：
+                分布式应用：
+                分布式静态资源：
+                分布式数据和存储：
+                分布式计算：
+
+        LB集群的实现：
+            硬件:
+               F5 BIG-IP 
+               Citrix NetScaler
+               A10 A10
+               Array
+               Redware
+            软件
+                lvs
+                haproxy
+                nginx
+                ats(apache traffic server)
+                perlbal
+                varnish缓存代理服务器
+                    
+            基于工作的层次划分
+                传输层:
+                    lvs,haproxy(mode tcp)
+                应用层:
+                    haproxy,nignx,ats,perlbal
+lvs:
+    章文嵩:正明 
+    linux  virtual  server
+    layer4:四层交换机，四层路由
+        根据目标请求报文的目标ip和port 将其转发至后端主机集群中的某台主机(根据挑选算法)：
+        netfilter:
+            PREROUTING --> INPUT
+            PREROUTING --> FORWARD -->POSTROUTING
+            OUTPUT -->  POSTROUTING
+
+    lvs:
+        ipvsadm/ipvs
+
+        ipvsadm:用户空间的命令行工具，用于管理集群服务
+        ipvs:工作于内核中的netfilter INPUT钩子上;
+
+        支持TCP,UDP,AH,EST,AH_EST,SCTP等诸多协议
+
+    lvs arch:
+        调度器：director,dispatcher,balancer
+        RS:Real Server
+
+        Client IP:CIP
+        Director Virtual IP:VIP
+        Director IP:DIP
+        Real Server IP:RIP
+
+    lvs type:   
+        lvs-nat:
+        lvs-dr(direct routing)
+        lvs-tun(ip-tunneling)
+        lvs-fullnat 
+
+
+        lvs-nat:
+            多目标的DNAT(iptables):通过修改请求报文的目标IP地址(同时可能会修改目标端口)至挑选出某RS的RIP地址实现转发:
+
+
+            (1)RS应该和DIP应该使用私网地址，且RS的网关要指向DIP  
+            (2)请求和响应报文都必须经由director转发,极高负载的场景中，director可能会成为系统瓶颈
+            (3)支持端口映射
+            (4)RS可以使用任意os
+            (5)RIP和Director 的DIP必须在同一IP网段
+
+        lvs-dr:direct routing
+            通过修改请求报文的目标MAC地址进行转发:
+                Director:VIP,DIP
+                RSs:RIP，VIP
+
+            (1)保证前端路由器将目标IP为VIP的请求发送给director
+                解决方案：
+                    静态绑定，
+                    arptables
+                    修改RS主机内核参数
+            (2)RS的RIP可以使用私有地址，但也可以使用公网地址
+            (3)RS跟Director必须在同一物理网络中(由交换机分割)
+            (4)请求报文经由于Director调度，但是响应报文一定不能经过Director
+            (5)不支持端口映射
+            (6)RS可以是大多数OS
+            (7)RS的网关不能指向DIP:
+
+回顾
+    Linux Cluster：
+        LB,HA,HP
+            LB:
+                软件:lvs,haproxy,nginx,ats
+                硬件F5
+        
+        LVS:
+            ipvsadm/ipvs
+
+            Director/RealServer
+                Client --> Director --> RS#(scheduler)
+
+            LVS-TYPE:
+                lvs-nat : MASQUERADE 地址伪装
+                lvs-dr: GATEWAY
+                lvs-tun: IPIP
+                lvs-fullnat 
+
+            lvs-nat:请求报文和响应报文都经过director 
+            lvs-dr:仅请求报文经过director,响应报文是由于RS直接响应给client
+ipvs(2)
+    
+    lvs-type:
+        lvs-nat: RIP与BIP必须在同一网段:
+        lvs-dr:Director与RS必须在同一物理网络中:
+        lvs-tun:
+            不修改请求报文的ip首部，而是通过在原有的ip首部之外，再封装一个首部(dip <--> rip)
+	            (1) RIP,DIP,VIP全部为公网地址
+	            (2) RS的网关不能指向DIP
+	            (3) 请求报文必须经由director调度，但是响应报文不能经由director
+	            (4)不支持端口映射   
+	            (5)RS的OS必须支持隧道功能
+        lvs-fullnat:
+            director 通过同时修改请求报文目标地址和源地址进行转发
+                (1)VIP是公网地址：RIP和DIP是私网地址，二者无须在同一网络中
+                (2)RS接受到的请求报文的源地址是dip因此要响应给dip
+                (3)请求报文和响应报文都必须经由Director 
+                (4)支持端口映射机制
+                (5)RS可以使用任意OS
+http:stateless
+    session保持:
+        session绑定:
+            source ip hash
+            cookie hash
+        session集群:
+        session服务器:
+
+lvs scheduler:
+    静态方法：仅根据算法本身进行调度:起点公平
+        RR:round robin,轮调
+        WRR:weighted rr,
+        SH:source ip hash,实现session保持的机制:将来自于同一个ip的请求始终调度至同一个RS
+        DH:destination hash,将对同一个目标的请求始终发往同一个RS
+    动态方法：根据算法及各RS的当前负载状态进行调度:结果公平
+            Overhead = 
+        LC:least connection
+            Overhead = Active *256 + Inactive
+        WLC:
+            weighted LC
+            Overhaead= (Active*256+Inactive)/weight
+        SED:Shortest Expect Delay
+           Overhead =(Active+1)*256/weight
+           保证权重最大的响应结果
+        NQ:Never Queue
+           SED算法改进 
+        LBLC:locality-Based LC:动态的DH算法
+            正向代理情况下的cache server调度
+        LBLCR:locality-Based Least-Connection with Replication带复制功能的LBLC算法
+            
+ipvs的集群服务：
+    tcp,udp,ah,esp,ah_esp,sctp
+
+    (1)一个ipvs主机可以同时定义多个cluster service
+        tcp udp
+    (2)一个cluster service 上至少应该有一个real server:
+
+        定义时：指明lvs-type,以及lvs scheduler
+
+ipvsadm用法:
+    管理集群服务：
+        ipvsadm -A|E -t|u|f service-address [-s scheduler]
+        ipvsadm -D -t|u|f service-address
+
+        service-address:
+            tcp:-t ip:port
+            udp:-u ip:port
+            fwm:-f mark防火墙标记
+            ip[:port]
+
+        -s scheduler 
+             默认为wlc
+
+
+    管理集群服务中的RS:
+        ipvsadm -a|e -t|u|f service-address -r server-address [-g|i|m] [-w weught]
+        ipvsadm -d -t|u|f service-address -r server-address
+
+        server-address
+            ip[:port]
+
+         lvs-type:
+            -g:gateway,dr
+            -i:ipip，tun
+            -m:masqueue,nat
+
+    清空和查看：
+        ipvsadm -C
+        ipvsadm -L|l [options]
+        
+    保存和重载
+        ipvsadm -R 
+        ipvsadm -S [-n]
+
+    置零计数器:
+        ipvsadm -Z [-t|u|f service-address]
+
+回顾：
+    lvs:l4 switch,l4 router
+        vip,port,{tcp|udp}
+
+    lvs-type:
+        lvs-nat,masquerade
+        lvs-dr,gateway
+        lvs-tun,ipip
+        lvs-fullnat(keepalived)自动生成 
+
+    lvs scheduler:
+
+        static:rr,wrr,sh,dh
+        dynamic:lc,wlc,sed,nq,lblc,lblcr
+            overhead:active connections,inactive connections
+
+    lvs-dr:vip,dip/rip
+
+
+        bridge,nat,host-only,
+
+
+        
+
+	            
+
+
+
+
+
+
+            
+
+
+                
+             
+
+
+
+        

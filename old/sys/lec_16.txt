@@ -1,0 +1,173 @@
+LVM2:
+    logical Volume Manager  Version2
+  
+    dm:device mapper:将一个 或多个底层块设备组织成一个逻辑设备：
+        /dev/dm-#
+
+    /dev/mapper/VG_NAME-LV_NAME
+        /dev/mapper/vo10-root <--/dev/VG_NAME/LV_NAME(/dev/vo10/root)(符号链接)
+    /dev/VG_NAME/LV_NAME
+        /dev/vo10/root  
+
+LV                           PE:Phsical Extent 
+--------------------------
+            vg 
+---------------------------
+PV    |   pv     |   pv   |
+
+
+
+
+    实验 lvm 
+    fdisk /dev/sda 
+    p 
+    n                       
+    3
+    +10G    
+    n
+    e  extend
+    4
+    n
+    +5G
+    n
+    +8G
+    p
+    l
+    8e linux lvm 
+    t   3,5,6都调整为逻辑卷为linux lvm 为Linux lvm的卷
+    partx -a /dev/sda 加载新的分区信息
+    pv管理工具
+        pvs :简要显示pv信息
+        pvdisplay:显示pv详细信息
+
+        pvcreate /dev/DEVICE: 创建pv
+
+        pvremove /dev/DEVICE
+
+    vg管理工具
+        vgs 
+        vgdisplay 
+        vgcreate 
+                [Volume Group name]  /dev/DEVICE
+                -s  # 指定vg的pe大小    
+        vgentend [Volume Group name] /dev/DEVICE
+        vgreduce [Volume GROUP name] /
+                在使用前需要使用pvmove 将pv上的pe移动到其他的分区上
+        vgremove 
+
+
+    lv管理工具
+        lvs 
+        lvdisplay 
+
+        lvcreate 
+                -L #[nMgGtT] -n NAME VolumeGroup 必须在卷组中有足够的空间
+        创建逻辑卷过程
+        lvcreate -L 2G -n mylv mvvg
+        ls /dev/mappers 下出现相关的设备名字，则可以进行相关的操作挂载等的
+        mvg-mylv
+        mke2fs -t ext4 -b 1024 -L MYLV /dev/myvg/mylv
+        mkdir /backup
+        mount /dev/myvg/mylv /backup/
+        ls -l /backup/ 任何一个新的文件系统在创建后会有一个lost+found目录出现
+        cp /etc/grub.conf /backup/
+
+    扩展逻辑卷：
+        lvextend 
+              -L [+]#[mMgGtT] /dev/VG_NAME/LV_NAME 可以直接增加到目标的大小，+则增加相对之前
+              支持在线在线修改逻辑卷大小  
+            #lventend -L[+]#[mMgGtT] /dev/VG_NAME/LV_NAME   
+            #resize2fs /dev/VG_NAME/LV_NAME
+
+        lvextend -L 5G /dev/myvg/mylv
+        在扩展了lv的空间后还需要扩展文件系统的分区
+        resize2fs /dev/myvg/mylv
+
+
+    缩减逻辑卷：
+        不允许联机进行
+        #umount /dev/VG_NAME/LV_NAME
+        #e2fsck -f /dev/VG_NAME/LV_NAME
+        #resize2fs /dev/VG_NAME/LV_NAME #[mMgGtT]
+        #lvreduce -L [-]#[mMgGgtT] /dev/VG_NAME/LV_NAME 
+        #mount
+
+
+    快照：snapshot 
+    创建快照卷需要与原卷在同一个分区上，其链接属于硬链接,复制的新文件
+        lvcreate -L #[mMgGtT] -p r -s -n snapshot_LV_NAME oriinal_lv_NAME
+        eg,
+            lvcreate -s -L 512M -n mylv-snap -p r /dev/myvg/mylv
+            mount /dev/myvg/mylv-snap /mnt
+
+        lvremove /dev/VG_NAME/LV_NAME
+            先umount 然后再使用,lvremove  
+            umount /backup/
+            lvremove /dev/myvg/mylv
+            vgremove myvg 
+            pvremove /dev/sda3
+            pvremove /dev/sda5
+            
+    练习：
+        创建一个至少有两个pv组成的大小为20G的testvg的VG;要求PE大小为16mb
+        而后在卷组中创建大小为5g的逻辑卷testlv, 挂载至/users目录
+        创建用户archlinux 要求其家目录为/users/archlinux 而后su切换至archlinux用户，复制/etc/pam.d目录至自己的家目录；
+        扩展testlv至7g，要求archlinux用户的文件不能丢失：
+        收缩teslv至3g,要求archlinux用户文件不能丢失
+        对testlv创建快照，并尝试基于快照备份数据，验证快照功能
+
+
+    文件挂载使用
+        挂在光盘文件：
+            光盘设备文件：
+                IDE: /dev/hdc
+                SATA: /dev/sr0
+
+                符号链接文件：
+                    /dev/cdrom
+                    /dev/cdrw
+                    /dev/dvd
+                    /dev/dvdrw  
+
+            mount -r /dev/cdrom /media/cdrom    
+            umount /dev/cdrom
+
+
+            eg,
+              mkdir /media/cdrom
+              mount -r /dev/cdrom /media/cdrom 
+        dd命令：convert and copy a file 
+            用法：
+                dd if=/PATH/FROM/SRC of=/PATH/TO/DEST
+                    bs= #:block size,复制单元格大小 单位字节
+                    count=#:复制多少个bs    
+
+            dd if=/etc/fstab of=/tmp/fstab bs=1 count=100
+            复制前100字节
+            
+            磁盘拷贝:
+            dd if=/dev/sda of=/dev/sdb
+            备份MBR：
+                dd if=/dev/sda of=/tmp/mbr.bak bs=512 count=1
+
+            清除MBR：
+                dd if=/dev/zero of=/dev/sda bd=256 count=1
+                
+            分区还在，有意破坏bootloader
+                dd if=/dev/zero of=/dev/sda bd=256 count=1
+
+            两个特殊设备：
+                /dev/null； 数据黑洞
+                /dev/zero: 吐零机；
+                    
+
+            
+            
+
+
+
+
+
+
+
+                

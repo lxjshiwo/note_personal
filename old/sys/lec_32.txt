@@ -1,0 +1,70 @@
+bash脚本编程；
+    
+    编程语言
+        数据结构：
+
+        顺序执行:
+        选择执行：
+            条件测试：
+                运行命令或[[ EXPRESSION ]]
+                    执行状态返回值;
+                if
+                case 
+            循环执行：
+                将某段代码段重复运行多次
+                重复运行多少次
+                    循环此时已知道
+                    循环此时未知道
+
+                    必须有进入条件和退出条件
+
+                for, while, until 
+
+
+            函数：结构化编程以及代码复用
+                function
+
+    for循环语句
+        for name in list ;do
+            循环体
+        done
+
+        列表生成方式：
+            (1)整数列表
+                {start..end}
+                $(seq start [[step]end])
+            (2)glob
+                /etc/rc.d/rc3.d/k*
+            (3)命令
+                ls cat 非交互式生成列表
+    while循环：
+        while CONDITION; do 
+            循环体
+        done 
+
+        CONDITION：循环控制条件 进入循环之前做一次判断，每一次循环结束后再次做判断
+            条件为“true”，则执行一次循环；直到条件测试状态为flase 终止循环
+            因此：CONDITION一般应该有循环控制变量； 而此变量的值会在循环体内不断修正；
+
+            declare -i i=1
+            declsre -i users=0
+
+            while[ $i -le 10]; do 
+                if !id user$i $> /dev/null; then 
+                    useradd user$i
+                    echo "Add user: user$i."
+                    let users++
+                fi
+                let i++
+            done 
+
+            echo "Add $users users."
+
+
+            
+                
+                    
+
+
+
+

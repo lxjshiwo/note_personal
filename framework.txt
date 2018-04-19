@@ -1,0 +1,7 @@
+	启动页面(LauncherActivity)			
+	主页面布局
+		
+
+		
+
+
