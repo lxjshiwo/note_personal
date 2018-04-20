@@ -221,9 +221,53 @@ OkHttp多线程下载
             文件管理
             url加密
         2.线程池管理
+
+
+线程池管理和任务队列
+    线程池的实现原理
+        减少线程的创建和申请
+        ThreadPoolExecutor
+
+                首先启动核心线程
+                当核心线程数目满后，后续会往队列中提交数据，提交任务超过队列数目
+                判断相应的最大线程数目，如果也超过最大线程数目将会抛出异常
+                corePoolSize
+                maximumPoolSize
+                keepAliveTime
+                    
+                unit
+                BlockingQueue
+                    SynchronousQueue
+                    LinkedBlockingDeque<Runnable>
+                        没有队列数目的限制，将会导致资源的不断消耗 
+                    ArrayBlockingQueue<Runnable>(opacity)
+                        指定相应队列的数目
+
+
+    队列
+        所有任务在执行过程中按照先进先出的方式排列 
+        避免系统出现一瞬间大量请求的问题 
+            有限队列
+                    SynchronousQueue
+                        满足生产者消费者模式
+                    ArrayBlockingQueue<Runnable>(opacity)
+            无限队列
+                    LinkedBlockingDeque<Runnable>
+
+    阻塞队列
+    终止线程
+        1.使用一个runnable类内变量
+        2.使用Thread.interrupted() 与 thread.interrupt()来进行操作,在
+        printStackTrace()后执行return
+        3.volatile保证变量在修改的时候立刻同步到关联程序中
+        修改相应的变量 并发送interrupt指令 
+        while(flag && !Thread.interrupted())
+        {
+                do something
+        }
+    注意事项
+        
          
-
-
 
 
 
